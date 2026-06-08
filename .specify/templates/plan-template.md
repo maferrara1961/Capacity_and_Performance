@@ -20,7 +20,7 @@
 
 **Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Primary Dependencies**: [existing runtime/platform APIs only; new external libraries are prohibited]
 
 **Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
@@ -40,7 +40,18 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **TDD**: Tests are planned before implementation, including unit tests for domain rules and
+  validation plus integration/end-to-end tests for protected user flows where applicable.
+- **SOLID / Clean Architecture**: Domain, application, adapter, and infrastructure boundaries are
+  identified; dependencies point inward and domain code is independent of frameworks and persistence.
+- **DRY / YAGNI**: The plan avoids duplicated domain logic and speculative abstractions; any shared
+  abstraction has at least two concrete uses or a required architecture boundary.
+- **PascalCase**: Project-defined code symbols and artifacts use PascalCase where the language and
+  runtime allow it; unavoidable external convention exceptions are documented.
+- **No New External Libraries**: The plan does not add packages, SDKs, hosted services, or other
+  external dependencies. Any such need is a constitution violation requiring amendment first.
+- **Validation and Auth**: User-controlled inputs, validation failures, protected routes, and
+  authentication/authorization checks are explicitly identified.
 
 ## Project Structure
 
