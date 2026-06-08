@@ -9,6 +9,13 @@ ContainerImages/VictoriaMetrics/Containerfile
 ContainerImages/Grafana/Containerfile
 ContainerImages/PostgreSQL/Containerfile
 ContainerImages/CapacityEngine/Containerfile
+Scripts/StackCommon.sh
+Scripts/BuildImages.sh
+Scripts/StartStack.sh
+Scripts/StopStack.sh
+Scripts/StackLogs.sh
+Scripts/StackStatus.sh
+Scripts/CleanupStack.sh
 Config/Grafana/Datasources/Datasources.yml
 Config/Grafana/Dashboards/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
@@ -22,18 +29,18 @@ Sql/Seed/SampleCatalog.sql
 
 for FilePath in $RequiredFiles; do
   if [ ! -f "$FilePath" ]; then
-    echo "Missing required file: $FilePath" >&2
+    echo "Falta archivo requerido: $FilePath" >&2
     exit 1
   fi
 done
 
 if grep -R "pip install\\|requirements.txt\\|poetry\\|pipenv" CapacityEngine ContainerImages/CapacityEngine Config/StackManifest.yml >/dev/null 2>&1; then
-  echo "Unapproved application-code dependency detected" >&2
+  echo "Dependencia de codigo de aplicacion no aprobada detectada" >&2
   exit 1
 fi
 
 if [ "${1:-}" = "--load-sample-data" ]; then
-  echo "Sample data available at Sql/Seed/SampleCatalog.sql"
+  echo "Datos de ejemplo disponibles en Sql/Seed/SampleCatalog.sql"
 fi
 
-echo "Stack validation passed"
+echo "Validacion del stack completada correctamente"

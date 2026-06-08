@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
 set -eu
 
-echo "Stop stack placeholder: stop the Podman containers declared in Config/PodmanStack.yml."
+. "$(dirname "$0")/StackCommon.sh"
+
+RequireRuntime
+
+for Service in $STACK_STOP_ORDER; do
+  Container="$(ContainerFor "$Service")"
+  Info "deteniendo $Service ($Container) sin borrar volumenes persistentes"
+  RunPodman stop "$Container" || Info "$Service ya estaba detenido o no existe"
+done
+
+Info "stop finalizado; los volumenes persistentes fueron preservados"
