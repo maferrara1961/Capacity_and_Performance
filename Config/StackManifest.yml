@@ -1,0 +1,13 @@
+approved_runtime_components:
+  - Podman
+  - Zabbix
+  - VictoriaMetrics
+  - Grafana
+  - PostgreSQL
+  - CapacityEngine
+application_code_dependencies: []
+license_cost_services: []
+policy:
+  no_external_application_libraries: true
+  python_standard_library_only: true
+  protected_dashboards: true

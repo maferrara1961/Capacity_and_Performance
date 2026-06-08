@@ -1,0 +1,6 @@
+FROM python:3.11-slim
+LABEL org.opencontainers.image.title="Capacity Engine"
+LABEL org.opencontainers.image.description="Python standard-library capacity calculation engine"
+WORKDIR /app
+COPY CapacityEngine /app/CapacityEngine
+CMD ["python", "-m", "CapacityEngine.Scheduler.DailyCapacityRun"]

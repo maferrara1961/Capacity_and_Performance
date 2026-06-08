@@ -1,0 +1,10 @@
+{
+  "title": "Application Dashboard",
+  "tags": ["capacity", "application"],
+  "timezone": "browser",
+  "panels": [
+    {"title": "Application Health", "type": "stat", "targets": [{"rawSql": "select Name, HealthStatus from Application"}]},
+    {"title": "Associated Infrastructure", "type": "table", "targets": [{"rawSql": "select ServiceId, ResourceId, Role, ImpactWeight from ServiceResourceMap"}]},
+    {"title": "Critical Dependencies", "type": "table", "targets": [{"rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical')"}]}
+  ]
+}

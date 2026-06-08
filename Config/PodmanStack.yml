@@ -1,0 +1,25 @@
+version: "1.0"
+services:
+  postgresql:
+    image: localhost/capacity-postgresql:latest
+    containerfile: ContainerImages/PostgreSQL/Containerfile
+    ports:
+      - "5432:5432"
+  victoriametrics:
+    image: localhost/capacity-victoriametrics:latest
+    containerfile: ContainerImages/VictoriaMetrics/Containerfile
+    ports:
+      - "8428:8428"
+  zabbix:
+    image: localhost/capacity-zabbix:latest
+    containerfile: ContainerImages/Zabbix/Containerfile
+    ports:
+      - "8080:8080"
+  grafana:
+    image: localhost/capacity-grafana:latest
+    containerfile: ContainerImages/Grafana/Containerfile
+    ports:
+      - "3000:3000"
+  capacityengine:
+    image: localhost/capacity-engine:latest
+    containerfile: ContainerImages/CapacityEngine/Containerfile

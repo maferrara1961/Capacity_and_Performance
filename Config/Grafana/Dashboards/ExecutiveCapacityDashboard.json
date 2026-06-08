@@ -1,0 +1,11 @@
+{
+  "title": "Executive Capacity Dashboard",
+  "tags": ["capacity", "executive"],
+  "timezone": "browser",
+  "panels": [
+    {"title": "Overall Capacity State", "type": "stat", "targets": [{"rawSql": "select OverallRisk from RiskAssessment order by CalculatedAt desc limit 1"}]},
+    {"title": "Top 10 Saturation Risks", "type": "table", "targets": [{"rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment order by CalculatedAt desc limit 10"}]},
+    {"title": "Forecast 30/60/90 Days", "type": "table", "targets": [{"rawSql": "select ResourceId, Forecast30Days, Forecast60Days, Forecast90Days, DaysToSaturation from ForecastResult"}]},
+    {"title": "Recommendations", "type": "table", "targets": [{"rawSql": "select Priority, Action, Reason from Recommendation where Status = 'Open'"}]}
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Technical Performance Dashboard",
+  "tags": ["capacity", "technical"],
+  "timezone": "browser",
+  "panels": [
+    {"title": "CPU Memory Disk Network IOPS", "type": "timeseries", "targets": [{"expr": "{resource_id=~\"$Resource\"}"}]},
+    {"title": "Average Peak P95", "type": "table", "targets": [{"rawSql": "select ResourceId, MetricName, AverageUtilization, PeakUtilization, P95Utilization from CapacityKpi"}]},
+    {"title": "Threshold Breaches", "type": "table", "targets": [{"rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical')"}]}
+  ]
+}

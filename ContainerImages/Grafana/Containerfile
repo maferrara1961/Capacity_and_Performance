@@ -1,0 +1,5 @@
+FROM grafana/grafana-oss:latest
+LABEL org.opencontainers.image.title="Capacity Grafana"
+LABEL org.opencontainers.image.description="Self-hosted Grafana OSS dashboards for capacity observability"
+COPY Config/Grafana/Datasources /etc/grafana/provisioning/datasources
+COPY Config/Grafana/Dashboards /etc/grafana/provisioning/dashboards

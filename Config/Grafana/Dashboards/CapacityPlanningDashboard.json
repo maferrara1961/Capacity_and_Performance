@@ -1,0 +1,10 @@
+{
+  "title": "Capacity Planning Dashboard",
+  "tags": ["capacity", "planning"],
+  "timezone": "browser",
+  "panels": [
+    {"title": "Monthly Growth", "type": "table", "targets": [{"rawSql": "select ResourceId, MetricName, MonthlyGrowthRate from CapacityKpi"}]},
+    {"title": "Exhaustion Date Estimate", "type": "table", "targets": [{"rawSql": "select ResourceId, DaysToSaturation from ForecastResult"}]},
+    {"title": "Headroom And Baseline", "type": "table", "targets": [{"rawSql": "select ResourceId, HeadroomAvailable, BaselineDelta from CapacityKpi"}]}
+  ]
+}

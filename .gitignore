@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+*.log
+.env
+.env.*
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+*.egg-info/
+coverage/
