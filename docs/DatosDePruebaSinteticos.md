@@ -33,6 +33,9 @@ Los dashboards optimizados se validan con esos cuatro perfiles:
 - `critical`: confirma top 5 de riesgos, forecast 30/60/90 y recomendaciones ejecutivas.
 - `mixed`: confirma comparacion tecnica, outliers, sobredimensionamiento y subdimensionamiento.
 
+En Grafana, cada dashboard incluye un cuadro informativo inicial `Como leer este dashboard`. Ese
+cuadro explica que muestra la vista, como interpretar los resultados y que accion sugerida tomar.
+
 Antes de recrear cada lote, el script intenta borrar el lote con el mismo identificador para que la
 ejecucion sea repetible. Si Zabbix rechaza muestras historicas por permisos o cache de configuracion,
 la carga continua con hosts/items sinteticos creados para validar `Monitoring > Latest data`.

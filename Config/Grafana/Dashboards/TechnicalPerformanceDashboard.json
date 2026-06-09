@@ -7,12 +7,23 @@
   "refresh": "30s",
   "panels": [
     {
+      "id": 100,
+      "title": "Como leer este dashboard",
+      "description": "Guia visible para interpretar los cuadros tecnicos de performance.",
+      "type": "text",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {
+        "mode": "markdown",
+        "content": "### Que muestra\nEste tablero separa performance tecnica por CPU, RAM, storage, IOPS, red, latencia, throughput, errores y saturacion.\n\n### Como interpretarlo\nPicos altos y P95 alto indican consumo sostenido; errores y latencia altos indican degradacion de servicio; saturacion alta indica riesgo operativo. Si no hay datos, falta carga o rango para esa metrica.\n\n### Accion sugerida\nEmpezar por Top Consumers And Outliers, confirmar la metrica afectada y revisar Threshold Breaches para priorizar remediacion."
+      }
+    },
+    {
       "id": 1,
       "title": "CPU Utilization",
       "description": "CPU performance by resource and load identifier. Missing data means no CPU samples are available for the selected range.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 0},
+      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 4},
       "targets": [{"refId": "A", "expr": "synthetic_cpu", "legendFormat": "CPU {{resource_id}} {{load_id}}"}]
     },
     {
@@ -21,7 +32,7 @@
       "description": "Memory performance by resource and load identifier.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 0},
+      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 4},
       "targets": [{"refId": "A", "expr": "synthetic_ram", "legendFormat": "RAM {{resource_id}} {{load_id}}"}]
     },
     {
@@ -30,7 +41,7 @@
       "description": "Storage performance by resource and load identifier.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 0},
+      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 4},
       "targets": [{"refId": "A", "expr": "synthetic_storage", "legendFormat": "Storage {{resource_id}} {{load_id}}"}]
     },
     {
@@ -39,7 +50,7 @@
       "description": "IOPS and network indicators for operational bottleneck diagnosis.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 7},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 11},
       "targets": [
         {"refId": "A", "expr": "synthetic_iops", "legendFormat": "IOPS {{resource_id}} {{load_id}}"},
         {"refId": "B", "expr": "synthetic_network", "legendFormat": "Network {{resource_id}} {{load_id}}"}
@@ -51,7 +62,7 @@
       "description": "Application-style performance signals for end-to-end diagnosis.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 7},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 11},
       "targets": [
         {"refId": "A", "expr": "synthetic_latency", "legendFormat": "Latency {{resource_id}} {{load_id}}"},
         {"refId": "B", "expr": "synthetic_throughput", "legendFormat": "Throughput {{resource_id}} {{load_id}}"},
@@ -64,7 +75,7 @@
       "description": "Saturation signal by resource and scenario.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 15},
+      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 19},
       "targets": [{"refId": "A", "expr": "synthetic_saturation", "legendFormat": "Saturation {{resource_id}} {{load_id}}"}]
     },
     {
@@ -73,7 +84,7 @@
       "description": "Operational KPI table with average, peak, and P95 utilization.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 15},
+      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 19},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, AverageUtilization, PeakUtilization, P95Utilization from CapacityKpi order by P95Utilization desc, CalculatedAt desc limit 50"}]
     },
     {
@@ -82,7 +93,7 @@
       "description": "Highest consumers with ServiceId and ResourceId context for prioritizing operations work.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 15},
+      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 19},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, k.ResourceId, k.MetricName, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId order by k.P95Utilization desc, k.PeakUtilization desc limit 20"}]
     },
     {
@@ -91,7 +102,7 @@
       "description": "Warning and Critical conditions with resource/service severity context.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 22},
+      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 26},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeId, OverallRisk, Reason, CalculatedAt from RiskAssessment where OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc limit 50"}]
     }
   ]

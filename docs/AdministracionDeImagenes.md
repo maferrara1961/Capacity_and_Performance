@@ -89,6 +89,8 @@ Scripts/GenerateVerificationBatches.sh DemoFull001
 
 Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
 
+- Cada dashboard comienza con `Como leer este dashboard`, que explica que muestra cada vista, como
+  interpretar los cuadros y que accion tomar.
 - `Executive Capacity Dashboard`: decision ejecutiva y acciones priorizadas.
 - `Technical Performance Dashboard`: diagnostico operativo por recurso y metrica.
 - `Capacity Planning Dashboard`: crecimiento, headroom, baseline y sizing.

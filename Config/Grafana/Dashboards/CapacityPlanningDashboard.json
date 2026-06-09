@@ -7,12 +7,23 @@
   "refresh": "30s",
   "panels": [
     {
+      "id": 100,
+      "title": "Como leer este dashboard",
+      "description": "Guia visible para interpretar los cuadros de planificacion de capacidad.",
+      "type": "text",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {
+        "mode": "markdown",
+        "content": "### Que muestra\nEste tablero ayuda a planificar capacidad: crecimiento mensual, fecha estimada de agotamiento, headroom, baseline, sobredimensionamiento y subdimensionamiento.\n\n### Como interpretarlo\nMonthlyGrowthRate alto acelera la demanda; DaysToSaturation bajo indica urgencia; HeadroomAvailable alto con baja utilizacion sugiere sobredimensionamiento; HeadroomAvailable bajo sugiere subdimensionamiento.\n\n### Accion sugerida\nRevisar primero Underprovisioned Resources para evitar saturacion y luego Overprovisioned Resources para optimizar costos/capacidad."
+      }
+    },
+    {
       "id": 1,
       "title": "Monthly Growth",
       "description": "MonthlyGrowthRate by resource for planning trend analysis.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, MonthlyGrowthRate from CapacityKpi order by MonthlyGrowthRate desc, CalculatedAt desc limit 30"}]
     },
     {
@@ -21,7 +32,7 @@
       "description": "Forecast30Days, Forecast60Days, Forecast90Days, and DaysToSaturation for planning decisions.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, Forecast30Days, Forecast60Days, Forecast90Days, DaysToSaturation from ForecastResult order by DaysToSaturation asc, CalculatedAt desc limit 30"}]
     },
     {
@@ -30,7 +41,7 @@
       "description": "HeadroomAvailable and BaselineDelta for sizing and baseline comparison.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, HeadroomAvailable, BaselineDelta, AverageUtilization, PeakUtilization, P95Utilization from CapacityKpi order by HeadroomAvailable asc, CalculatedAt desc limit 30"}]
     },
     {
@@ -39,7 +50,7 @@
       "description": "Resources with high available headroom and low average utilization.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, AverageUtilization, HeadroomAvailable, BaselineDelta from CapacityKpi where HeadroomAvailable >= 70 order by HeadroomAvailable desc limit 20"}]
     },
     {
@@ -48,7 +59,7 @@
       "description": "Resources with limited headroom or short days-to-saturation.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select k.ResourceId, k.MetricName, k.HeadroomAvailable, f.DaysToSaturation, f.Forecast90Days from CapacityKpi k left join ForecastResult f on f.ResourceId = k.ResourceId where k.HeadroomAvailable <= 25 or f.DaysToSaturation <= 90 order by k.HeadroomAvailable asc, f.DaysToSaturation asc limit 20"}]
     },
     {
@@ -57,7 +68,7 @@
       "description": "Saturation time series by resource and verification scenario. Missing data means no saturation samples are available.",
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 16},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 20},
       "targets": [{"refId": "A", "expr": "synthetic_saturation", "legendFormat": "{{resource_id}} {{load_id}}"}]
     }
   ]

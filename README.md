@@ -31,6 +31,8 @@ pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias
 
 Uso recomendado de dashboards:
 
+- Cada dashboard incluye un cuadro visible `Como leer este dashboard` con tres partes:
+  `Que muestra`, `Como interpretarlo` y `Accion sugerida`.
 - **Executive Capacity Dashboard**: decision ejecutiva con estado general, top 5 riesgos,
   forecast 30/60/90, headroom y recomendaciones priorizadas.
 - **Technical Performance Dashboard**: mejora operativa con CPU, RAM, storage, IOPS, red,

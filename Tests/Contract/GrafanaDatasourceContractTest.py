@@ -78,6 +78,16 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
             for Panel in Dashboard.get("panels", []):
                 self.assertTrue(Panel.get("description"), f"{DashboardPath.name}: {Panel.get('title')}")
 
+    def test_dashboards_incluyen_ayuda_visible_para_interpretacion(self):
+        for DashboardPath in DashboardDirectory.glob("*.json"):
+            Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
+            HelpPanels = [Panel for Panel in Dashboard.get("panels", []) if Panel.get("title") == "Como leer este dashboard"]
+            self.assertTrue(HelpPanels, DashboardPath.name)
+            Content = HelpPanels[0].get("options", {}).get("content", "")
+            self.assertIn("Que muestra", Content)
+            self.assertIn("Como interpretarlo", Content)
+            self.assertIn("Accion sugerida", Content)
+
 
 if __name__ == "__main__":
     unittest.main()

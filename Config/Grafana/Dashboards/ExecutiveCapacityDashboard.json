@@ -7,12 +7,23 @@
   "refresh": "30s",
   "panels": [
     {
+      "id": 100,
+      "title": "Como leer este dashboard",
+      "description": "Guia visible para interpretar los cuadros ejecutivos de capacidad.",
+      "type": "text",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {
+        "mode": "markdown",
+        "content": "### Que muestra\nEste tablero resume capacidad para toma de decision: estado general, top 5 riesgos, forecast 30/60/90, headroom y recomendaciones.\n\n### Como interpretarlo\nCritical requiere accion inmediata; Warning requiere plan preventivo; OK indica que no hay riesgo relevante en los datos cargados. Si un cuadro no muestra datos, significa que falta informacion para el rango o lote seleccionado, no que el estado sea OK.\n\n### Accion sugerida\nPriorizar primero los recursos con menor headroom, menor DaysToSaturation y recomendaciones High."
+      }
+    },
+    {
       "id": 1,
       "title": "Overall Capacity State",
       "description": "Executive decision summary. Missing data means the selected range has no capacity evidence, not that the estate is OK.",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 4},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select OverallRisk from RiskAssessment order by case OverallRisk when 'Critical' then 3 when 'Warning' then 2 when 'OK' then 1 else 0 end desc, CalculatedAt desc limit 1"}]
     },
     {
@@ -21,7 +32,7 @@
       "description": "Top 5 services or resources that need executive prioritization.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0},
+      "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeId, OverallRisk, Reason, CalculatedAt from RiskAssessment where OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc limit 5"}]
     },
     {
@@ -30,7 +41,7 @@
       "description": "Decision view of used capacity and remaining headroom. Missing data means no KPI evidence for the selected range.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 4},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, AverageUtilization as UsedPercent, PeakUtilization, P95Utilization, HeadroomAvailable as AvailablePercent from CapacityKpi order by HeadroomAvailable asc, CalculatedAt desc limit 10"}]
     },
     {
@@ -39,7 +50,7 @@
       "description": "Forecast windows and days-to-saturation for investment and remediation decisions.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 14, "x": 0, "y": 8},
+      "gridPos": {"h": 8, "w": 14, "x": 0, "y": 12},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, Forecast30Days, Forecast60Days, Forecast90Days, DaysToSaturation, Confidence from ForecastResult order by DaysToSaturation asc, CalculatedAt desc limit 20"}]
     },
     {
@@ -48,7 +59,7 @@
       "description": "Prioritized recommended actions. Missing data means no open recommendation exists for the selected scope.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 10, "x": 14, "y": 8},
+      "gridPos": {"h": 8, "w": 10, "x": 14, "y": 12},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select Priority, Action, Reason, Status from Recommendation where Status = 'Open' order by case Priority when 'High' then 3 when 'Medium' then 2 when 'Low' then 1 else 0 end desc limit 20"}]
     },
     {
@@ -57,7 +68,7 @@
       "description": "Executive trend context for growth and deviation from baseline.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 16},
+      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 20},
       "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, MonthlyGrowthRate, BaselineDelta, HeadroomAvailable from CapacityKpi order by MonthlyGrowthRate desc, CalculatedAt desc limit 20"}]
     }
   ]
