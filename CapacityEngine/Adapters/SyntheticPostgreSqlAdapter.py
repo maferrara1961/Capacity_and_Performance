@@ -25,11 +25,11 @@ class SyntheticPostgreSqlAdapter:
         LoadId = Dataset["Load"]["LoadId"]
         if LoadId in Store["Loads"] and Store["Loads"][LoadId]["Status"] != "Deleted":
             raise ValueError("el identificador de lote ya existe")
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            self.ExecuteSql(self.BuildLoadSql(Dataset))
         Store["Loads"][LoadId] = Dataset["Load"]
         Store["Datasets"][LoadId] = Dataset
         self.SaveStore(Store)
-        if os.environ.get("STACK_DRY_RUN", "0") != "1":
-            self.ExecuteSql(self.BuildLoadSql(Dataset))
 
     def ListLoads(self, Status: str | None = None) -> list[TestLoad]:
         Store = self.LoadStore()

@@ -53,6 +53,13 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("insert into RiskAssessment", Sql)
         self.assertIn("insert into Recommendation", Sql)
         self.assertIn("insert into Service", Sql)
+        self.assertIn("Servicio Sintetico SqlDemo001 1", Sql)
+
+    def test_nombres_sinteticos_son_unicos_por_lote(self):
+        First = SyntheticDataService().BuildSyntheticDataset("NameDemo001", "mixed", "small", 30, 1)
+        Second = SyntheticDataService().BuildSyntheticDataset("NameDemo002", "mixed", "small", 30, 1)
+        self.assertNotEqual(First["Services"][0]["Name"], Second["Services"][0]["Name"])
+        self.assertNotEqual(First["Resources"][0]["Name"], Second["Resources"][0]["Name"])
 
     def test_victoriametrics_import_usa_formato_prometheus(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("VmDemo001", "mixed", "small", 30, 1)
