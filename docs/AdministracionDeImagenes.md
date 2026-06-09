@@ -28,6 +28,27 @@ detiene antes de crear contenedores y solicita ejecutar `Scripts/BuildImages.sh`
 comun del stack e inicia servicios en orden compatible con dependencias: PostgreSQL,
 VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
 
+## Modo de uso
+
+URLs locales luego de iniciar el stack:
+
+```text
+Grafana:          http://localhost:3000
+Zabbix:           http://localhost:8080
+VictoriaMetrics:  http://localhost:8428
+PostgreSQL:       localhost:5432
+```
+
+Credenciales por defecto para Grafana:
+
+```text
+Usuario: admin
+Password: admin
+```
+
+En servidores remotos, reemplazar `localhost` por la IP publica o nombre DNS del servidor. Tambien
+se deben habilitar los puertos en el firewall local y en las reglas de red del proveedor cloud.
+
 ## Stop
 
 ```bash

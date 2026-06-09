@@ -84,6 +84,29 @@ Scripts/StartStack.sh
 `StartStack.sh` valida primero que existan todas las imagenes locales. Si falta alguna, ejecutar
 `Scripts/BuildImages.sh` antes de iniciar.
 
+## Modo de uso
+
+Con el stack iniciado, acceder desde el navegador o desde herramientas cliente:
+
+```text
+Grafana:          http://localhost:3000
+Zabbix:           http://localhost:8080
+VictoriaMetrics:  http://localhost:8428
+PostgreSQL:       localhost:5432
+```
+
+Credenciales por defecto para Grafana:
+
+```text
+Usuario: admin
+Password: admin
+```
+
+Para una instancia remota de Ubuntu, reemplazar `localhost` por la IP publica o nombre DNS del
+servidor, por ejemplo `http://IP_DEL_SERVIDOR:3000`. En Oracle Cloud, AWS, Azure u otro proveedor,
+abrir los puertos requeridos en el firewall del sistema operativo y en las reglas de red del
+proveedor antes de acceder desde otra maquina.
+
 Consultar estado:
 
 ```bash
@@ -127,7 +150,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 37 tests OK
+Scripts/RunTests.sh        -> 38 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```
