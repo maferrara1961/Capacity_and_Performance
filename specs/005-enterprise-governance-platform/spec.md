@@ -1,330 +1,342 @@
-# Feature Specification: Enterprise Governance Platform
+# Especificacion de Feature: Plataforma Enterprise de Gobierno
 
-**Feature Branch**: `005-enterprise-governance-platform`
+**Rama de Feature**: `005-enterprise-governance-platform`
 
-**Created**: 2026-06-09
+**Creado**: 2026-06-09
 
-**Status**: Draft
+**Estado**: Borrador
 
-**Input**: User description: "Agregar especificacion enterprise para Capacity_and_Performance como plataforma de observabilidad, gobierno y soporte de decisiones que consolida salud tecnologica, capacidad, performance, disponibilidad, ciclo de vida y cumplimiento sobre dominios tecnologicos empresariales, usando Zabbix, VictoriaMetrics, PostgreSQL y Grafana."
+**Entrada**: Descripcion del usuario: "Agregar especificacion enterprise para Capacity_and_Performance como plataforma de observabilidad, gobierno y soporte de decisiones que consolida salud tecnologica, capacidad, performance, disponibilidad, ciclo de vida y cumplimiento sobre dominios tecnologicos empresariales, usando Zabbix, VictoriaMetrics, PostgreSQL y Grafana."
 
-## User Scenarios & Testing *(mandatory)*
+## Escenarios de Usuario y Pruebas *(obligatorio)*
 
-### User Story 1 - Executive Technology Health View (Priority: P1)
+### Historia de Usuario 1 - Vista Ejecutiva de Salud Tecnologica (Prioridad: P1)
 
-As an executive stakeholder, I need a consolidated view of technology health, risk exposure,
-compliance, lifecycle, capacity, performance, availability, and monitoring confidence so I can
-understand the state of the environment within sixty seconds and prioritize action.
+Como stakeholder ejecutivo, necesito una vista consolidada de salud tecnologica, exposicion a
+riesgos, cumplimiento, ciclo de vida, capacidad, performance, disponibilidad y confianza de
+monitoreo para entender el estado del entorno en sesenta segundos y priorizar acciones.
 
-**Why this priority**: Executive decision support is the highest business value. Without a
-consolidated evidence-based view, risk and investment decisions remain fragmented across teams and
-tools.
+**Por que esta prioridad**: El soporte a decisiones ejecutivas es el mayor valor de negocio. Sin
+una vista consolidada y basada en evidencia, las decisiones de riesgo e inversion siguen
+fragmentadas entre equipos y herramientas.
 
-**Independent Test**: Can be tested by presenting representative technology inventory, telemetry,
-risk, lifecycle, compliance, and trend evidence and confirming that an executive can identify
-current health, major risks, affected services, emerging trends, and recommended priorities without
-accessing source systems directly.
+**Prueba independiente**: Se puede probar presentando inventario tecnologico, telemetria, riesgos,
+ciclo de vida, cumplimiento y tendencias representativas, y confirmando que un ejecutivo puede
+identificar salud actual, riesgos principales, servicios afectados, tendencias emergentes y
+prioridades recomendadas sin acceder directamente a los sistemas fuente.
 
-**Acceptance Scenarios**:
+**Escenarios de aceptacion**:
 
-1. **Given** evidence exists for multiple technology domains, **When** an executive opens the
-   executive dashboard, **Then** the dashboard shows Technology Health Score, domain scores,
-   monitoring confidence, top risks, and recommended priorities.
-2. **Given** one or more domains contain critical or high risk, **When** the executive reviews the
-   risk heat map and top risks, **Then** the dashboard identifies severity, impact, affected
-   technologies, affected services, and recommended action.
-3. **Given** evidence is missing or incomplete for one or more domains, **When** the executive
-   reviews the scorecard, **Then** the dashboard explicitly shows missing, unknown, incomplete, or
-   unverified evidence rather than presenting the domain as healthy.
-
----
-
-### User Story 2 - Service and Domain Governance (Priority: P2)
-
-As a service delivery manager, platform owner, or governance lead, I need technology inventory,
-service mapping, lifecycle status, compliance status, and risk registry views so I can connect
-component-level issues to business services and governance decisions.
-
-**Why this priority**: Technology governance requires a shared inventory and risk model. Teams must
-see which technologies and services are affected before they can plan remediation, investment, or
-exception handling.
-
-**Independent Test**: Can be tested by loading inventory and risk evidence for multiple services
-and technology domains and confirming that each risk, score, and recommendation identifies affected
-technologies, affected services, owners, lifecycle state, compliance state, and evidence status.
-
-**Acceptance Scenarios**:
-
-1. **Given** a technology component belongs to a business service, **When** a governance user
-   reviews the inventory, **Then** the component shows technology type, version, vendor,
-   environment, owner, support status, lifecycle status, and business service.
-2. **Given** a lifecycle, compliance, capacity, performance, or availability risk exists, **When**
-   a governance user opens the risk registry, **Then** the registry shows category, severity,
-   impact, affected technologies, affected services, and recommended actions.
-3. **Given** a technology domain has incomplete monitoring coverage, **When** a governance user
-   reviews monitoring confidence, **Then** the platform shows the coverage gap and prevents the
-   gap from being interpreted as healthy.
+1. **Dado** que existe evidencia para multiples dominios tecnologicos, **cuando** un ejecutivo abre
+   el dashboard ejecutivo, **entonces** el dashboard muestra Technology Health Score, scores por
+   dominio, confianza de monitoreo, riesgos principales y prioridades recomendadas.
+2. **Dado** que uno o mas dominios contienen riesgo alto o critico, **cuando** el ejecutivo revisa
+   el mapa de calor y los top riesgos, **entonces** el dashboard identifica severidad, impacto,
+   tecnologias afectadas, servicios afectados y accion recomendada.
+3. **Dado** que falta evidencia o hay evidencia incompleta para uno o mas dominios, **cuando** el
+   ejecutivo revisa el scorecard, **entonces** el dashboard muestra explicitamente evidencia
+   faltante, desconocida, incompleta o no verificada en lugar de presentar el dominio como sano.
 
 ---
 
-### User Story 3 - Operational and Trend Analysis (Priority: P3)
+### Historia de Usuario 2 - Gobierno por Servicio y Dominio (Prioridad: P2)
 
-As an operations or engineering user, I need operational dashboards, historical trend analysis, and
-forecasting so I can prevent incidents, optimize resources, and validate remediation priorities.
+Como service delivery manager, owner de plataforma o responsable de gobierno, necesito vistas de
+inventario tecnologico, mapeo de servicios, estado de ciclo de vida, estado de cumplimiento y
+registro de riesgos para conectar problemas de componentes con servicios de negocio y decisiones
+de gobierno.
 
-**Why this priority**: Operational users need drill-down detail behind executive summaries. Trend
-and forecast evidence turns telemetry into proactive capacity and performance management.
+**Por que esta prioridad**: El gobierno tecnologico requiere inventario y modelo de riesgo
+compartidos. Los equipos deben ver que tecnologias y servicios estan afectados antes de planificar
+remediacion, inversion o excepciones.
 
-**Independent Test**: Can be tested by loading historical telemetry and confirming that operational
-views show capacity, performance, availability, seasonality, growth, forecast horizons, top
-consumers, and evidence freshness for supported technology domains.
+**Prueba independiente**: Se puede probar cargando inventario y evidencia de riesgo para multiples
+servicios y dominios tecnologicos, y confirmando que cada riesgo, score y recomendacion identifica
+tecnologias afectadas, servicios afectados, owners, estado de ciclo de vida, estado de cumplimiento
+y estado de evidencia.
 
-**Acceptance Scenarios**:
+**Escenarios de aceptacion**:
 
-1. **Given** historical telemetry exists for a supported component, **When** an operations user
-   reviews trend analysis, **Then** the platform shows historical behavior, growth, seasonality,
-   and evidence freshness.
-2. **Given** capacity metrics indicate increasing consumption, **When** an operations user reviews
-   forecasts, **Then** the platform shows forecasted exhaustion for 30, 90, 180, and 365 days where
-   sufficient evidence exists.
-3. **Given** a component is degrading, **When** an operations user drills into operational views,
-   **Then** the platform shows resource contention, saturation indicators, response time, latency,
-   throughput, and affected services.
+1. **Dado** que un componente tecnologico pertenece a un servicio de negocio, **cuando** un usuario
+   de gobierno revisa el inventario, **entonces** el componente muestra tipo de tecnologia,
+   version, vendor, ambiente, owner, estado de soporte, estado de ciclo de vida y servicio de
+   negocio.
+2. **Dado** que existe un riesgo de ciclo de vida, cumplimiento, capacidad, performance o
+   disponibilidad, **cuando** un usuario de gobierno abre el registro de riesgos, **entonces** el
+   registro muestra categoria, severidad, impacto, tecnologias afectadas, servicios afectados y
+   acciones recomendadas.
+3. **Dado** que un dominio tecnologico tiene cobertura de monitoreo incompleta, **cuando** un
+   usuario de gobierno revisa la confianza de monitoreo, **entonces** la plataforma muestra la
+   brecha de cobertura e impide interpretarla como saludable.
 
 ---
 
-### Edge Cases
+### Historia de Usuario 3 - Analisis Operativo y de Tendencias (Prioridad: P3)
 
-- If evidence is missing, unknown, incomplete, or unverified, the platform must show the evidence
-  state explicitly and must not classify the condition as healthy.
-- If only partial evidence exists for a score, the platform must calculate only evidence-backed
-  portions and show reduced monitoring confidence.
-- If a technology component is not mapped to a business service, the platform must show the mapping
-  gap and keep the component visible in governance views.
-- If historical data is insufficient for a forecast horizon, the platform must show the limitation
-  and avoid unsupported forecasts.
-- If the same component affects multiple services, risk and recommendation views must show all
-  affected services or clearly indicate shared impact.
-- If source evidence conflicts across tools or teams, the platform must preserve traceability and
-  mark the assessment as requiring review.
-- If compliance or lifecycle status is unavailable, the platform must show unknown status rather
-  than infer compliant or supported status.
+Como usuario de operaciones o ingenieria, necesito dashboards operativos, analisis historico de
+tendencias y forecast para prevenir incidentes, optimizar recursos y validar prioridades de
+remediacion.
 
-## Requirements *(mandatory)*
+**Por que esta prioridad**: Los usuarios operativos necesitan detalle accionable detras de los
+resumenes ejecutivos. La evidencia historica y el forecast convierten la telemetria en gestion
+proactiva de capacidad y performance.
 
-### Functional Requirements
+**Prueba independiente**: Se puede probar cargando telemetria historica y confirmando que las vistas
+operativas muestran capacidad, performance, disponibilidad, estacionalidad, crecimiento, horizontes
+de forecast, top consumidores y frescura de evidencia para dominios tecnologicos soportados.
 
-- **FR-001**: System MUST maintain a technology inventory repository containing component name,
-  technology type, version, vendor, environment, business service, owner, support status, and
-  lifecycle status.
-- **FR-002**: System MUST collect or represent telemetry, inventory data, availability data, event
-  evidence, lifecycle data, compliance data, and historical trend evidence for supported technology
-  domains.
-- **FR-003**: System MUST support infrastructure, operating systems, databases, middleware,
-  container platforms, messaging platforms, monitoring platforms, enterprise applications, and
-  business services as technology domains.
-- **FR-004**: System MUST remain extensible so new technology domains can be added without
-  redesigning the platform assessment model.
-- **FR-005**: System MUST provide a capacity assessment covering CPU utilization, memory
-  utilization, storage utilization, filesystem growth, resource consumption trends, and forecasted
-  resource exhaustion.
-- **FR-006**: System MUST provide a performance assessment covering response times, latency,
-  resource contention, throughput, and saturation indicators.
-- **FR-007**: System MUST provide an availability assessment covering component availability,
-  service availability, dependency health, and outage history.
-- **FR-008**: System MUST provide a lifecycle assessment covering technology versions, support
-  status, end-of-support status, end-of-life status, and technology debt indicators.
-- **FR-009**: System MUST provide a compliance assessment covering license compliance, technology
-  standards compliance, inventory completeness, and policy compliance.
-- **FR-010**: System MUST provide a monitoring governance assessment covering monitoring coverage,
-  data completeness, data freshness, and collection failures.
-- **FR-011**: System MUST calculate Capacity Score, Performance Score, Availability Score,
-  Lifecycle Score, Compliance Score, and Monitoring Confidence Score on a 0 to 100 range.
-- **FR-012**: System MUST calculate a Technology Health Score on a 0 to 100 range using capacity,
-  performance, availability, lifecycle, compliance, and monitoring confidence assessments.
-- **FR-013**: System MUST classify Technology Health Score as Excellent for 90-100, Healthy for
-  75-89, Attention Required for 60-74, At Risk for 40-59, and Critical for 0-39.
-- **FR-014**: System MUST provide an executive dashboard that presents business-oriented insights
-  and avoids raw technical metrics as the primary view.
-- **FR-015**: System MUST provide operational dashboards that support drill-down analysis for
-  engineering and operations teams.
-- **FR-016**: System MUST maintain historical metrics and support trend analysis, seasonality
-  analysis, capacity planning, and growth analysis.
-- **FR-017**: System MUST provide capacity forecasts for CPU, memory, storage, and capacity
-  exhaustion over 30, 90, 180, and 365 day horizons where sufficient historical evidence exists.
-- **FR-018**: System MUST maintain a technology risk registry with risk ID, risk category,
-  severity, impact, affected technologies, affected services, and recommended actions.
-- **FR-019**: System MUST identify capacity risks, performance risks, availability risks, lifecycle
-  risks, compliance risks, and monitoring confidence risks using objective and reproducible
-  criteria.
-- **FR-020**: System MUST ensure every score, risk, and recommendation is traceable to supporting
-  evidence.
-- **FR-021**: System MUST explicitly represent missing, unknown, incomplete, and unverified
-  evidence states.
-- **FR-022**: System MUST NOT infer healthy status, compliance status, or supported lifecycle
-  status from missing evidence.
-- **FR-023**: System MUST allow stakeholders to determine current technology health, operational
-  risk, compliance risk, lifecycle risk, capacity constraints, forecasted issues, affected
-  technologies, affected services, and recommended priorities without direct access to source
-  evidence repositories.
-- **FR-024**: System MUST validate every user-controlled input before domain logic or persistence.
-- **FR-025**: System MUST require authentication for every protected route, screen, command, or API
-  endpoint.
-- **FR-026**: System MUST enforce authorization wherever user identity changes data access or
-  allowed actions.
-- **FR-027**: System MUST satisfy the feature without adding external libraries, SDKs, packages, or
-  hosted services.
-- **FR-028**: Project-defined code symbols and artifacts MUST use PascalCase unless a documented
-  platform convention requires otherwise.
+**Escenarios de aceptacion**:
 
-### Key Entities *(include if feature involves data)*
+1. **Dado** que existe telemetria historica para un componente soportado, **cuando** un usuario de
+   operaciones revisa el analisis de tendencias, **entonces** la plataforma muestra comportamiento
+   historico, crecimiento, estacionalidad y frescura de evidencia.
+2. **Dado** que metricas de capacidad indican consumo creciente, **cuando** un usuario de
+   operaciones revisa forecasts, **entonces** la plataforma muestra agotamiento proyectado para 30,
+   90, 180 y 365 dias cuando existe evidencia suficiente.
+3. **Dado** que un componente se degrada, **cuando** un usuario de operaciones profundiza en vistas
+   operativas, **entonces** la plataforma muestra contencion de recursos, indicadores de
+   saturacion, tiempo de respuesta, latencia, throughput y servicios afectados.
 
-- **TechnologyComponent**: A monitored or governed technology element, including name, technology
-  type, version, vendor, environment, owner, support status, lifecycle status, and evidence status.
-- **BusinessService**: A business-facing service or application grouping that depends on one or
-  more technology components.
-- **TechnologyInventoryRecord**: The authoritative inventory representation used for governance,
-  service mapping, lifecycle tracking, and compliance evidence.
-- **TelemetryEvidence**: Performance, capacity, availability, event, and historical data used to
-  support assessments.
-- **LifecycleEvidence**: Support, end-of-support, end-of-life, and technology debt evidence.
-- **ComplianceEvidence**: License, policy, standards, and inventory completeness evidence.
-- **RiskAssessment**: An objective assessment of capacity, performance, availability, lifecycle,
-  compliance, or monitoring confidence risk.
-- **RiskRegistryEntry**: A tracked risk containing category, severity, impact, affected
-  technologies, affected services, evidence, and recommended actions.
-- **ScoreAssessment**: A 0 to 100 score for one assessment domain or the consolidated Technology
-  Health Score.
-- **Recommendation**: A recommended priority or action tied to evidence, risks, affected
-  technologies, and affected services.
-- **EvidenceState**: Classification of evidence as available, missing, unknown, incomplete, or
-  unverified.
+---
 
-## Executive Dashboard Specification
+### Casos Borde
 
-### Purpose
+- Si la evidencia falta, es desconocida, incompleta o no verificada, la plataforma debe mostrar el
+  estado de evidencia explicitamente y no debe clasificar la condicion como saludable.
+- Si solo existe evidencia parcial para un score, la plataforma debe calcular solamente las partes
+  respaldadas por evidencia y mostrar menor confianza de monitoreo.
+- Si un componente tecnologico no esta mapeado a un servicio de negocio, la plataforma debe mostrar
+  la brecha de mapeo y mantener el componente visible en vistas de gobierno.
+- Si los datos historicos son insuficientes para un horizonte de forecast, la plataforma debe
+  mostrar la limitacion y evitar forecasts no respaldados.
+- Si el mismo componente afecta multiples servicios, las vistas de riesgo y recomendacion deben
+  mostrar todos los servicios afectados o indicar claramente el impacto compartido.
+- Si la evidencia fuente entra en conflicto entre herramientas o equipos, la plataforma debe
+  preservar trazabilidad y marcar la evaluacion como pendiente de revision.
+- Si el estado de cumplimiento o ciclo de vida no esta disponible, la plataforma debe mostrar estado
+  desconocido en lugar de inferir cumplimiento o soporte.
 
-The executive dashboard must provide a consolidated executive view of technology health and
-operational risk. Executives must be able to understand the state of the environment within sixty
-seconds.
+## Requisitos *(obligatorio)*
 
-### Executive KPIs
+### Requisitos Funcionales
+
+- **FR-001**: El sistema DEBE mantener un repositorio de inventario tecnologico con nombre de
+  componente, tipo de tecnologia, version, vendor, ambiente, servicio de negocio, owner, estado de
+  soporte y estado de ciclo de vida.
+- **FR-002**: El sistema DEBE recolectar o representar telemetria, datos de inventario, datos de
+  disponibilidad, evidencia de eventos, datos de ciclo de vida, datos de cumplimiento y evidencia
+  historica de tendencias para dominios tecnologicos soportados.
+- **FR-003**: El sistema DEBE soportar infraestructura, sistemas operativos, bases de datos,
+  middleware, plataformas de contenedores, plataformas de mensajeria, plataformas de monitoreo,
+  aplicaciones enterprise y servicios de negocio como dominios tecnologicos.
+- **FR-004**: El sistema DEBE permanecer extensible para agregar nuevos dominios tecnologicos sin
+  redisenar el modelo de evaluacion.
+- **FR-005**: El sistema DEBE proveer evaluacion de capacidad sobre utilizacion de CPU, utilizacion
+  de memoria, utilizacion de storage, crecimiento de filesystem, tendencias de consumo y
+  agotamiento proyectado de recursos.
+- **FR-006**: El sistema DEBE proveer evaluacion de performance sobre tiempos de respuesta,
+  latencia, contencion de recursos, throughput e indicadores de saturacion.
+- **FR-007**: El sistema DEBE proveer evaluacion de disponibilidad sobre disponibilidad de
+  componentes, disponibilidad de servicios, salud de dependencias e historial de caidas.
+- **FR-008**: El sistema DEBE proveer evaluacion de ciclo de vida sobre versiones tecnologicas,
+  estado de soporte, fin de soporte, fin de vida e indicadores de deuda tecnologica.
+- **FR-009**: El sistema DEBE proveer evaluacion de cumplimiento sobre licencias, estandares
+  tecnologicos, completitud de inventario y politicas.
+- **FR-010**: El sistema DEBE proveer evaluacion de gobierno de monitoreo sobre cobertura,
+  completitud de datos, frescura de datos y fallas de recoleccion.
+- **FR-011**: El sistema DEBE calcular Capacity Score, Performance Score, Availability Score,
+  Lifecycle Score, Compliance Score y Monitoring Confidence Score en rango 0 a 100.
+- **FR-012**: El sistema DEBE calcular Technology Health Score en rango 0 a 100 usando capacidad,
+  performance, disponibilidad, ciclo de vida, cumplimiento y confianza de monitoreo.
+- **FR-013**: El sistema DEBE clasificar Technology Health Score como Excellent para 90-100,
+  Healthy para 75-89, Attention Required para 60-74, At Risk para 40-59 y Critical para 0-39.
+- **FR-014**: El sistema DEBE proveer un dashboard ejecutivo que presente insights orientados a
+  negocio y evite metricas tecnicas crudas como vista primaria.
+- **FR-015**: El sistema DEBE proveer dashboards operativos con drill-down para equipos de
+  ingenieria y operaciones.
+- **FR-016**: El sistema DEBE mantener metricas historicas y soportar analisis de tendencias,
+  estacionalidad, planificacion de capacidad y analisis de crecimiento.
+- **FR-017**: El sistema DEBE proveer forecasts de capacidad para CPU, memoria, storage y
+  agotamiento de capacidad sobre horizontes de 30, 90, 180 y 365 dias cuando exista evidencia
+  historica suficiente.
+- **FR-018**: El sistema DEBE mantener un registro de riesgos tecnologicos con Risk ID, categoria,
+  severidad, impacto, tecnologias afectadas, servicios afectados y acciones recomendadas.
+- **FR-019**: El sistema DEBE identificar riesgos de capacidad, performance, disponibilidad, ciclo
+  de vida, cumplimiento y confianza de monitoreo usando criterios objetivos y reproducibles.
+- **FR-020**: El sistema DEBE asegurar que cada score, riesgo y recomendacion sea trazable a
+  evidencia de soporte.
+- **FR-021**: El sistema DEBE representar explicitamente estados de evidencia faltante,
+  desconocida, incompleta y no verificada.
+- **FR-022**: El sistema NO DEBE inferir estado saludable, estado de cumplimiento o estado de ciclo
+  de vida soportado desde evidencia faltante.
+- **FR-023**: El sistema DEBE permitir que las partes interesadas determinen salud tecnologica actual,
+  riesgo operativo, riesgo de cumplimiento, riesgo de ciclo de vida, restricciones de capacidad,
+  problemas proyectados, tecnologias afectadas, servicios afectados y prioridades recomendadas sin
+  acceso directo a repositorios de evidencia fuente.
+- **FR-024**: El sistema DEBE validar toda entrada controlada por usuario antes de logica de dominio
+  o persistencia.
+- **FR-025**: El sistema DEBE requerir autenticacion para toda ruta, pantalla, comando o endpoint
+  protegido.
+- **FR-026**: El sistema DEBE aplicar autorizacion cuando la identidad del usuario cambie acceso a
+  datos o acciones permitidas.
+- **FR-027**: El sistema DEBE satisfacer el feature sin agregar librerias externas, SDKs, paquetes
+  o servicios alojados.
+- **FR-028**: Los simbolos y artefactos definidos por el proyecto DEBEN usar PascalCase salvo que
+  una convencion de plataforma documentada requiera excepcion.
+
+### Entidades Clave *(incluir si el feature involucra datos)*
+
+- **TechnologyComponent**: Elemento tecnologico monitoreado o gobernado, con nombre, tipo de
+  tecnologia, version, vendor, ambiente, owner, estado de soporte, estado de ciclo de vida y estado
+  de evidencia.
+- **BusinessService**: Servicio o agrupacion de aplicacion orientada al negocio que depende de uno
+  o mas componentes tecnologicos.
+- **TechnologyInventoryRecord**: Representacion autoritativa de inventario usada para gobierno,
+  mapeo de servicios, ciclo de vida y evidencia de cumplimiento.
+- **TelemetryEvidence**: Datos de performance, capacidad, disponibilidad, eventos e historia usados
+  para sostener evaluaciones.
+- **LifecycleEvidence**: Evidencia de soporte, fin de soporte, fin de vida y deuda tecnologica.
+- **ComplianceEvidence**: Evidencia de licencia, politica, estandares y completitud de inventario.
+- **RiskAssessment**: Evaluacion objetiva de riesgo de capacidad, performance, disponibilidad,
+  ciclo de vida, cumplimiento o confianza de monitoreo.
+- **RiskRegistryEntry**: Riesgo registrado con categoria, severidad, impacto, tecnologias
+  afectadas, servicios afectados, evidencia y acciones recomendadas.
+- **ScoreAssessment**: Score de 0 a 100 para un dominio de evaluacion o para Technology Health
+  Score consolidado.
+- **Recommendation**: Prioridad o accion recomendada vinculada a evidencia, riesgos, tecnologias
+  afectadas y servicios afectados.
+- **EvidenceState**: Clasificacion de evidencia como disponible, faltante, desconocida, incompleta
+  o no verificada.
+
+## Especificacion del Dashboard Ejecutivo
+
+### Proposito
+
+El dashboard ejecutivo debe proveer una vista ejecutiva consolidada de salud tecnologica y riesgo
+operativo. Los ejecutivos deben poder entender el estado del entorno en sesenta segundos.
+
+### KPIs Ejecutivos
 
 - **Technology Health Score**: 0-100.
-- **Capacity Risk**: Low, Medium, High, or Critical.
-- **Performance Risk**: Low, Medium, High, or Critical.
-- **Availability Risk**: Low, Medium, High, or Critical.
-- **Lifecycle Risk**: Low, Medium, High, or Critical.
-- **Compliance Risk**: Compliant, Attention Required, or Non-Compliant.
+- **Capacity Risk**: Low, Medium, High o Critical.
+- **Performance Risk**: Low, Medium, High o Critical.
+- **Availability Risk**: Low, Medium, High o Critical.
+- **Lifecycle Risk**: Low, Medium, High o Critical.
+- **Compliance Risk**: Compliant, Attention Required o Non-Compliant.
 - **Monitoring Confidence**: 0-100%.
 
-### Executive Visualizations
+### Visualizaciones Ejecutivas
 
 - **Executive Scorecard**: Technology Health Score, Capacity Score, Performance Score,
-  Availability Score, Lifecycle Score, Compliance Score, and Monitoring Confidence.
-- **Risk Heat Map**: Technology domains versus risk level.
-- **Top Risks**: Top 10 risks, severity, impact, affected technologies, affected services, and
-  recommended action.
-- **Capacity Forecast**: CPU, memory, and storage forecast views.
-- **Lifecycle Overview**: Supported, backlevel, end-of-support, and end-of-life technologies.
-- **Compliance Overview**: Compliant technologies, non-compliant technologies, and unknown
-  compliance status.
-- **Service Health Overview**: Healthy, degraded, and critical services.
-- **Executive Decision Summary**: Current state, major risks, emerging trends, and recommended
-  priorities.
+  Availability Score, Lifecycle Score, Compliance Score y Monitoring Confidence.
+- **Risk Heat Map**: dominios tecnologicos versus nivel de riesgo.
+- **Top Risks**: top 10 riesgos, severidad, impacto, tecnologias afectadas, servicios afectados y
+  accion recomendada.
+- **Capacity Forecast**: vistas de forecast para CPU, memoria y storage.
+- **Lifecycle Overview**: tecnologias soportadas, backlevel, fin de soporte y fin de vida.
+- **Compliance Overview**: tecnologias cumplidoras, no cumplidoras y con estado desconocido.
+- **Service Health Overview**: servicios saludables, degradados y criticos.
+- **Executive Decision Summary**: estado actual, riesgos principales, tendencias emergentes y
+  prioridades recomendadas.
 
-## Data Sources
+## Fuentes de Datos
 
-- **Monitoring Evidence Source**: Provides monitoring data, inventory data, availability data, and
-  events.
-- **Historical Metrics Source**: Provides historical metrics, trends, and forecast datasets.
-- **Metadata Repository**: Provides metadata, inventory, lifecycle information, compliance
-  information, and risk data.
-- **Visualization Layer**: Presents executive, operational, and analytical dashboards.
+- **Fuente de Evidencia de Monitoreo**: provee datos de monitoreo, inventario, disponibilidad y
+  eventos.
+- **Fuente de Metricas Historicas**: provee metricas historicas, tendencias y datasets de forecast.
+- **Repositorio de Metadatos**: provee metadatos, inventario, informacion de ciclo de vida,
+  informacion de cumplimiento y datos de riesgo.
+- **Capa de Visualizacion**: presenta dashboards ejecutivos, operativos y analiticos.
 
-The platform scope currently names Zabbix, VictoriaMetrics, PostgreSQL, and Grafana as required
-source and presentation platforms for these responsibilities.
+El alcance de plataforma nombra actualmente Zabbix, VictoriaMetrics, PostgreSQL y Grafana como
+plataformas requeridas para esas responsabilidades de fuente y presentacion.
 
-## Non-Functional Requirements
+## Requisitos No Funcionales
 
-- **NFR-001 Scalability**: System MUST support 10,000 or more monitored components.
-- **NFR-002 Historical Retention**: System MUST support multi-year historical retention for trend
-  and forecasting use cases.
-- **NFR-003 Availability**: System MUST support continuous monitoring operations.
-- **NFR-004 Traceability**: All scores MUST be traceable to supporting evidence.
-- **NFR-005 Extensibility**: New technology domains MUST be added without redesigning the platform.
-- **NFR-006 Auditability**: All assessments MUST be reproducible and verifiable.
-- **NFR-007 Executive Usability**: Executive users MUST be able to understand the current state and
-  priorities within sixty seconds.
+- **NFR-001 Escalabilidad**: El sistema DEBE soportar 10.000 o mas componentes monitoreados.
+- **NFR-002 Retencion Historica**: El sistema DEBE soportar retencion historica multi-anual para
+  casos de tendencia y forecasting.
+- **NFR-003 Disponibilidad**: El sistema DEBE soportar operaciones de monitoreo continuo.
+- **NFR-004 Trazabilidad**: Todos los scores DEBEN ser trazables a evidencia de soporte.
+- **NFR-005 Extensibilidad**: Nuevos dominios tecnologicos DEBEN agregarse sin redisenar la
+  plataforma.
+- **NFR-006 Auditabilidad**: Todas las evaluaciones DEBEN ser reproducibles y verificables.
+- **NFR-007 Usabilidad Ejecutiva**: Los usuarios ejecutivos DEBEN entender estado actual y
+  prioridades en sesenta segundos.
 
-## Out of Scope
+## Fuera de Alcance
 
-The platform MUST NOT:
+La plataforma NO DEBE:
 
-- Replace ITSM platforms.
-- Replace CMDB platforms.
-- Perform automated remediation.
-- Make autonomous business decisions.
-- Infer healthy status from missing data.
-- Generate conclusions without supporting evidence.
+- Reemplazar plataformas ITSM.
+- Reemplazar plataformas CMDB.
+- Ejecutar remediacion automatica.
+- Tomar decisiones autonomas de negocio.
+- Inferir estado saludable desde datos faltantes.
+- Generar conclusiones sin evidencia de soporte.
 
-## Success Criteria *(mandatory)*
+## Criterios de Exito *(obligatorio)*
 
-### Measurable Outcomes
+### Resultados Medibles
 
-- **SC-001**: Executive users can identify current technology health, top risks, and recommended
-  priorities within sixty seconds using the executive dashboard.
-- **SC-002**: Stakeholders can determine affected technologies and affected services for 100% of
-  displayed risk registry entries.
-- **SC-003**: 100% of score and risk outputs expose their supporting evidence or evidence-state
-  limitation.
-- **SC-004**: Missing, unknown, incomplete, or unverified evidence is visibly distinguished from
-  healthy status in every assessment view.
-- **SC-005**: The platform supports assessment visibility across at least the listed technology
-  domains without requiring redesign of the assessment model.
-- **SC-006**: Forecast views show 30, 90, 180, and 365 day horizons where sufficient historical
-  evidence exists, and clearly mark horizons with insufficient evidence.
-- **SC-007**: A stakeholder can determine current health, operational risks, compliance risks,
-  lifecycle risks, capacity constraints, forecasted issues, affected technologies, affected
-  services, and recommended priorities without direct access to source systems.
+- **SC-001**: Los usuarios ejecutivos pueden identificar salud tecnologica actual, top riesgos y
+  prioridades recomendadas en sesenta segundos usando el dashboard ejecutivo.
+- **SC-002**: Las partes interesadas pueden determinar tecnologias afectadas y servicios afectados para
+  el 100% de los riesgos mostrados en el registro.
+- **SC-003**: El 100% de los scores y riesgos expone su evidencia de soporte o limitacion de estado
+  de evidencia.
+- **SC-004**: La evidencia faltante, desconocida, incompleta o no verificada se distingue
+  visiblemente del estado saludable en toda vista de evaluacion.
+- **SC-005**: La plataforma soporta visibilidad de evaluacion sobre al menos los dominios
+  tecnologicos listados sin requerir rediseno del modelo de evaluacion.
+- **SC-006**: Las vistas de forecast muestran horizontes de 30, 90, 180 y 365 dias cuando existe
+  evidencia historica suficiente, y marcan claramente horizontes con evidencia insuficiente.
+- **SC-007**: Un stakeholder puede determinar salud actual, riesgos operativos, riesgos de
+  cumplimiento, riesgos de ciclo de vida, restricciones de capacidad, problemas proyectados,
+  tecnologias afectadas, servicios afectados y prioridades recomendadas sin acceso directo a
+  sistemas fuente.
 
-## Constitution Alignment *(mandatory)*
+## Alineacion con la Constitucion *(obligatorio)*
 
-- **Testability**: Each user story defines an independent test and acceptance scenarios. Tests must
-  cover evidence states, risk registry behavior, score ranges, executive dashboard outcomes,
-  protected access, and no-healthy-from-missing-data behavior before implementation.
-- **Clean Architecture**: Domain concepts include inventory, evidence, assessments, scores, risks,
-  recommendations, and dashboards. Source systems and presentation layers remain external to domain
-  scoring and risk policy.
-- **Validation**: User-controlled inputs include filters, inventory fields, assessment parameters,
-  service mappings, risk updates, dashboard selections, and governance records. Invalid or
-  unauthorized inputs must be rejected deterministically.
-- **Protected Access**: Executive dashboards, operational dashboards, governance views, risk
-  registry changes, inventory changes, and administrative commands are protected and require
-  authentication.
-- **Dependency Constraint**: The specification requires no new external libraries, SDKs, packages,
-  or hosted services beyond the already approved platform tools.
-- **Naming**: Project-defined code symbols and artifacts must use PascalCase unless an external
-  platform convention requires a documented exception.
-- **Platform Domains**: The feature affects Capacity, Performance, Availability, Lifecycle,
-  Compliance, and Monitoring Governance.
-- **Evidence Model**: Evidence must be measurable and classified as available, missing, unknown,
-  incomplete, or unverified.
-- **Risk and Scoring**: Risk and score outputs must use objective criteria, identify affected
-  technologies and services, use 0-100 score ranges, and remain traceable to evidence.
-- **Trend Priority**: Historical trends have priority over isolated measurements for capacity,
-  lifecycle, and forecast decisions.
-- **Decision Support**: Recommendations support authorized human decisions and do not perform
-  autonomous remediation or autonomous business decision-making.
+- **Testabilidad**: Cada historia define una prueba independiente y escenarios de aceptacion. Las
+  pruebas deben cubrir estados de evidencia, registro de riesgos, rangos de score, resultados de
+  dashboard ejecutivo, acceso protegido y comportamiento de no inferir salud desde evidencia
+  faltante antes de implementar.
+- **Clean Architecture**: Los conceptos de dominio incluyen inventario, evidencia, evaluaciones,
+  scores, riesgos, recomendaciones y dashboards. Sistemas fuente y capas de presentacion quedan
+  externos a la politica de dominio de scoring y riesgo.
+- **Validacion**: Las entradas controladas por usuario incluyen filtros, campos de inventario,
+  parametros de evaluacion, mapeos de servicio, actualizaciones de riesgo, selecciones de dashboard
+  y registros de gobierno. Las entradas invalidas o no autorizadas deben rechazarse de forma
+  deterministica.
+- **Acceso Protegido**: Dashboards ejecutivos, dashboards operativos, vistas de gobierno, cambios
+  en registro de riesgos, cambios de inventario y comandos administrativos son protegidos y
+  requieren autenticacion.
+- **Restriccion de Dependencias**: La especificacion no requiere nuevas librerias externas, SDKs,
+  paquetes o servicios alojados mas alla de las herramientas de plataforma ya aprobadas.
+- **Nombres**: Los simbolos y artefactos definidos por el proyecto deben usar PascalCase salvo que
+  una convencion externa requiera excepcion documentada.
+- **Dominios de Plataforma**: El feature afecta Capacidad, Performance, Disponibilidad, Ciclo de
+  Vida, Cumplimiento y Gobierno de Monitoreo.
+- **Modelo de Evidencia**: La evidencia debe ser medible y clasificarse como disponible, faltante,
+  desconocida, incompleta o no verificada.
+- **Riesgo y Scoring**: Los outputs de riesgo y score deben usar criterios objetivos, identificar
+  tecnologias y servicios afectados, usar rangos de 0 a 100 y permanecer trazables a evidencia.
+- **Prioridad de Tendencias**: Las tendencias historicas tienen prioridad sobre mediciones aisladas
+  para decisiones de capacidad, ciclo de vida y forecast.
+- **Soporte a Decisiones**: Las recomendaciones soportan decisiones humanas autorizadas y no
+  ejecutan remediacion automatica ni decisiones autonomas de negocio.
 
-## Assumptions
+## Supuestos
 
-- Version 1.0 of this specification defines the enterprise target scope and may be delivered
-  incrementally through later implementation phases.
-- Zabbix, VictoriaMetrics, PostgreSQL, and Grafana are approved platform tools and are treated as
-  evidence, repository, and visualization responsibilities rather than optional dependencies.
-- Direct replacement of ITSM and CMDB systems is out of scope; the platform can reference or align
-  with those records but does not become those systems.
-- Automated remediation is out of scope; recommendations remain decision-support outputs.
-- Executive users require business-oriented views first, with drill-down available for technical
-  and operational users.
+- La version 1.0 de esta especificacion define el alcance objetivo enterprise y puede entregarse de
+  forma incremental en fases posteriores de implementacion.
+- Zabbix, VictoriaMetrics, PostgreSQL y Grafana son herramientas de plataforma aprobadas y se
+  tratan como responsabilidades de evidencia, repositorio y visualizacion, no como dependencias
+  opcionales.
+- El reemplazo directo de sistemas ITSM y CMDB queda fuera de alcance; la plataforma puede
+  referenciar o alinearse con esos registros, pero no convertirse en esos sistemas.
+- La remediacion automatica queda fuera de alcance; las recomendaciones permanecen como salidas de
+  soporte a decisiones.
+- Los usuarios ejecutivos requieren primero vistas orientadas a negocio, con drill-down disponible
+  para usuarios tecnicos y operativos.

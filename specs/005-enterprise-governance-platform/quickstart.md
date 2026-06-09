@@ -1,27 +1,27 @@
-# Quickstart: Enterprise Governance Platform
+# Quickstart: Plataforma Enterprise de Gobierno
 
-## Prerequisites
+## Prerrequisitos
 
-- Podman available on the host.
-- Repository cloned and on `main`.
-- Stack images built.
-- No new external Python packages installed.
+- Podman disponible en el host.
+- Repositorio clonado y en `main`.
+- Imagenes del stack construidas.
+- Sin nuevos paquetes externos de Python instalados.
 
-## 1. Validate the Repository
+## 1. Validar el Repositorio
 
 ```bash
 Scripts/ValidateStack.sh
 Scripts/RunTests.sh
 ```
 
-Expected outcome:
+Resultado esperado:
 
 ```text
 Validacion del stack completada correctamente
 OK
 ```
 
-## 2. Start the Stack
+## 2. Iniciar el Stack
 
 ```bash
 Scripts/BuildImages.sh
@@ -29,41 +29,42 @@ Scripts/StartStack.sh
 Scripts/StackStatus.sh
 ```
 
-Expected outcome:
+Resultado esperado:
 
-- PostgreSQL is healthy.
-- VictoriaMetrics is healthy.
-- ZabbixServer is healthy.
-- ZabbixWeb is healthy.
-- Grafana is healthy.
-- CapacityEngine is completed successfully or ready for batch execution.
+- PostgreSQL saludable.
+- VictoriaMetrics saludable.
+- ZabbixServer saludable.
+- ZabbixWeb saludable.
+- Grafana saludable.
+- CapacityEngine completado correctamente o listo para ejecucion batch.
 
-## 3. Generate Enterprise Verification Evidence
+## 3. Generar Evidencia Enterprise de Verificacion
 
-Planned validation command:
+Comando de validacion planificado:
 
 ```bash
 Scripts/GenerateEnterpriseVerificationData.sh --profile mixed --domains all --services 5 --components 50 --days 90 --load-id EnterpriseDemo001
 ```
 
-Expected outcome:
+Resultado esperado:
 
-- Inventory records exist for multiple technology domains.
-- Business services map to technology components.
-- Evidence records include available, missing, unknown, incomplete, and unverified states.
-- Score assessments exist on a 0-100 range.
-- Risk registry entries identify affected technologies and services.
-- Recommendations are tied to risks and evidence.
+- Existen registros de inventario para multiples dominios tecnologicos.
+- Los servicios de negocio mapean a componentes tecnologicos.
+- Los registros de evidencia incluyen estados disponible, faltante, desconocido, incompleto y no
+  verificado.
+- Existen evaluaciones de score en rango 0-100.
+- Los registros de riesgo identifican tecnologias y servicios afectados.
+- Las recomendaciones estan vinculadas a riesgos y evidencia.
 
-## 4. Run Enterprise Assessment
+## 4. Ejecutar Evaluacion Enterprise
 
-Planned validation command:
+Comando de validacion planificado:
 
 ```bash
 Scripts/RunEnterpriseAssessment.sh --scope enterprise --evidence-window-days 90 --run-id EnterpriseRun001
 ```
 
-Expected outcome:
+Resultado esperado:
 
 ```text
 INFO: evaluacion enterprise completada
@@ -74,15 +75,15 @@ INFO: evaluacion enterprise completada
   recomendaciones: <count>
 ```
 
-## 5. Validate Governance Outputs
+## 5. Validar Salidas de Gobierno
 
-Planned validation command:
+Comando de validacion planificado:
 
 ```bash
 Scripts/ValidateEnterpriseGovernance.sh --run-id EnterpriseRun001
 ```
 
-Expected outcome:
+Resultado esperado:
 
 ```text
 INFO: validacion enterprise completada
@@ -93,39 +94,40 @@ INFO: validacion enterprise completada
   dashboards: OK
 ```
 
-## 6. Review Dashboards
+## 6. Revisar Dashboards
 
-Open Grafana:
+Abrir Grafana:
 
 ```text
 http://localhost:3000
 ```
 
-Expected dashboard behavior:
+Comportamiento esperado de dashboards:
 
-- Executive dashboard shows Technology Health Score and domain scores.
-- Risk heat map shows risk by technology domain.
-- Top risks include affected technologies, affected services, severity, impact, and recommended
-  action.
-- Missing or incomplete evidence is visible and not treated as healthy.
-- Operational dashboards show trends, forecast horizons, top consumers, and evidence freshness.
+- El dashboard ejecutivo muestra Technology Health Score y scores por dominio.
+- El mapa de calor de riesgo muestra riesgo por dominio tecnologico.
+- Top riesgos incluye tecnologias afectadas, servicios afectados, severidad, impacto y accion
+  recomendada.
+- La evidencia faltante o incompleta es visible y no se trata como saludable.
+- Los dashboards operativos muestran tendencias, horizontes de forecast, top consumidores y
+  frescura de evidencia.
 
-## 7. Cleanup Verification Data
+## 7. Limpiar Datos de Verificacion
 
-Planned validation command:
+Comando de validacion planificado:
 
 ```bash
 Scripts/GenerateEnterpriseVerificationData.sh delete --load-id EnterpriseDemo001
 ```
 
-Expected outcome:
+Resultado esperado:
 
-- Generated verification records are removed.
-- Non-generated operational inventory and manually managed evidence remain intact.
+- Los registros generados de verificacion se eliminan.
+- El inventario operativo no generado y la evidencia administrada manualmente permanecen intactos.
 
-## References
+## Referencias
 
-- [Data model](./data-model.md)
-- [CLI contract](./contracts/cli-contract.md)
-- [Dashboard contract](./contracts/dashboard-contract.md)
-- [Dataset contract](./contracts/dataset-contract.md)
+- [Modelo de datos](./data-model.md)
+- [Contrato CLI](./contracts/cli-contract.md)
+- [Contrato de dashboards](./contracts/dashboard-contract.md)
+- [Contrato de dataset](./contracts/dataset-contract.md)

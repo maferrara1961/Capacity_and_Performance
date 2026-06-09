@@ -1,234 +1,242 @@
-# Data Model: Enterprise Governance Platform
+# Modelo de Datos: Plataforma Enterprise de Gobierno
 
 ## TechnologyDomain
 
-Represents a supported enterprise technology domain.
+Representa un dominio tecnologico enterprise soportado.
 
-**Fields**:
+**Campos**:
 
-- `DomainId`: stable identifier.
+- `DomainId`: identificador estable.
 - `Name`: Infrastructure, OperatingSystem, Database, Middleware, ContainerPlatform,
-  MessagingPlatform, MonitoringPlatform, EnterpriseApplication, or BusinessService.
-- `Description`: business-readable description.
-- `Status`: Active, Deprecated, or Disabled.
+  MessagingPlatform, MonitoringPlatform, EnterpriseApplication o BusinessService.
+- `Description`: descripcion legible por negocio.
+- `Status`: Active, Deprecated o Disabled.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- `Name` is required and unique.
-- Disabled domains cannot receive new inventory records.
+- `Name` es requerido y unico.
+- Dominios Disabled no pueden recibir nuevos registros de inventario.
 
 ## TechnologyComponent
 
-Represents a monitored or governed technology element.
+Representa un elemento tecnologico monitoreado o gobernado.
 
-**Fields**:
+**Campos**:
 
-- `ComponentId`: stable identifier.
-- `ComponentName`: visible name.
-- `TechnologyType`: server, virtual machine, database, middleware, application, service, or other
-  controlled value.
-- `DomainId`: associated TechnologyDomain.
-- `Version`: technology version where available.
-- `Vendor`: vendor or provider.
-- `Environment`: Production, NonProduction, Development, Test, or Unknown.
-- `BusinessServiceId`: optional associated business service.
-- `Owner`: accountable owner or team.
-- `SupportStatus`: Supported, Backlevel, EndOfSupport, EndOfLife, or Unknown.
-- `LifecycleStatus`: Current, AttentionRequired, AtRisk, Critical, or Unknown.
-- `EvidenceState`: Available, Missing, Unknown, Incomplete, or Unverified.
+- `ComponentId`: identificador estable.
+- `ComponentName`: nombre visible.
+- `TechnologyType`: servidor, maquina virtual, base de datos, middleware, aplicacion, servicio u
+  otro valor controlado.
+- `DomainId`: TechnologyDomain asociado.
+- `Version`: version tecnologica cuando exista.
+- `Vendor`: vendor o proveedor.
+- `Environment`: Production, NonProduction, Development, Test o Unknown.
+- `BusinessServiceId`: servicio de negocio asociado opcional.
+- `Owner`: owner o equipo responsable.
+- `SupportStatus`: Supported, Backlevel, EndOfSupport, EndOfLife o Unknown.
+- `LifecycleStatus`: Current, AttentionRequired, AtRisk, Critical o Unknown.
+- `EvidenceState`: Available, Missing, Unknown, Incomplete o Unverified.
 
-**Relationships**:
+**Relaciones**:
 
-- Belongs to one TechnologyDomain.
-- May support one or more BusinessServices through ServiceComponentMap.
-- Has many EvidenceRecords, RiskAssessments, and ScoreAssessments.
+- Pertenece a un TechnologyDomain.
+- Puede soportar uno o mas BusinessServices mediante ServiceComponentMap.
+- Tiene muchos EvidenceRecords, RiskAssessments y ScoreAssessments.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- `ComponentName`, `TechnologyType`, `DomainId`, and `EvidenceState` are required.
-- Missing lifecycle evidence must produce `SupportStatus = Unknown` or `LifecycleStatus = Unknown`.
+- `ComponentName`, `TechnologyType`, `DomainId` y `EvidenceState` son requeridos.
+- Evidencia faltante de ciclo de vida debe producir `SupportStatus = Unknown` o
+  `LifecycleStatus = Unknown`.
 
 ## BusinessService
 
-Represents a business-facing service or application grouping.
+Representa un servicio o agrupacion de aplicacion orientada al negocio.
 
-**Fields**:
+**Campos**:
 
-- `BusinessServiceId`: stable identifier.
-- `ServiceName`: visible service name.
-- `ServiceOwner`: accountable owner or team.
-- `Criticality`: Low, Medium, High, or Critical.
-- `Status`: Active, Degraded, Critical, Retired, or Unknown.
+- `BusinessServiceId`: identificador estable.
+- `ServiceName`: nombre visible del servicio.
+- `ServiceOwner`: owner o equipo responsable.
+- `Criticality`: Low, Medium, High o Critical.
+- `Status`: Active, Degraded, Critical, Retired o Unknown.
 
-**Relationships**:
+**Relaciones**:
 
-- Has many TechnologyComponents through ServiceComponentMap.
-- Has many RiskRegistryEntries through affected service mappings.
+- Tiene muchos TechnologyComponents mediante ServiceComponentMap.
+- Tiene muchos RiskRegistryEntries mediante mapeos de servicios afectados.
 
 ## ServiceComponentMap
 
-Maps technology components to business services.
+Mapea componentes tecnologicos a servicios de negocio.
 
-**Fields**:
+**Campos**:
 
-- `MapId`: stable identifier.
-- `BusinessServiceId`: service reference.
-- `ComponentId`: component reference.
-- `Role`: Application, Database, Middleware, Storage, Network, Monitoring, or Other.
-- `ImpactWeight`: numeric contribution to service risk.
+- `MapId`: identificador estable.
+- `BusinessServiceId`: referencia al servicio.
+- `ComponentId`: referencia al componente.
+- `Role`: Application, Database, Middleware, Storage, Network, Monitoring u Other.
+- `ImpactWeight`: contribucion numerica al riesgo del servicio.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- `ImpactWeight` must be 0-100.
-- A component shared by multiple services must remain visible in every affected service context.
+- `ImpactWeight` debe estar entre 0 y 100.
+- Un componente compartido por multiples servicios debe permanecer visible en cada contexto de
+  servicio afectado.
 
 ## EvidenceRecord
 
-Represents evidence used by assessments.
+Representa evidencia usada por evaluaciones.
 
-**Fields**:
+**Campos**:
 
-- `EvidenceId`: stable identifier.
-- `SourceSystem`: Zabbix, VictoriaMetrics, PostgreSQL, ManualRecord, SyntheticDataset, or Other.
-- `EvidenceType`: Telemetry, Inventory, Availability, Event, Lifecycle, Compliance, Trend, or
+- `EvidenceId`: identificador estable.
+- `SourceSystem`: Zabbix, VictoriaMetrics, PostgreSQL, ManualRecord, SyntheticDataset u Other.
+- `EvidenceType`: Telemetry, Inventory, Availability, Event, Lifecycle, Compliance, Trend o
   Forecast.
-- `ComponentId`: optional component reference.
-- `BusinessServiceId`: optional service reference.
-- `ObservedAt`: timestamp of evidence.
-- `FreshnessStatus`: Fresh, Stale, Expired, or Unknown.
-- `EvidenceState`: Available, Missing, Unknown, Incomplete, or Unverified.
-- `EvidenceReference`: source query, record id, metric label, dashboard reference, or file path.
+- `ComponentId`: referencia opcional al componente.
+- `BusinessServiceId`: referencia opcional al servicio.
+- `ObservedAt`: timestamp de la evidencia.
+- `FreshnessStatus`: Fresh, Stale, Expired o Unknown.
+- `EvidenceState`: Available, Missing, Unknown, Incomplete o Unverified.
+- `EvidenceReference`: consulta fuente, id de registro, label de metrica, referencia de dashboard
+  o path de archivo.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- Every assessment must reference at least one EvidenceRecord or an explicit missing evidence state.
-- Stale or incomplete evidence must reduce MonitoringConfidenceScore.
+- Toda evaluacion debe referenciar al menos un EvidenceRecord o un estado explicito de evidencia
+  faltante.
+- Evidencia stale o incompleta debe reducir MonitoringConfidenceScore.
 
 ## AssessmentRun
 
-Represents one execution of enterprise assessment calculations.
+Representa una ejecucion de calculos de evaluacion enterprise.
 
-**Fields**:
+**Campos**:
 
-- `AssessmentRunId`: stable identifier.
-- `StartedAt`: run start timestamp.
-- `CompletedAt`: optional completion timestamp.
-- `Status`: Running, Succeeded, Failed, or Partial.
-- `Scope`: domain, component, service, or enterprise scope.
-- `EvidenceWindowStart`: start of evidence window.
-- `EvidenceWindowEnd`: end of evidence window.
+- `AssessmentRunId`: identificador estable.
+- `StartedAt`: timestamp de inicio.
+- `CompletedAt`: timestamp opcional de fin.
+- `Status`: Running, Succeeded, Failed o Partial.
+- `Scope`: alcance domain, component, service o enterprise.
+- `EvidenceWindowStart`: inicio de la ventana de evidencia.
+- `EvidenceWindowEnd`: fin de la ventana de evidencia.
 
 ## ScoreAssessment
 
-Represents a 0-100 score for an assessment area.
+Representa un score 0-100 para un area de evaluacion.
 
-**Fields**:
+**Campos**:
 
-- `ScoreAssessmentId`: stable identifier.
-- `AssessmentRunId`: run reference.
-- `ScoreType`: Capacity, Performance, Availability, Lifecycle, Compliance, MonitoringConfidence,
-  or TechnologyHealth.
-- `ScopeType`: Enterprise, Domain, BusinessService, or TechnologyComponent.
-- `ScopeId`: referenced scope identifier.
+- `ScoreAssessmentId`: identificador estable.
+- `AssessmentRunId`: referencia al run.
+- `ScoreType`: Capacity, Performance, Availability, Lifecycle, Compliance, MonitoringConfidence o
+  TechnologyHealth.
+- `ScopeType`: Enterprise, Domain, BusinessService o TechnologyComponent.
+- `ScopeId`: identificador de alcance referenciado.
 - `ScoreValue`: 0-100.
-- `Classification`: Excellent, Healthy, AttentionRequired, AtRisk, or Critical.
-- `EvidenceState`: Available, Missing, Unknown, Incomplete, or Unverified.
+- `Classification`: Excellent, Healthy, AttentionRequired, AtRisk o Critical.
+- `EvidenceState`: Available, Missing, Unknown, Incomplete o Unverified.
 - `CalculatedAt`: timestamp.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- `ScoreValue` must be between 0 and 100.
-- TechnologyHealth classification must follow the 90/75/60/40 thresholds.
-- Missing evidence cannot produce Excellent or Healthy classification.
+- `ScoreValue` debe estar entre 0 y 100.
+- La clasificacion TechnologyHealth debe seguir umbrales 90/75/60/40.
+- Evidencia faltante no puede producir clasificacion Excellent o Healthy.
 
 ## RiskAssessment
 
-Represents a domain-specific risk calculated from evidence.
+Representa un riesgo especifico de dominio calculado desde evidencia.
 
-**Fields**:
+**Campos**:
 
-- `RiskAssessmentId`: stable identifier.
-- `AssessmentRunId`: run reference.
-- `RiskCategory`: Capacity, Performance, Availability, Lifecycle, Compliance, or Monitoring.
-- `Severity`: Low, Medium, High, or Critical.
-- `Impact`: business-readable impact.
-- `ScopeType`: Enterprise, Domain, BusinessService, or TechnologyComponent.
-- `ScopeId`: referenced scope identifier.
-- `EvidenceState`: Available, Missing, Unknown, Incomplete, or Unverified.
-- `Reason`: explanation.
+- `RiskAssessmentId`: identificador estable.
+- `AssessmentRunId`: referencia al run.
+- `RiskCategory`: Capacity, Performance, Availability, Lifecycle, Compliance o Monitoring.
+- `Severity`: Low, Medium, High o Critical.
+- `Impact`: impacto legible por negocio.
+- `ScopeType`: Enterprise, Domain, BusinessService o TechnologyComponent.
+- `ScopeId`: identificador de alcance referenciado.
+- `EvidenceState`: Available, Missing, Unknown, Incomplete o Unverified.
+- `Reason`: explicacion.
 - `CalculatedAt`: timestamp.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- Each risk must identify affected technologies and services through RiskRegistryEntry mappings.
-- Risks must be reproducible from referenced evidence.
+- Cada riesgo debe identificar tecnologias y servicios afectados mediante mapeos de
+  RiskRegistryEntry.
+- Los riesgos deben ser reproducibles desde la evidencia referenciada.
 
 ## RiskRegistryEntry
 
-Represents the shared risk object for governance and executive decisions.
+Representa el objeto compartido de riesgo para gobierno y decisiones ejecutivas.
 
-**Fields**:
+**Campos**:
 
-- `RiskId`: stable risk identifier.
-- `RiskAssessmentId`: assessment reference.
-- `RiskCategory`: Capacity, Performance, Availability, Lifecycle, Compliance, or Monitoring.
-- `Severity`: Low, Medium, High, or Critical.
-- `Impact`: business-readable impact.
-- `AffectedTechnologyIds`: one or more TechnologyComponent references.
-- `AffectedServiceIds`: zero or more BusinessService references.
-- `RecommendedAction`: action proposal.
-- `Status`: Open, Accepted, Mitigating, Closed, or Deferred.
-- `Owner`: accountable owner or team.
-- `EvidenceState`: Available, Missing, Unknown, Incomplete, or Unverified.
+- `RiskId`: identificador estable del riesgo.
+- `RiskAssessmentId`: referencia a la evaluacion.
+- `RiskCategory`: Capacity, Performance, Availability, Lifecycle, Compliance o Monitoring.
+- `Severity`: Low, Medium, High o Critical.
+- `Impact`: impacto legible por negocio.
+- `AffectedTechnologyIds`: una o mas referencias a TechnologyComponent.
+- `AffectedServiceIds`: cero o mas referencias a BusinessService.
+- `RecommendedAction`: propuesta de accion.
+- `Status`: Open, Accepted, Mitigating, Closed o Deferred.
+- `Owner`: owner o equipo responsable.
+- `EvidenceState`: Available, Missing, Unknown, Incomplete o Unverified.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- Every open risk must include severity, impact, affected technologies, and recommended action.
-- If no service mapping exists, the risk must show the mapping gap instead of hiding the component.
+- Todo riesgo abierto debe incluir severidad, impacto, tecnologias afectadas y accion recomendada.
+- Si no existe mapeo de servicio, el riesgo debe mostrar la brecha de mapeo en lugar de ocultar el
+  componente.
 
 ## Recommendation
 
-Represents a decision-support recommendation.
+Representa una recomendacion de soporte a decision.
 
-**Fields**:
+**Campos**:
 
-- `RecommendationId`: stable identifier.
-- `RiskId`: risk reference.
-- `Priority`: Low, Medium, High, or Critical.
-- `Action`: recommended action.
-- `Rationale`: evidence-backed rationale.
-- `DecisionOwner`: authorized decision owner or team.
-- `Status`: Open, Accepted, Rejected, Completed, or Deferred.
+- `RecommendationId`: identificador estable.
+- `RiskId`: referencia al riesgo.
+- `Priority`: Low, Medium, High o Critical.
+- `Action`: accion recomendada.
+- `Rationale`: razon respaldada por evidencia.
+- `DecisionOwner`: owner o equipo autorizado para decidir.
+- `Status`: Open, Accepted, Rejected, Completed o Deferred.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- Recommendations must not execute remediation automatically.
-- Recommendations must reference evidence and affected technologies/services through the risk.
+- Las recomendaciones no deben ejecutar remediacion automaticamente.
+- Las recomendaciones deben referenciar evidencia y tecnologias/servicios afectados mediante el
+  riesgo.
 
 ## ForecastResult
 
-Represents a forecast derived from historical evidence.
+Representa un forecast derivado de evidencia historica.
 
-**Fields**:
+**Campos**:
 
-- `ForecastId`: stable identifier.
-- `AssessmentRunId`: run reference.
-- `ComponentId`: component reference.
-- `MetricName`: CPU, Memory, Storage, Filesystem, or other controlled value.
-- `Forecast30Days`: optional projected value.
-- `Forecast90Days`: optional projected value.
-- `Forecast180Days`: optional projected value.
-- `Forecast365Days`: optional projected value.
-- `DaysToExhaustion`: optional days to saturation or exhaustion.
-- `EvidenceState`: Available, Missing, Unknown, Incomplete, or Unverified.
-- `Confidence`: Low, Medium, or High.
+- `ForecastId`: identificador estable.
+- `AssessmentRunId`: referencia al run.
+- `ComponentId`: referencia al componente.
+- `MetricName`: CPU, Memory, Storage, Filesystem u otro valor controlado.
+- `Forecast30Days`: valor proyectado opcional.
+- `Forecast90Days`: valor proyectado opcional.
+- `Forecast180Days`: valor proyectado opcional.
+- `Forecast365Days`: valor proyectado opcional.
+- `DaysToExhaustion`: dias opcionales hasta saturacion o agotamiento.
+- `EvidenceState`: Available, Missing, Unknown, Incomplete o Unverified.
+- `Confidence`: Low, Medium o High.
 
-**Validation Rules**:
+**Reglas de Validacion**:
 
-- Forecast horizons without sufficient history must remain empty and report insufficient evidence.
-- Forecast outputs must identify source evidence window and component.
+- Horizontes de forecast sin historia suficiente deben quedar vacios e informar evidencia
+  insuficiente.
+- Los forecasts deben identificar ventana de evidencia fuente y componente.
 
-## State Transitions
+## Transiciones de Estado
 
 ### RiskRegistryEntry.Status
 

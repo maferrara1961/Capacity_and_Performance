@@ -1,98 +1,101 @@
-# Research: Enterprise Governance Platform
+# Investigacion: Plataforma Enterprise de Gobierno
 
-## Decision: Keep the Existing Approved Toolchain
+## Decision: Mantener el Toolchain Aprobado Existente
 
-Capacity_and_Performance will continue to use Zabbix, VictoriaMetrics, PostgreSQL, Grafana,
-Podman, shell scripts, and Python stdlib only.
+Capacity_and_Performance seguira usando Zabbix, VictoriaMetrics, PostgreSQL, Grafana, Podman,
+scripts shell y Python stdlib solamente.
 
-**Rationale**: The constitution prohibits new external libraries and the project already has a
-working stack, validation scripts, synthetic data loader, and dashboard provisioning model.
+**Razon**: La constitucion prohibe nuevas librerias externas y el proyecto ya tiene stack funcional,
+scripts de validacion, loader de datos sinteticos y modelo de provisioning de dashboards.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- Add a new analytics engine: rejected because it introduces dependency and licensing risk.
-- Add a new workflow/orchestration platform: rejected because current batch scripts and
-  CapacityEngine are sufficient for planned assessments.
+- Agregar un nuevo motor analitico: rechazado porque introduce riesgo de dependencias y licencias.
+- Agregar una nueva plataforma de workflow/orquestacion: rechazado porque los scripts batch
+  actuales y CapacityEngine son suficientes para las evaluaciones planificadas.
 
-## Decision: Model Technology Domains as Data
+## Decision: Modelar Dominios Tecnologicos como Datos
 
-Technology domains, component types, business services, lifecycle states, compliance states, and
-evidence states will be modeled as data attributes rather than hard-coded per-domain classes.
+Dominios tecnologicos, tipos de componente, servicios de negocio, estados de ciclo de vida, estados
+de cumplimiento y estados de evidencia se modelaran como atributos de datos y no como clases
+hardcodeadas por dominio.
 
-**Rationale**: The platform must support infrastructure, OS, database, middleware, container,
-messaging, monitoring, enterprise application, and future domains without redesigning the platform.
+**Razon**: La plataforma debe soportar infraestructura, OS, bases de datos, middleware,
+contenedores, mensajeria, monitoreo, aplicaciones enterprise y dominios futuros sin redisenar.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- Separate code paths for each technology domain: rejected due to duplication and poor
-  extensibility.
-- Free-form text only: rejected because scoring, filtering, and auditability require controlled
-  values and validation.
+- Caminos de codigo separados por dominio tecnologico: rechazado por duplicacion y baja
+  extensibilidad.
+- Texto libre solamente: rechazado porque scoring, filtros y auditabilidad requieren valores
+  controlados y validacion.
 
-## Decision: Treat Missing Evidence as a First-Class State
+## Decision: Tratar Evidencia Faltante como Estado de Primera Clase
 
-Evidence status will explicitly include Available, Missing, Unknown, Incomplete, and Unverified.
-Missing or weak evidence reduces monitoring confidence and must not be interpreted as healthy.
+El estado de evidencia incluira Disponible, Faltante, Desconocida, Incompleta y NoVerificada. La
+evidencia faltante o debil reduce la confianza de monitoreo y no debe interpretarse como saludable.
 
-**Rationale**: The constitution and specification both prohibit inferring healthy status from
-missing data.
+**Razon**: La constitucion y la especificacion prohiben inferir salud desde datos faltantes.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- Null values only: rejected because null does not explain whether evidence is missing, unknown,
-  incomplete, or unverified.
-- Exclude incomplete records: rejected because hiding gaps creates false confidence.
+- Usar solo valores nulos: rechazado porque null no explica si la evidencia falta, es desconocida,
+  incompleta o no verificada.
+- Excluir registros incompletos: rechazado porque ocultar brechas genera falsa confianza.
 
-## Decision: Score Everything on a 0-100 Scale
+## Decision: Scoring en Escala Comun 0-100
 
-Capacity, Performance, Availability, Lifecycle, Compliance, Monitoring Confidence, and Technology
-Health scores will use a normalized 0-100 scale. Technology Health classification follows:
-Excellent 90-100, Healthy 75-89, Attention Required 60-74, At Risk 40-59, Critical 0-39.
+Capacity, Performance, Availability, Lifecycle, Compliance, Monitoring Confidence y Technology
+Health usaran escala normalizada 0-100. La clasificacion de Technology Health es: Excellent
+90-100, Healthy 75-89, Attention Required 60-74, At Risk 40-59, Critical 0-39.
 
-**Rationale**: A common score range supports executive comparison and reproducible reporting.
+**Razon**: Una escala comun permite comparacion ejecutiva y reporting reproducible.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- Domain-specific score ranges: rejected because they complicate executive interpretation.
-- Status-only output: rejected because stakeholders need trending and prioritization.
+- Rangos de score especificos por dominio: rechazado porque complican la interpretacion ejecutiva.
+- Solo estados sin puntaje: rechazado porque las partes interesadas necesitan tendencias y priorizacion.
 
-## Decision: Risk Registry Is the Shared Decision Object
+## Decision: El Registro de Riesgos es el Objeto Compartido de Decision
 
-Every risk entry will identify category, severity, impact, affected technologies, affected
-services, evidence state, evidence references, and recommended action.
+Cada riesgo identificara categoria, severidad, impacto, tecnologias afectadas, servicios afectados,
+estado de evidencia, referencias de evidencia y accion recomendada.
 
-**Rationale**: This gives executives, governance users, and operations teams one shared language
-for decision support.
+**Razon**: Esto da a ejecutivos, gobierno y operaciones un lenguaje compartido para soporte de
+decisiones.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- Dashboard-only risk rendering: rejected because risk decisions need auditability and reuse.
-- Tool-specific alerts only: rejected because raw alerts do not carry lifecycle, compliance, and
-  business service context.
+- Riesgo solo renderizado en dashboard: rechazado porque las decisiones de riesgo requieren
+  auditabilidad y reutilizacion.
+- Alertas especificas por herramienta: rechazado porque las alertas crudas no incluyen contexto de
+  ciclo de vida, cumplimiento y servicio de negocio.
 
-## Decision: Historical Evidence Is Required for Forecasts
+## Decision: La Evidencia Historica es Requerida para Forecasts
 
-Forecasts for 30, 90, 180, and 365 days require sufficient historical evidence. If evidence is
-insufficient, the forecast output must show an insufficient-evidence state instead of fabricating a
-projection.
+Los forecasts de 30, 90, 180 y 365 dias requieren evidencia historica suficiente. Si la evidencia
+es insuficiente, la salida de forecast debe mostrar un estado de evidencia insuficiente en vez de
+fabricar una proyeccion.
 
-**Rationale**: Trend principles prioritize historical behavior over snapshots and require
-traceability.
+**Razon**: Los principios de tendencia priorizan comportamiento historico sobre snapshots y exigen
+trazabilidad.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- Always forecast from latest point: rejected because it creates unsupported conclusions.
-- Hide forecasts when insufficient: rejected because stakeholders must see evidence gaps.
+- Siempre forecast desde el ultimo punto: rechazado porque crea conclusiones no soportadas.
+- Ocultar forecasts insuficientes: rechazado porque las partes interesadas deben ver brechas de
+  evidencia.
 
-## Decision: Contracts Cover CLI, Dataset, and Dashboard Behavior
+## Decision: Contratos para CLI, Dataset y Dashboards
 
-This feature exposes operational behavior through scripts, generated datasets, and Grafana
-dashboards, so contracts are documented as command, dataset, and dashboard expectations.
+Este feature expone comportamiento operativo mediante scripts, datasets generados y dashboards
+Grafana, por lo que los contratos se documentan como expectativas de comandos, datos y dashboards.
 
-**Rationale**: The project is not a public web API. The relevant external surfaces are commands,
-data artifacts, and dashboards.
+**Razon**: El proyecto no define una API web publica. Las superficies externas relevantes son
+comandos, artefactos de datos y dashboards.
 
-**Alternatives considered**:
+**Alternativas consideradas**:
 
-- OpenAPI contracts: rejected because no HTTP API is defined for this feature.
-- No contracts: rejected because Spec Kit planning requires testable interface expectations.
+- Contratos OpenAPI: rechazado porque no se define API HTTP para este feature.
+- Sin contratos: rechazado porque la planificacion Spec Kit requiere expectativas testeables de
+  interfaz.

@@ -1,34 +1,37 @@
-# CLI Contract: Enterprise Governance Platform
+# Contrato CLI: Plataforma Enterprise de Gobierno
 
-## Scope
+## Alcance
 
-This contract defines expected command behavior for enterprise assessment, validation, inventory
-sync, and synthetic evidence generation. Command names may be implemented by extending existing
-scripts or by adding new scripts, but behavior must remain testable from the shell.
+Este contrato define el comportamiento esperado de comandos para evaluacion enterprise, validacion,
+sincronizacion de inventario y generacion de evidencia sintetica. Los nombres de comandos pueden
+implementarse extendiendo scripts existentes o agregando nuevos scripts, pero el comportamiento debe
+ser testeable desde shell.
 
-## Common Rules
+## Reglas Comunes
 
-- Commands must validate all user-controlled arguments before execution.
-- Commands must print Spanish operational messages consistent with existing scripts.
-- Commands must return exit code `0` on success and non-zero on validation or execution failure.
-- Destructive commands must require explicit confirmation.
-- Commands must not require new external libraries.
+- Los comandos deben validar todos los argumentos controlados por usuario antes de ejecutar.
+- Los comandos deben imprimir mensajes operativos en castellano, consistentes con los scripts
+  existentes.
+- Los comandos deben retornar exit code `0` en exito y distinto de cero ante error de validacion o
+  ejecucion.
+- Los comandos destructivos deben requerir confirmacion explicita.
+- Los comandos no deben requerir nuevas librerias externas.
 
 ## `Scripts/RunEnterpriseAssessment.sh`
 
-Runs enterprise scoring and risk assessment for the selected scope.
+Ejecuta scoring y evaluacion de riesgos enterprise para el alcance seleccionado.
 
-### Required Arguments
+### Argumentos Requeridos
 
-- `--scope`: `enterprise`, `domain`, `service`, or `component`.
+- `--scope`: `enterprise`, `domain`, `service` o `component`.
 
-### Optional Arguments
+### Argumentos Opcionales
 
-- `--scope-id`: identifier required when scope is not `enterprise`.
-- `--evidence-window-days`: positive integer; default `90`.
-- `--run-id`: caller-supplied run id; generated if omitted.
+- `--scope-id`: identificador requerido cuando scope no es `enterprise`.
+- `--evidence-window-days`: entero positivo; default `90`.
+- `--run-id`: run id provisto por caller; generado si se omite.
 
-### Success Output
+### Salida Exitosa
 
 ```text
 INFO: evaluacion enterprise completada
@@ -39,23 +42,23 @@ INFO: evaluacion enterprise completada
   recomendaciones: <count>
 ```
 
-### Validation Failures
+### Fallas de Validacion
 
-- Unknown scope.
-- Missing `--scope-id` for non-enterprise scope.
-- Invalid evidence window.
-- Missing required source containers or unavailable data source.
+- Scope desconocido.
+- Falta `--scope-id` para scope no enterprise.
+- Ventana de evidencia invalida.
+- Contenedores requeridos faltantes o fuente de datos no disponible.
 
 ## `Scripts/ValidateEnterpriseGovernance.sh`
 
-Validates that enterprise governance datasets and dashboards are usable.
+Valida que datasets y dashboards de gobierno enterprise sean utilizables.
 
-### Optional Arguments
+### Argumentos Opcionales
 
-- `--run-id`: validate a specific assessment run.
-- `--scope`: validate a specific scope.
+- `--run-id`: validar un run especifico.
+- `--scope`: validar un alcance especifico.
 
-### Success Output
+### Salida Exitosa
 
 ```text
 INFO: validacion enterprise completada
@@ -68,23 +71,23 @@ INFO: validacion enterprise completada
 
 ## `Scripts/GenerateEnterpriseVerificationData.sh`
 
-Generates representative enterprise evidence for inventory, telemetry, lifecycle, compliance,
-monitoring confidence, risk, scoring, and dashboards.
+Genera evidencia enterprise representativa para inventario, telemetria, ciclo de vida,
+cumplimiento, confianza de monitoreo, riesgo, scoring y dashboards.
 
-### Optional Arguments
+### Argumentos Opcionales
 
-- `--profile`: `normal`, `warning`, `critical`, or `mixed`.
-- `--domains`: comma-separated technology domains.
-- `--services`: positive integer.
-- `--components`: positive integer.
-- `--days`: positive integer, default `90`.
-- `--load-id`: caller-supplied dataset id.
+- `--profile`: `normal`, `warning`, `critical` o `mixed`.
+- `--domains`: dominios tecnologicos separados por coma.
+- `--services`: entero positivo.
+- `--components`: entero positivo.
+- `--days`: entero positivo, default `90`.
+- `--load-id`: id de dataset provisto por caller.
 
-### Delete Mode
+### Modo Borrado
 
 ```bash
 Scripts/GenerateEnterpriseVerificationData.sh delete --load-id <LoadId>
 Scripts/GenerateEnterpriseVerificationData.sh delete --all --confirmar
 ```
 
-Delete mode must remove only generated enterprise verification data.
+El modo borrado debe eliminar solamente datos enterprise de verificacion generados.

@@ -1,21 +1,21 @@
-# Dataset Contract: Enterprise Governance Platform
+# Contrato de Dataset: Plataforma Enterprise de Gobierno
 
-## Purpose
+## Proposito
 
-Enterprise governance datasets must be consistent across PostgreSQL, VictoriaMetrics, Zabbix, and
-Grafana so stakeholders see the same technologies, services, evidence, risks, scores, and
-recommendations.
+Los datasets de gobierno enterprise deben ser consistentes entre PostgreSQL, VictoriaMetrics,
+Zabbix y Grafana para que las partes interesadas vean las mismas tecnologias, servicios, evidencias,
+riesgos, scores y recomendaciones.
 
-## Required Dataset Groups
+## Grupos de Dataset Requeridos
 
-### Inventory
+### Inventario
 
 - TechnologyDomain.
 - TechnologyComponent.
 - BusinessService.
 - ServiceComponentMap.
 
-### Evidence
+### Evidencia
 
 - TelemetryEvidence.
 - LifecycleEvidence.
@@ -24,7 +24,7 @@ recommendations.
 - MonitoringCoverageEvidence.
 - EvidenceState.
 
-### Assessment
+### Evaluacion
 
 - AssessmentRun.
 - ScoreAssessment.
@@ -33,40 +33,42 @@ recommendations.
 - RiskRegistryEntry.
 - Recommendation.
 
-## Identity Consistency
+## Consistencia de Identidad
 
-- Component visible name must be stable across Zabbix, PostgreSQL, VictoriaMetrics labels, and
-  Grafana panels.
-- Internal identifiers may exist for joins and cleanup, but executive dashboards must show
-  business-readable names.
-- Business service references must be shared by score, risk, and recommendation outputs.
+- El nombre visible del componente debe ser estable entre Zabbix, PostgreSQL, labels de
+  VictoriaMetrics y paneles Grafana.
+- Pueden existir identificadores internos para joins y limpieza, pero los dashboards ejecutivos
+  deben mostrar nombres legibles por negocio.
+- Las referencias a servicios de negocio deben ser compartidas por scores, riesgos y
+  recomendaciones.
 
-## Evidence State Rules
+## Reglas de Estado de Evidencia
 
-- Available evidence can support healthy status only when risk criteria pass.
-- Missing evidence cannot support healthy, compliant, or supported status.
-- Unknown evidence must remain visible in dashboard and registry outputs.
-- Incomplete evidence must reduce Monitoring Confidence Score.
-- Unverified evidence must require review before supporting final conclusions.
+- Evidencia disponible puede soportar estado saludable solo cuando los criterios de riesgo pasan.
+- Evidencia faltante no puede soportar estado saludable, compliant o supported.
+- Evidencia desconocida debe permanecer visible en dashboards y registros.
+- Evidencia incompleta debe reducir Monitoring Confidence Score.
+- Evidencia no verificada debe requerir revision antes de soportar conclusiones finales.
 
-## Score Rules
+## Reglas de Score
 
-- All scores are integers or decimals in the range 0-100.
-- Technology Health Score classification uses the required thresholds:
+- Todos los scores son enteros o decimales en rango 0-100.
+- La clasificacion de Technology Health Score usa los umbrales requeridos:
   - 90-100: Excellent.
   - 75-89: Healthy.
   - 60-74: Attention Required.
   - 40-59: At Risk.
   - 0-39: Critical.
 
-## Forecast Rules
+## Reglas de Forecast
 
-- Forecasts must include 30 and 90 days when sufficient evidence exists.
-- Forecasts should include 180 and 365 days when sufficient history exists.
-- Insufficient history must produce an explicit evidence limitation.
+- Los forecasts deben incluir 30 y 90 dias cuando exista evidencia suficiente.
+- Los forecasts deben incluir 180 y 365 dias cuando exista historia suficiente.
+- Historia insuficiente debe producir una limitacion explicita de evidencia.
 
-## Deletion Rules
+## Reglas de Borrado
 
-- Generated verification datasets must be deletable by load id.
-- Delete-all mode must require explicit confirmation.
-- Deletion must not remove non-generated operational inventory or manually managed evidence.
+- Los datasets generados de verificacion deben poder borrarse por load id.
+- El modo delete-all debe requerir confirmacion explicita.
+- El borrado no debe eliminar inventario operativo no generado ni evidencia administrada
+  manualmente.

@@ -1,11 +1,11 @@
-# Dashboard Contract: Enterprise Governance Platform
+# Contrato de Dashboards: Plataforma Enterprise de Gobierno
 
-## Executive Dashboard
+## Dashboard Ejecutivo
 
-The executive dashboard must allow an executive user to understand enterprise technology health
-within sixty seconds.
+El dashboard ejecutivo debe permitir que un usuario ejecutivo entienda la salud tecnologica
+enterprise en sesenta segundos.
 
-### Required Panels
+### Paneles Requeridos
 
 - Technology Health Score.
 - Capacity Score.
@@ -14,60 +14,61 @@ within sixty seconds.
 - Lifecycle Score.
 - Compliance Score.
 - Monitoring Confidence Score.
-- Risk Heat Map by technology domain.
-- Top 10 Risks with severity, impact, affected technologies, affected services, and action.
-- Capacity Forecast for CPU, memory, and storage.
+- Risk Heat Map por dominio tecnologico.
+- Top 10 Riesgos con severidad, impacto, tecnologias afectadas, servicios afectados y accion.
+- Capacity Forecast para CPU, memoria y storage.
 - Lifecycle Overview.
 - Compliance Overview.
 - Service Health Overview.
 - Executive Decision Summary.
 
-### Empty and Missing Evidence Behavior
+### Comportamiento ante Vacio y Evidencia Faltante
 
-- Missing evidence must display as missing, unknown, incomplete, or unverified.
-- Missing evidence must not render as OK, Healthy, Compliant, or Supported.
-- Dashboards must include enough context to distinguish "no risk" from "no evidence".
+- La evidencia faltante debe mostrarse como faltante, desconocida, incompleta o no verificada.
+- La evidencia faltante no debe renderizarse como OK, Healthy, Compliant o Supported.
+- Los dashboards deben incluir contexto suficiente para distinguir "sin riesgo" de "sin evidencia".
 
-## Governance Dashboard
+## Dashboard de Gobierno
 
-The governance dashboard supports service delivery managers, platform owners, and compliance users.
+El dashboard de gobierno soporta service delivery managers, platform owners y usuarios de
+cumplimiento.
 
-### Required Panels
+### Paneles Requeridos
 
-- Technology inventory by domain.
-- Service-to-component mapping.
-- Lifecycle status by technology.
-- Compliance status by technology.
-- Monitoring coverage and freshness.
-- Risk registry.
-- Open recommendations by owner and severity.
+- Inventario tecnologico por dominio.
+- Mapeo servicio-componente.
+- Estado de ciclo de vida por tecnologia.
+- Estado de cumplimiento por tecnologia.
+- Cobertura y frescura de monitoreo.
+- Registro de riesgos.
+- Recomendaciones abiertas por owner y severidad.
 
-## Operational Dashboard
+## Dashboard Operativo
 
-The operational dashboard supports engineering and operations teams.
+El dashboard operativo soporta equipos de ingenieria y operaciones.
 
-### Required Panels
+### Paneles Requeridos
 
-- Capacity trends.
-- Performance trends.
-- Availability history.
-- Top consumers.
-- Saturation indicators.
-- Forecast horizons for 30, 90, 180, and 365 days.
-- Evidence freshness and collection failures.
+- Tendencias de capacidad.
+- Tendencias de performance.
+- Historia de disponibilidad.
+- Top consumidores.
+- Indicadores de saturacion.
+- Horizontes de forecast para 30, 90, 180 y 365 dias.
+- Frescura de evidencia y fallas de recoleccion.
 
-## Filters
+## Filtros
 
-Dashboards must support, where data exists:
+Los dashboards deben soportar, cuando existan datos:
 
-- Assessment run.
-- Technology domain.
-- Business service.
-- Environment.
-- Severity.
-- Evidence state.
+- Run de evaluacion.
+- Dominio tecnologico.
+- Servicio de negocio.
+- Ambiente.
+- Severidad.
+- Estado de evidencia.
 
-## Validation
+## Validacion
 
-Contract tests must inspect dashboard provisioning artifacts and confirm required titles, queries,
-datasources, filters, and missing-evidence text are present.
+Las pruebas contract deben inspeccionar artefactos de provisioning de dashboards y confirmar que
+titulos, queries, datasources, filtros y texto de evidencia faltante requeridos esten presentes.

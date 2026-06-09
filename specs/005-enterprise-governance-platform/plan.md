@@ -1,97 +1,103 @@
-# Implementation Plan: Enterprise Governance Platform
+# Plan de Implementacion: Plataforma Enterprise de Gobierno
 
-**Branch**: `main` | **Date**: 2026-06-09 | **Spec**: [spec.md](./spec.md)
+**Rama**: `main` | **Fecha**: 2026-06-09 | **Spec**: [spec.md](./spec.md)
 
-**Input**: Feature specification from `specs/005-enterprise-governance-platform/spec.md`
+**Entrada**: Especificacion desde `specs/005-enterprise-governance-platform/spec.md`
 
-## Summary
+## Resumen
 
-Extend Capacity_and_Performance from a capacity/performance observability stack into an enterprise
-technology governance platform. The implementation will add domain models and evidence-backed
-assessment flows for technology inventory, capacity, performance, availability, lifecycle,
-compliance, monitoring confidence, risk registry, scoring, and executive/operational dashboards.
+Extender Capacity_and_Performance desde un stack de observabilidad de capacidad y performance hacia
+una plataforma enterprise de gobierno tecnologico. La implementacion agregara modelos de dominio y
+flujos de evaluacion basados en evidencia para inventario tecnologico, capacidad, performance,
+disponibilidad, ciclo de vida, cumplimiento, confianza de monitoreo, registro de riesgos, scoring y
+dashboards ejecutivos/operativos.
 
-The technical approach preserves the current Podman stack and Clean Architecture structure:
-domain policy and scoring live in `CapacityEngine/Domain` and `CapacityEngine/Application`,
-source-system access remains in adapters, reporting datasets stay in PostgreSQL, time-series
-evidence remains in VictoriaMetrics, inventory and monitoring evidence remains governed by Zabbix,
-and Grafana remains the visualization layer.
+El enfoque tecnico preserva el stack Podman actual y la estructura Clean Architecture: la politica
+de dominio y scoring vive en `CapacityEngine/Domain` y `CapacityEngine/Application`, el acceso a
+sistemas fuente queda en adapters, los datasets de reporting quedan en PostgreSQL, la evidencia de
+series temporales queda en VictoriaMetrics, el inventario y monitoreo quedan gobernados por Zabbix,
+y Grafana sigue siendo la capa de visualizacion.
 
-## Technical Context
+## Contexto Tecnico
 
-**Language/Version**: Python 3.11 for CapacityEngine runtime; shell scripts for stack
-administration; JSON/YAML provisioning for Grafana and Podman.
+**Lenguaje/Version**: Python 3.11 para runtime de CapacityEngine; scripts shell para
+administracion del stack; provisioning JSON/YAML para Grafana y Podman.
 
-**Primary Dependencies**: Existing runtime/platform APIs only. No new external Python libraries,
-SDKs, packages, hosted services, or proprietary licensed components.
+**Dependencias Primarias**: Solo APIs existentes del runtime/plataforma. Sin nuevas librerias
+externas de Python, SDKs, paquetes, servicios alojados ni componentes propietarios licenciados.
 
-**Storage**: PostgreSQL `capacity` database for inventory, lifecycle, compliance, risk, scoring,
-and reporting datasets; VictoriaMetrics for historical metric evidence; Zabbix/PostgreSQL for
-monitoring and inventory evidence; Grafana SQLite only for Grafana internal state.
+**Storage**: Base PostgreSQL `capacity` para inventario, ciclo de vida, cumplimiento, riesgo,
+scoring y datasets de reporting; VictoriaMetrics para evidencia historica de metricas;
+Zabbix/PostgreSQL para evidencia de monitoreo e inventario; SQLite de Grafana solo para estado
+interno de Grafana.
 
-**Testing**: Existing stdlib `unittest` suite executed through `Scripts/RunTests.sh`, with unit,
-contract, and integration tests under `Tests/`.
+**Testing**: Suite existente stdlib `unittest` ejecutada con `Scripts/RunTests.sh`, con pruebas
+unitarias, contract e integracion bajo `Tests/`.
 
-**Target Platform**: Linux/Podman self-hosted stack, validated locally and on remote Ubuntu hosts.
+**Plataforma Objetivo**: Stack Linux/Podman self-hosted, validado localmente y en hosts Ubuntu
+remotos.
 
-**Project Type**: Self-hosted observability/governance platform with Python batch engine, shell
-administration scripts, Grafana dashboards, and containerized services.
+**Tipo de Proyecto**: Plataforma self-hosted de observabilidad/gobierno con motor batch Python,
+scripts shell de administracion, dashboards Grafana y servicios containerizados.
 
-**Performance Goals**: Support 10,000+ monitored components, multi-year historical retention, and
-executive state comprehension within sixty seconds.
+**Objetivos de Performance**: Soportar 10.000+ componentes monitoreados, retencion historica
+multi-anual y comprension ejecutiva del estado en sesenta segundos.
 
-**Constraints**: No healthy inference from missing evidence; all scores must be 0-100 and
-traceable; protected dashboards/commands require authentication; user-controlled inputs must be
-validated; project-defined symbols use PascalCase unless external platform conventions require an
-exception.
+**Restricciones**: No inferir salud desde evidencia faltante; todos los scores deben estar en rango
+0-100 y ser trazables; dashboards/comandos protegidos requieren autenticacion; las entradas de
+usuario deben validarse; los simbolos definidos por el proyecto usan PascalCase salvo excepciones
+por convenciones externas documentadas.
 
-**Scale/Scope**: Enterprise technology domains covering infrastructure, operating systems,
-databases, middleware, container platforms, messaging platforms, monitoring platforms, enterprise
-applications, and business services.
+**Escala/Alcance**: Dominios tecnologicos enterprise: infraestructura, sistemas operativos, bases
+de datos, middleware, plataformas de contenedores, plataformas de mensajeria, monitoreo,
+aplicaciones enterprise y servicios de negocio.
 
-**Technology Domains Affected**: Capacity, Performance, Availability, Lifecycle, Compliance, and
-Monitoring Governance.
+**Dominios Tecnologicos Afectados**: Capacidad, Performance, Disponibilidad, Ciclo de Vida,
+Cumplimiento y Gobierno de Monitoreo.
 
-**Evidence Sources**: Zabbix monitoring/inventory/events, VictoriaMetrics historical metrics,
-PostgreSQL metadata/inventory/lifecycle/compliance/risk datasets, Grafana dashboard presentation,
-and generated validation datasets.
+**Fuentes de Evidencia**: Monitoreo/inventario/eventos de Zabbix, metricas historicas de
+VictoriaMetrics, datasets de metadata/inventario/ciclo de vida/cumplimiento/riesgo de PostgreSQL,
+presentacion en Grafana y datasets generados de validacion.
 
-**Assessment Outputs**: Capacity Risk Assessment, Performance Risk Assessment, Availability Risk
+**Salidas de Evaluacion**: Capacity Risk Assessment, Performance Risk Assessment, Availability Risk
 Assessment, Lifecycle Risk Assessment, Compliance Risk Assessment, Monitoring Confidence
-Assessment, Technology Health Score, risk registry entries, and executive/operational dashboards.
+Assessment, Technology Health Score, registros de riesgo y dashboards ejecutivos/operativos.
 
-## Constitution Check
+## Chequeo de Constitucion
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*GATE: Debe pasar antes de Phase 0 research. Re-chequear despues de Phase 1 design.*
 
-- **TDD**: PASS. Plan requires failing unit/contract/integration tests for evidence states,
-  scoring, risk registry, protected access, and dashboard data contracts before implementation.
-- **SOLID / Clean Architecture**: PASS. Domain models and scoring policy stay independent from
-  Zabbix, VictoriaMetrics, PostgreSQL, Grafana, shell, and Podman adapters.
-- **DRY / YAGNI**: PASS. Reuse existing `CapacityEngine` layers, synthetic data mechanisms, and
-  dashboard provisioning; avoid speculative integrations beyond the declared enterprise domains.
-- **PascalCase**: PASS. New project-defined Python symbols, table-like entity names, and artifact
-  names use PascalCase; external metric labels and Grafana JSON conventions remain documented
-  exceptions.
-- **No New External Libraries**: PASS. Implementation uses stdlib Python, existing shell tooling,
-  existing Podman images, and approved platform APIs only.
-- **Validation and Auth**: PASS. User-controlled script inputs, dashboard filters, governance
-  updates, inventory changes, and risk registry commands must be validated; Grafana and Zabbix
-  views remain authenticated.
-- **Platform Scope**: PASS. The model represents domain and technology type as data so future
-  technologies can be added without redesigning assessment policy.
-- **Evidence Handling**: PASS. Evidence states include available, missing, unknown, incomplete,
-  and unverified, and missing evidence cannot produce healthy status.
-- **Risk and Trend Logic**: PASS. Risk and scoring criteria are objective, reproducible, and
-  traceable; forecasts require historical evidence and must show insufficient-evidence states.
-- **Scoring**: PASS. All domain scores and Technology Health Score use a 0-100 range with
-  classification thresholds from the specification.
-- **Human Decision Support**: PASS. Recommendations identify affected technologies/services and
-  support human decisions without automated remediation.
+- **TDD**: PASS. El plan requiere pruebas unitarias/contract/integracion fallidas antes de
+  implementar estados de evidencia, scoring, registro de riesgos, acceso protegido y contratos de
+  datos de dashboards.
+- **SOLID / Clean Architecture**: PASS. Modelos de dominio y politica de scoring quedan
+  independientes de Zabbix, VictoriaMetrics, PostgreSQL, Grafana, shell y adapters Podman.
+- **DRY / YAGNI**: PASS. Reutiliza capas existentes de `CapacityEngine`, mecanismos de datos
+  sinteticos y provisioning de dashboards; evita integraciones especulativas fuera de los dominios
+  enterprise declarados.
+- **PascalCase**: PASS. Nuevos simbolos Python, nombres de entidades y artefactos definidos por el
+  proyecto usan PascalCase; labels externos de metricas y convenciones JSON de Grafana quedan como
+  excepciones documentadas.
+- **Sin Nuevas Librerias Externas**: PASS. La implementacion usa Python stdlib, shell existente,
+  imagenes Podman existentes y APIs de plataforma aprobadas.
+- **Validacion y Auth**: PASS. Entradas de scripts, filtros de dashboard, actualizaciones de
+  gobierno, cambios de inventario y comandos de registro de riesgos deben validarse; vistas de
+  Grafana y Zabbix permanecen autenticadas.
+- **Alcance de Plataforma**: PASS. El modelo representa dominio y tipo tecnologico como datos para
+  permitir agregar tecnologias futuras sin redisenar la politica de evaluacion.
+- **Manejo de Evidencia**: PASS. Los estados incluyen disponible, faltante, desconocida, incompleta
+  y no verificada; la evidencia faltante no puede producir estado saludable.
+- **Logica de Riesgo y Tendencia**: PASS. Criterios de riesgo y scoring son objetivos,
+  reproducibles y trazables; los forecasts requieren evidencia historica y deben mostrar estados de
+  evidencia insuficiente.
+- **Scoring**: PASS. Todos los scores de dominio y Technology Health Score usan rango 0-100 con
+  umbrales de clasificacion definidos por la especificacion.
+- **Soporte a Decision Humana**: PASS. Las recomendaciones identifican tecnologias/servicios
+  afectados y soportan decisiones humanas sin remediacion automatica.
 
-## Project Structure
+## Estructura del Proyecto
 
-### Documentation (this feature)
+### Documentacion (este feature)
 
 ```text
 specs/005-enterprise-governance-platform/
@@ -107,24 +113,24 @@ specs/005-enterprise-governance-platform/
     └── requirements.md
 ```
 
-### Source Code (repository root)
+### Codigo Fuente (raiz del repositorio)
 
 ```text
 CapacityEngine/
-├── Domain/              # Enterprise inventory, evidence, score, risk, and recommendation policy
-├── Application/         # Assessment, scoring, orchestration, validation, and use cases
-├── Adapters/            # PostgreSQL, VictoriaMetrics, Zabbix, and command adapters
-└── Scheduler/           # Batch entry points and CLI commands
+├── Domain/              # Politica de inventario, evidencia, score, riesgo y recomendacion
+├── Application/         # Evaluacion, scoring, orquestacion, validacion y casos de uso
+├── Adapters/            # Adapters PostgreSQL, VictoriaMetrics, Zabbix y comandos
+└── Scheduler/           # Entrypoints batch y comandos CLI
 
 Config/
 ├── Grafana/
-│   ├── Dashboards/      # Executive, operational, planning, application, and governance views
+│   ├── Dashboards/      # Vistas ejecutivas, operativas, planning, aplicacion y gobierno
 │   ├── Datasources/
 │   └── DashboardProviders/
 ├── PodmanStack.yml
 └── StackManifest.yml
 
-Scripts/                 # Build/start/stop/status/logs/sync/load/validate commands
+Scripts/                 # Build/start/stop/status/logs/sync/load/validate
 Tests/
 ├── Unit/
 ├── Contract/
@@ -132,13 +138,14 @@ Tests/
 docs/
 ```
 
-**Structure Decision**: Use the existing single-repository platform layout. Domain expansion will
-be implemented inside `CapacityEngine` and existing configuration/script folders so governance
-features share the same stack, validation, and deployment model as the current capacity platform.
+**Decision de Estructura**: Usar el layout existente de plataforma en un solo repositorio. La
+expansion de dominio se implementara dentro de `CapacityEngine` y las carpetas existentes de
+configuracion/scripts para que gobierno comparta el mismo stack, validacion y modelo de despliegue
+que la plataforma actual de capacidad.
 
-## Complexity Tracking
+## Seguimiento de Complejidad
 
-No constitution violations are planned.
+No se planifican violaciones de constitucion.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
+| Violacion | Por que se necesita | Alternativa simple rechazada porque |
+|-----------|---------------------|-------------------------------------|
