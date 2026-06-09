@@ -236,6 +236,13 @@ Ese valor se usa como nombre visible y como host name tecnico en Zabbix, y tambi
 catalogo PostgreSQL e inventario junto con asset tag, tipo, sistema operativo, ubicacion y notas del
 lote.
 
+La misma identidad de host queda disponible en todas las herramientas:
+
+- Zabbix: `host` y nombre visible `SRV-#####`.
+- PostgreSQL: `MonitoredResource.Name` como `SRV-#####`.
+- VictoriaMetrics: etiqueta `host_name="SRV-#####"`.
+- Grafana: columnas `HostName` y leyendas basadas en `{{host_name}}`.
+
 En Zabbix se crean hosts sinteticos con items, inventario, graficos por host y triggers
 Warning/Critical para validar alertamientos. Revisar:
 

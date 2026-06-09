@@ -108,6 +108,7 @@ class SyntheticDataService:
                             "SampleId": f"{LoadId}-{Resource['ResourceId']}-{Metric}-{Offset}",
                             "LoadId": LoadId,
                             "ResourceId": Resource["ResourceId"],
+                            "HostName": Resource["Name"],
                             "MetricName": Metric,
                             "ObservedAt": ObservedAt.isoformat(),
                             "Value": round(self.ValueFor(Profile, Offset, Days, Random), 2),

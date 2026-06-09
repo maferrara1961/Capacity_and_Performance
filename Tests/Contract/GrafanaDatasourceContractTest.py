@@ -117,6 +117,20 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
         self.assertIn("AverageUtilization", TopPanel["targets"][0]["rawSql"])
         self.assertIn("P95Utilization", TopPanel["targets"][0]["rawSql"])
 
+    def test_dashboards_muestran_hostname_congruente_con_zabbix(self):
+        RequiredDashboards = [
+            "ExecutiveCapacityDashboard.json",
+            "TechnicalPerformanceDashboard.json",
+            "CapacityPlanningDashboard.json",
+            "ApplicationDashboard.json",
+        ]
+        for FileName in RequiredDashboards:
+            Text = DashboardText(FileName)
+            self.assertIn("HostName", Text, FileName)
+            self.assertIn("MonitoredResource", Text, FileName)
+        PrometheusText = DashboardText("TechnicalPerformanceDashboard.json") + DashboardText("ApplicationDashboard.json")
+        self.assertIn("{{host_name}}", PrometheusText)
+
 
 if __name__ == "__main__":
     unittest.main()

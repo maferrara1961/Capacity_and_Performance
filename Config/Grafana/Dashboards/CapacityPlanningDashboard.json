@@ -40,7 +40,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, MonthlyGrowthRate from CapacityKpi where CapacityKpiId ~ '^(${LoadId:regex})' order by MonthlyGrowthRate desc, CalculatedAt desc limit 30"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.MonthlyGrowthRate from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 30"}]
     },
     {
       "id": 2,
@@ -49,7 +49,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, Forecast30Days, Forecast60Days, Forecast90Days, DaysToSaturation from ForecastResult where ForecastResultId ~ '^(${LoadId:regex})' order by DaysToSaturation asc, CalculatedAt desc limit 30"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.ResourceId, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 30"}]
     },
     {
       "id": 3,
@@ -58,7 +58,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, HeadroomAvailable, BaselineDelta, AverageUtilization, PeakUtilization, P95Utilization from CapacityKpi where CapacityKpiId ~ '^(${LoadId:regex})' order by HeadroomAvailable asc, CalculatedAt desc limit 30"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.HeadroomAvailable, k.BaselineDelta, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 30"}]
     },
     {
       "id": 4,
@@ -67,7 +67,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, AverageUtilization, HeadroomAvailable, BaselineDelta from CapacityKpi where CapacityKpiId ~ '^(${LoadId:regex})' and HeadroomAvailable >= 70 order by HeadroomAvailable desc limit 20"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.HeadroomAvailable, k.BaselineDelta from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and k.HeadroomAvailable >= 70 order by k.HeadroomAvailable desc limit 20"}]
     },
     {
       "id": 5,
@@ -76,7 +76,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select k.ResourceId, k.MetricName, k.HeadroomAvailable, f.DaysToSaturation, f.Forecast90Days from CapacityKpi k left join ForecastResult f on f.ResourceId = k.ResourceId and f.ForecastResultId ~ '^(${LoadId:regex})' where k.CapacityKpiId ~ '^(${LoadId:regex})' and (k.HeadroomAvailable <= 25 or f.DaysToSaturation <= 90) order by k.HeadroomAvailable asc, f.DaysToSaturation asc limit 20"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.HeadroomAvailable, f.DaysToSaturation, f.Forecast90Days from CapacityKpi k left join ForecastResult f on f.ResourceId = k.ResourceId and f.ForecastResultId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and (k.HeadroomAvailable <= 25 or f.DaysToSaturation <= 90) order by k.HeadroomAvailable asc, f.DaysToSaturation asc limit 20"}]
     },
     {
       "id": 6,
@@ -85,7 +85,7 @@
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 9, "w": 24, "x": 0, "y": 20},
-      "targets": [{"refId": "A", "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\"}", "legendFormat": "{{resource_id}} {{load_id}}"}]
+      "targets": [{"refId": "A", "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\"}", "legendFormat": "{{host_name}} {{load_id}}"}]
     }
   ]
 }

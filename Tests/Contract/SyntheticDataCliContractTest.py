@@ -82,6 +82,7 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         Payload = Adapter.BuildImportPayload(Dataset["Samples"])
         self.assertIn('"__name__": "synthetic_cpu"', Payload)
         self.assertIn('"load_id": "VmDemo001"', Payload)
+        self.assertIn('"host_name": "SRV-', Payload)
         self.assertIn('"timestamps": [', Payload)
 
     def test_zabbix_adapter_define_items_de_capacity(self):

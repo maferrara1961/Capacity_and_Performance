@@ -39,6 +39,10 @@ Los recursos se generan con host name `SRV-#####`, por ejemplo `SRV-48291`. Ese 
 nombre visible y como host tecnico en Zabbix, y queda registrado en PostgreSQL e inventario junto
 con asset tag, tipo, sistema operativo, ubicacion y notas del lote.
 
+La identidad del host es congruente entre herramientas: Zabbix usa `SRV-#####` como `host`,
+PostgreSQL lo guarda en `MonitoredResource.Name`, VictoriaMetrics lo publica como etiqueta
+`host_name` y Grafana lo muestra como `HostName` en tablas y leyendas.
+
 Los dashboards de Grafana incluyen el filtro `Lote`. Seleccionar `All` muestra todos los lotes
 cargados; seleccionar un lote como `HistoryFull001-90d-critical` filtra PostgreSQL y
 VictoriaMetrics con el mismo identificador.

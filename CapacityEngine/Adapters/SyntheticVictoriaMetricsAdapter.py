@@ -48,6 +48,7 @@ class SyntheticVictoriaMetricsAdapter:
                 "__name__": self.NormalizeMetricName(Sample["MetricName"]),
                 "load_id": Sample["LoadId"],
                 "resource_id": Sample["ResourceId"],
+                "host_name": Sample.get("HostName", Sample["ResourceId"]),
                 "source": Sample["Source"],
             }
             Key = json.dumps(Metric, sort_keys=True)
@@ -74,6 +75,7 @@ class SyntheticVictoriaMetricsAdapter:
                 "__name__": self.NormalizeMetricName(Sample["MetricName"]),
                 "load_id": Sample["LoadId"],
                 "resource_id": Sample["ResourceId"],
+                "host_name": Sample.get("HostName", Sample["ResourceId"]),
                 "source": Sample["Source"],
             }
             Key = json.dumps(Metric, sort_keys=True)
