@@ -1,0 +1,66 @@
+{
+  "uid": "enterprise-operational-trends",
+  "title": "Enterprise Operational Trends Dashboard",
+  "schemaVersion": 39,
+  "tags": ["Capacity", "Enterprise", "Operational"],
+  "templating": {
+    "list": [
+      {
+        "name": "LoadId",
+        "type": "query",
+        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "query": "select distinct LoadId from TestLoad order by LoadId desc",
+        "allValue": ".*",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Como leer este dashboard",
+      "type": "text",
+      "description": "Guia para operar tendencias enterprise, top consumidores, forecasts y frescura de evidencia.",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {"content": "Que muestra: performance, capacidad historica, top consumidores y forecast por host/servicio/dominio. Como interpretarlo: tendencias sostenidas y evidencia expirada elevan riesgo operativo. Accion sugerida: filtrar por lote y resolver primero saturacion, crecimiento y evidencia vencida.", "mode": "markdown"}
+    },
+    {
+      "id": 2,
+      "title": "Top Consumers Enterprise",
+      "type": "table",
+      "description": "Hosts con mayor consumo promedio y percentil alto por servicio y dominio.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select r.Name as HostName, c.DomainName, s.Name as BusinessService, k.MetricName, k.AverageUtilization, k.P95Utilization, k.PeakUtilization from CapacityKpi k join MonitoredResource r on r.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = r.Name and c.LoadId = k.LoadId left join Service s on s.ServiceId = c.BusinessServiceId where k.LoadId ~ '^(${LoadId:regex})' order by k.P95Utilization desc limit 20"}]
+    },
+    {
+      "id": 3,
+      "title": "Forecast 30 90 180 365",
+      "type": "table",
+      "description": "Horizontes de forecast para decisiones de capacidad y fechas estimadas de agotamiento.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select r.Name as HostName, f.MetricName, f.Forecast30Days, f.Forecast90Days, f.Forecast180Days, f.Forecast365Days, f.DaysToSaturation from ForecastResult f join MonitoredResource r on r.ResourceId = f.ResourceId where f.LoadId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc"}]
+    },
+    {
+      "id": 4,
+      "title": "Frescura de Evidencia",
+      "type": "table",
+      "description": "Evidencia fresca, vencida, incompleta o faltante por host para evitar conclusiones sin soporte.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select c.ComponentName as HostName, e.SourceSystem, e.EvidenceType, e.FreshnessStatus, e.EvidenceState from EnterpriseEvidenceRecord e join EnterpriseTechnologyComponent c on c.ComponentId = e.ComponentId where e.LoadId ~ '^(${LoadId:regex})' order by e.FreshnessStatus, e.EvidenceState"}]
+    },
+    {
+      "id": 5,
+      "title": "Serie VictoriaMetrics por Host Servicio Dominio",
+      "type": "timeseries",
+      "description": "Serie CPU historica con labels congruentes entre VictoriaMetrics, PostgreSQL y Zabbix.",
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "targets": [{"refId": "A", "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",technology_domain=~\".+\",business_service=~\".+\"}", "legendFormat": "{{host_name}} - {{business_service}} - {{technology_domain}}"}]
+    }
+  ]
+}

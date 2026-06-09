@@ -62,6 +62,8 @@ capacity-performance-net
 | ManageTestData | ZabbixWeb | HTTP JSON-RPC | Creacion de hosts, inventario, items, graficos y triggers sinteticos. |
 | SyncZabbixInventory | ZabbixWeb | HTTP JSON-RPC | Lectura de inventario de hosts administrado por Zabbix. |
 | SyncZabbixInventory | PostgreSQL | `podman exec` + `psql` | Alta, baja y modificacion de `MonitoredResource` segun inventario Zabbix. |
+| RunEnterpriseAssessment | PostgreSQL | `podman exec` + `psql` | Validacion de datos enterprise, scores, riesgos y evidencia. |
+| ValidateEnterpriseGovernance | PostgreSQL/VictoriaMetrics/Zabbix | SQL, HTTP y API JSON-RPC | Comprobacion cruzada de inventario, evidencia y series. |
 | CapacityEngine | PostgreSQL | TCP `5432` | Escritura/lectura prevista de resultados de capacidad. |
 | CapacityEngine | VictoriaMetrics | HTTP `8428` | Lectura prevista de metricas de series temporales. |
 
@@ -148,6 +150,9 @@ Dashboards provisionados:
 - `Technical Performance Dashboard`
 - `Capacity Planning Dashboard`
 - `Application Dashboard`
+- `Enterprise Executive Dashboard`
+- `Enterprise Governance Dashboard`
+- `Enterprise Operational Dashboard`
 
 Datasources:
 
@@ -170,6 +175,9 @@ Scripts principales:
 - `Scripts/ManageTestData.sh`
 - `Scripts/GenerateVerificationBatches.sh`
 - `Scripts/GenerateHistoricalVerificationBatches.sh`
+- `Scripts/GenerateEnterpriseVerificationData.sh`
+- `Scripts/RunEnterpriseAssessment.sh`
+- `Scripts/ValidateEnterpriseGovernance.sh`
 
 Responsabilidades:
 
@@ -178,6 +186,33 @@ Responsabilidades:
 - Generar muestras diarias de 30, 60 y 90 dias.
 - Cargar datos en PostgreSQL, VictoriaMetrics y Zabbix.
 - Borrar datos sinteticos por lote o de forma total con confirmacion.
+
+### Gobierno Enterprise
+
+Herramientas:
+
+- Zabbix como inventario operativo de hosts.
+- PostgreSQL como repositorio de metadata, evidencia, scores, riesgos y recomendaciones.
+- VictoriaMetrics como fuente historica de series con labels enterprise.
+- Grafana como capa de decision ejecutiva y operativa.
+
+Tablas enterprise:
+
+- `EnterpriseTechnologyDomain`
+- `EnterpriseTechnologyComponent`
+- `EnterpriseEvidenceRecord`
+- `EnterpriseScoreAssessment`
+- `EnterpriseRiskRegistryEntry`
+- `EnterpriseRecommendation`
+
+Responsabilidades:
+
+- Mantener score 0-100 de capacidad, performance, disponibilidad, ciclo de vida, compliance,
+  confianza de monitoreo y salud tecnologica.
+- Mostrar `Missing`, `Unknown`, `Incomplete` y `Unverified` como brechas de evidencia.
+- Relacionar cada riesgo con host `SRV-#####`, dominio tecnologico y servicio afectado.
+- Publicar series con `host_name`, `technology_domain`, `business_service` y
+  `business_service_id` para correlacionar VictoriaMetrics, PostgreSQL y Zabbix.
 
 ## Bases de Datos y Persistencia
 
@@ -196,6 +231,8 @@ Responsabilidades:
 | `LoadId` / `load_id` | PostgreSQL, VictoriaMetrics, Grafana | Identificar lote sintetico y filtrar dashboards. |
 | `ResourceId` / `resource_id` | PostgreSQL, VictoriaMetrics | Identificador tecnico estable para relaciones, borrado y correlacion historica. No debe usarse como nombre principal en tableros ejecutivos. |
 | `HostName` / `host_name` | PostgreSQL, VictoriaMetrics, Grafana | Nombre operativo comun `SRV-#####` para lectura, decision y validacion visual. |
+| `technology_domain` | VictoriaMetrics, Grafana | Dominio enterprise usado para tendencias y gobierno. |
+| `business_service` | VictoriaMetrics, Grafana | Servicio de negocio asociado al host o componente. |
 | `host` | Zabbix | Host tecnico y visible `SRV-#####`. |
 | `asset_tag` | Zabbix inventory | Relacionar host con lote y permitir limpieza por `LoadId`. |
 
@@ -228,7 +265,7 @@ GenerateHistoricalVerificationBatches.sh
       -> SyntheticPostgreSqlAdapter
           -> inserta catalogo, KPIs, forecast, riesgos, recomendaciones y TestLoad
       -> SyntheticVictoriaMetricsAdapter
-          -> publica series con load_id, resource_id y host_name
+          -> publica series con load_id, resource_id, host_name, technology_domain y business_service
       -> SyntheticZabbixAdapter
           -> crea hosts SRV-#####, inventario, items, graficos, triggers e historia
 ```

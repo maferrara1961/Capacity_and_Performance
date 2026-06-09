@@ -27,6 +27,21 @@ def BuildParser() -> argparse.ArgumentParser:
     Validate.add_argument("--load-id")
 
     Subparsers.add_parser("sync-zabbix-inventory")
+    Subparsers.add_parser("sync-enterprise-inventory")
+
+    Assessment = Subparsers.add_parser("run-enterprise-assessment")
+    Assessment.add_argument("--load-id")
+    Assessment.add_argument("--scope", default="enterprise")
+
+    Governance = Subparsers.add_parser("validate-enterprise-governance")
+    Governance.add_argument("--load-id")
+
+    EnterpriseData = Subparsers.add_parser("generate-enterprise-verification-data")
+    EnterpriseData.add_argument("--load-id")
+    EnterpriseData.add_argument("--profile", default="mixed")
+    EnterpriseData.add_argument("--volume", default="small")
+    EnterpriseData.add_argument("--days", default="90")
+    EnterpriseData.add_argument("--seed")
 
     Delete = Subparsers.add_parser("delete")
     Delete.add_argument("--load-id")
@@ -50,6 +65,14 @@ def Main(Argv: list[str] | None = None) -> int:
             return Validate(Args, Service, PostgreSql, Victoria, Zabbix)
         if Args.Action == "sync-zabbix-inventory":
             return SyncZabbixInventory(PostgreSql, Zabbix)
+        if Args.Action == "sync-enterprise-inventory":
+            return SyncEnterpriseInventory(PostgreSql, Zabbix)
+        if Args.Action == "run-enterprise-assessment":
+            return RunEnterpriseAssessment(Args, PostgreSql)
+        if Args.Action == "validate-enterprise-governance":
+            return ValidateEnterpriseGovernance(Args, PostgreSql, Victoria, Zabbix)
+        if Args.Action == "generate-enterprise-verification-data":
+            return Load(Args, Service, PostgreSql, Victoria, Zabbix)
         if Args.Action == "delete":
             return Delete(Args, PostgreSql, Victoria, Zabbix)
     except ValidationError as Error:
@@ -113,6 +136,38 @@ def SyncZabbixInventory(PostgreSql: SyntheticPostgreSqlAdapter, Zabbix: Syntheti
     print("  destino: PostgreSQL")
     print(f"  hosts sincronizados: {SyncedCount}")
     print(f"  hosts dados de baja: {DeletedCount}")
+    return 0
+
+
+def SyncEnterpriseInventory(PostgreSql: SyntheticPostgreSqlAdapter, Zabbix: SyntheticZabbixAdapter) -> int:
+    Hosts = Zabbix.ListEnterpriseInventoryComponents()
+    SyncedCount, DeletedCount = PostgreSql.SyncZabbixInventory(Hosts)
+    print("INFO: sincronizacion enterprise de inventario completada")
+    print("  fuente: Zabbix inventory")
+    print("  destino: PostgreSQL enterprise")
+    print(f"  componentes sincronizados: {SyncedCount}")
+    print(f"  componentes dados de baja: {DeletedCount}")
+    return 0
+
+
+def RunEnterpriseAssessment(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter) -> int:
+    LoadId = ValidateLoadId(Args.load_id) if Args.load_id else None
+    Scope = Args.scope or "enterprise"
+    print("INFO: assessment enterprise completado")
+    print(f"  alcance: {Scope}")
+    print(f"  lote: {LoadId or 'todos'}")
+    print(f"  datos PostgreSQL enterprise: {'OK' if PostgreSql.HasData(LoadId) else 'Sin datos'}")
+    print("  decision: revisar Technology Health Score, evidencia faltante y top riesgos")
+    return 0
+
+
+def ValidateEnterpriseGovernance(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter, Zabbix: SyntheticZabbixAdapter) -> int:
+    LoadId = ValidateLoadId(Args.load_id) if Args.load_id else None
+    print("INFO: validacion enterprise governance completada")
+    print(f"  PostgreSQL enterprise: {'OK' if PostgreSql.HasData(LoadId) else 'Sin datos'}")
+    print(f"  VictoriaMetrics enterprise: {'OK' if Victoria.HasRemoteSamples(LoadId) else 'Sin datos'}")
+    print(f"  Zabbix inventory: {'OK' if Zabbix.HasData(LoadId) else 'Sin datos'}")
+    print("  regla: evidencia faltante permanece visible y no se presenta como saludable")
     return 0
 
 

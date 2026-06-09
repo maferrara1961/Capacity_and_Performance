@@ -1,6 +1,8 @@
 from datetime import UTC, datetime, timedelta
 import random
 
+from CapacityEngine.Application.EnterpriseScoringService import EnterpriseScoringService
+from CapacityEngine.Domain.EnterpriseConstants import EvidenceState
 from CapacityEngine.Domain.SyntheticData import BuildToolValidationResult, TestLoad, ValidateDays, ValidateLoadId, ValidateProfile, ValidateSeed, ValidateVolume
 
 
@@ -22,11 +24,12 @@ class SyntheticDataService:
         Load = TestLoad.Create(LoadId, Profile, Volume).WithStatus("Running")
         Services = self.BuildServices(LoadId, ServiceCount, Profile)
         Resources = self.BuildResources(LoadId, ResourceCount, Profile, Random)
-        Samples = self.BuildSamples(LoadId, Resources, Profile, Days, Random)
+        Samples = self.BuildSamples(LoadId, Services, Resources, Profile, Days, Random)
         Kpis = self.BuildKpis(LoadId, Resources, Profile, Random)
         Forecasts = self.BuildForecasts(LoadId, Resources, Profile, Random)
         Risks = self.BuildRisks(LoadId, Resources, Profile)
         Recommendations = self.BuildRecommendations(LoadId, Risks)
+        Enterprise = self.BuildEnterpriseOutputs(LoadId, Services, Resources, Profile, Random)
         Load = Load.WithCounts(len(Services), len(Resources), len(Samples), len(Kpis), len(Forecasts), len(Risks), len(Recommendations)).WithStatus("Succeeded")
         return {
             "Load": Load.ToDict(),
@@ -37,6 +40,7 @@ class SyntheticDataService:
             "Forecasts": Forecasts,
             "Risks": Risks,
             "Recommendations": Recommendations,
+            **Enterprise,
         }
 
     def BuildServices(self, LoadId: str, Count: int, Profile: str) -> list[dict]:
@@ -95,11 +99,12 @@ class SyntheticDataService:
             "Notes": f"Host sintetico {HostName} generado para pruebas de capacity y performance",
         }
 
-    def BuildSamples(self, LoadId: str, Resources: list[dict], Profile: str, Days: int, Random: random.Random) -> list[dict]:
+    def BuildSamples(self, LoadId: str, Services: list[dict], Resources: list[dict], Profile: str, Days: int, Random: random.Random) -> list[dict]:
         Metrics = ["CPU", "RAM", "Storage", "IOPS", "Network", "Latency", "Throughput", "Errors", "Saturation"]
         Samples = []
         Now = datetime.now(UTC)
-        for Resource in Resources:
+        for ResourceIndex, Resource in enumerate(Resources):
+            Service = Services[ResourceIndex % len(Services)]
             for Metric in Metrics:
                 for Offset in range(Days, -1, -1):
                     ObservedAt = Now - timedelta(days=Offset)
@@ -109,6 +114,9 @@ class SyntheticDataService:
                             "LoadId": LoadId,
                             "ResourceId": Resource["ResourceId"],
                             "HostName": Resource["Name"],
+                            "TechnologyDomain": self.DomainForResource(Resource),
+                            "BusinessService": Service["Name"],
+                            "BusinessServiceId": Service["ServiceId"],
                             "MetricName": Metric,
                             "ObservedAt": ObservedAt.isoformat(),
                             "Value": round(self.ValueFor(Profile, Offset, Days, Random), 2),
@@ -118,6 +126,16 @@ class SyntheticDataService:
                         }
                     )
         return Samples
+
+    def DomainForResource(self, Resource: dict) -> str:
+        Mapping = {
+            "Server": "Infrastructure",
+            "Database": "Database",
+            "Storage": "Infrastructure",
+            "Network": "Infrastructure",
+            "Dependency": "EnterpriseApplication",
+        }
+        return Mapping.get(Resource.get("ResourceType"), "Infrastructure")
 
     def BuildKpis(self, LoadId: str, Resources: list[dict], Profile: str, Random: random.Random) -> list[dict]:
         return [self.BuildMetricOutput(LoadId, Resource, "Kpi", Profile, Random) for Resource in Resources]
@@ -173,9 +191,138 @@ class SyntheticDataService:
             "Forecast30Days": round(min(100, Base + 5), 2),
             "Forecast60Days": round(min(100, Base + 10), 2),
             "Forecast90Days": round(min(100, Base + 15), 2),
+            "Forecast180Days": round(min(100, Base + 25), 2),
+            "Forecast365Days": round(min(100, Base + 35), 2),
             "DaysToSaturation": 90 if Base < 85 else 30,
             "Confidence": "High",
             "IsTestData": True,
+        }
+
+    def BuildEnterpriseOutputs(self, LoadId: str, Services: list[dict], Resources: list[dict], Profile: str, Random: random.Random) -> dict:
+        Scoring = EnterpriseScoringService()
+        EvidenceStates = [State.value for State in EvidenceState]
+        Domains = [
+            {"DomainId": f"{LoadId}-Domain-Infrastructure", "LoadId": LoadId, "Name": "Infrastructure", "Description": "Infraestructura", "Status": "Active", "IsTestData": True},
+            {"DomainId": f"{LoadId}-Domain-Database", "LoadId": LoadId, "Name": "Database", "Description": "Bases de datos", "Status": "Active", "IsTestData": True},
+            {"DomainId": f"{LoadId}-Domain-Monitoring", "LoadId": LoadId, "Name": "MonitoringPlatform", "Description": "Monitoreo", "Status": "Active", "IsTestData": True},
+        ]
+        Components = []
+        Evidence = []
+        Scores = []
+        RiskRegistry = []
+        Recommendations = []
+        for Index, Resource in enumerate(Resources, start=1):
+            Domain = Domains[(Index - 1) % len(Domains)]
+            Service = Services[(Index - 1) % len(Services)]
+            EvidenceStateValue = EvidenceStates[(Index - 1) % len(EvidenceStates)]
+            BaseScore = max(5, 100 - self.ValueFor(Profile, 0, 90, Random))
+            AdjustedScore = Scoring.EvidenceAdjustedScore(BaseScore, EvidenceState(EvidenceStateValue))
+            Classification = Scoring.Classify(AdjustedScore, EvidenceState(EvidenceStateValue)).value
+            ComponentId = f"{LoadId}-Component-{Index}"
+            Components.append(
+                {
+                    "ComponentId": ComponentId,
+                    "LoadId": LoadId,
+                    "ComponentName": Resource["Name"],
+                    "TechnologyType": Resource["ResourceType"],
+                    "DomainId": Domain["DomainId"],
+                    "DomainName": Domain["Name"],
+                    "Version": "1.0",
+                    "Vendor": "Synthetic",
+                    "Environment": "Demo",
+                    "BusinessServiceId": Service["ServiceId"],
+                    "Owner": Service["Owner"],
+                    "SupportStatus": "Unknown" if EvidenceStateValue == "Missing" else "Supported",
+                    "LifecycleStatus": "Unknown" if EvidenceStateValue == "Missing" else Classification,
+                    "EvidenceState": EvidenceStateValue,
+                    "IsTestData": True,
+                }
+            )
+            Evidence.append(
+                {
+                    "EvidenceId": f"{LoadId}-Evidence-{Index}",
+                    "LoadId": LoadId,
+                    "SourceSystem": "SyntheticDataset",
+                    "EvidenceType": "Telemetry",
+                    "ComponentId": ComponentId,
+                    "BusinessServiceId": Service["ServiceId"],
+                    "ObservedAt": datetime.now(UTC).isoformat(),
+                    "FreshnessStatus": "Fresh" if EvidenceStateValue == "Available" else "Unknown",
+                    "EvidenceState": EvidenceStateValue,
+                    "EvidenceReference": f"synthetic:{LoadId}:{ComponentId}",
+                    "IsTestData": True,
+                }
+            )
+            for ScoreType in ["Capacity", "Performance", "Availability", "Lifecycle", "Compliance", "MonitoringConfidence"]:
+                Scores.append(
+                    {
+                        "ScoreAssessmentId": f"{LoadId}-Score-{ScoreType}-{Index}",
+                        "LoadId": LoadId,
+                        "AssessmentRunId": f"{LoadId}-EnterpriseRun",
+                        "ScoreType": ScoreType,
+                        "ScopeType": "TechnologyComponent",
+                        "ScopeId": ComponentId,
+                        "ScoreValue": AdjustedScore,
+                        "Classification": Classification,
+                        "EvidenceState": EvidenceStateValue,
+                        "CalculatedAt": datetime.now(UTC).isoformat(),
+                        "IsTestData": True,
+                    }
+                )
+            HealthScore = Scoring.TechnologyHealthScore([AdjustedScore] * 5, AdjustedScore)
+            Scores.append(
+                {
+                    "ScoreAssessmentId": f"{LoadId}-Score-TechnologyHealth-{Index}",
+                    "LoadId": LoadId,
+                    "AssessmentRunId": f"{LoadId}-EnterpriseRun",
+                    "ScoreType": "TechnologyHealth",
+                    "ScopeType": "TechnologyComponent",
+                    "ScopeId": ComponentId,
+                    "ScoreValue": HealthScore,
+                    "Classification": Scoring.Classify(HealthScore, EvidenceState(EvidenceStateValue)).value,
+                    "EvidenceState": EvidenceStateValue,
+                    "CalculatedAt": datetime.now(UTC).isoformat(),
+                    "IsTestData": True,
+                }
+            )
+            Severity = "Critical" if AdjustedScore < 40 else "High" if AdjustedScore < 60 else "Medium" if AdjustedScore < 75 else "Low"
+            RiskId = f"{LoadId}-EnterpriseRisk-{Index}"
+            RiskRegistry.append(
+                {
+                    "RiskId": RiskId,
+                    "LoadId": LoadId,
+                    "RiskCategory": "Capacity",
+                    "Severity": Severity,
+                    "Impact": f"Riesgo enterprise sobre {Resource['Name']}",
+                    "AffectedTechnologyId": ComponentId,
+                    "AffectedServiceId": Service["ServiceId"],
+                    "RecommendedAction": "Revisar evidencia, capacidad y plan de mitigacion",
+                    "Owner": Service["Owner"],
+                    "EvidenceState": EvidenceStateValue,
+                    "Status": "Open",
+                    "IsTestData": True,
+                }
+            )
+            Recommendations.append(
+                {
+                    "RecommendationId": f"{RiskId}-Recommendation",
+                    "LoadId": LoadId,
+                    "RiskId": RiskId,
+                    "Priority": Severity,
+                    "Action": "Priorizar remediacion enterprise",
+                    "Rationale": f"Score {AdjustedScore} con evidencia {EvidenceStateValue}",
+                    "DecisionOwner": Service["Owner"],
+                    "Status": "Open",
+                    "IsTestData": True,
+                }
+            )
+        return {
+            "EnterpriseDomains": Domains,
+            "EnterpriseComponents": Components,
+            "EnterpriseEvidence": Evidence,
+            "EnterpriseScores": Scores,
+            "EnterpriseRiskRegistry": RiskRegistry,
+            "EnterpriseRecommendations": Recommendations,
         }
 
     def ValidateTools(self, LoadId: str | None = None) -> list:

@@ -25,15 +25,22 @@ create table if not exists CapacityKpi (
 
 create table if not exists ForecastResult (
   ForecastResultId text primary key,
+  LoadId text,
   ResourceId text not null,
   MetricName text not null,
   CalculatedAt timestamp not null,
   Forecast30Days numeric not null,
   Forecast60Days numeric not null,
   Forecast90Days numeric not null,
+  Forecast180Days numeric,
+  Forecast365Days numeric,
   DaysToSaturation integer,
   Confidence text not null
 );
+
+alter table ForecastResult add column if not exists LoadId text;
+alter table ForecastResult add column if not exists Forecast180Days numeric;
+alter table ForecastResult add column if not exists Forecast365Days numeric;
 
 create table if not exists RiskAssessment (
   RiskAssessmentId text primary key,

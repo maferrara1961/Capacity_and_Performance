@@ -12,11 +12,11 @@
 
 **Proposito**: Preparar estructura, validaciones y documentacion base para el feature enterprise.
 
-- [ ] T001 Crear documento de arquitectura enterprise en `docs/EnterpriseGovernancePlatform.md`
-- [ ] T002 [P] Crear contrato de excepciones PascalCase enterprise en `docs/PascalCaseExceptions.md`
-- [ ] T003 [P] Agregar referencias del feature enterprise en `README.md`
-- [ ] T004 [P] Crear prueba contract de documentacion enterprise en `Tests/Contract/EnterpriseGovernanceDocumentationContractTest.py`
-- [ ] T005 Ejecutar `Scripts/RunTests.sh` y confirmar que la prueba contract nueva falla por falta de contenido enterprise
+- [X] T001 Crear documento de arquitectura enterprise en `docs/EnterpriseGovernancePlatform.md`
+- [X] T002 [P] Crear contrato de excepciones PascalCase enterprise en `docs/PascalCaseExceptions.md`
+- [X] T003 [P] Agregar referencias del feature enterprise en `README.md`
+- [X] T004 [P] Crear prueba contract de documentacion enterprise en `Tests/Contract/EnterpriseGovernanceDocumentationContractTest.py`
+- [X] T005 Ejecutar `Scripts/RunTests.sh` y confirmar que la prueba contract nueva falla por falta de contenido enterprise
 
 ---
 
@@ -26,16 +26,16 @@
 
 **CRITICO**: Ninguna historia debe implementarse antes de completar esta fase.
 
-- [ ] T006 [P] Crear pruebas unitarias para `TechnologyDomain`, `TechnologyComponent`, `BusinessService` y `ServiceComponentMap` en `Tests/Unit/EnterpriseInventoryValidationTest.py`
-- [ ] T007 [P] Crear pruebas unitarias para `EvidenceRecord`, `EvidenceState` y reglas de evidencia faltante en `Tests/Unit/EnterpriseEvidenceValidationTest.py`
-- [ ] T008 [P] Crear pruebas unitarias para `ScoreAssessment`, `RiskAssessment`, `RiskRegistryEntry`, `Recommendation` y `ForecastResult` en `Tests/Unit/EnterpriseAssessmentValidationTest.py`
-- [ ] T009 Crear entidades enterprise en `CapacityEngine/Domain/EnterpriseEntities.py`
-- [ ] T010 Crear constantes enterprise de dominios, estados, severidades, scores y clasificaciones en `CapacityEngine/Domain/EnterpriseConstants.py`
-- [ ] T011 Crear validadores enterprise sin librerias externas en `CapacityEngine/Domain/EnterpriseValidators.py`
-- [ ] T012 Crear puertos de aplicacion enterprise en `CapacityEngine/Application/EnterprisePorts.py`
-- [ ] T013 Actualizar exports de dominio en `CapacityEngine/Domain/__init__.py`
-- [ ] T014 Actualizar exports de aplicacion en `CapacityEngine/Application/__init__.py`
-- [ ] T015 Ejecutar `Scripts/RunTests.sh` y confirmar que las pruebas foundational pasan
+- [X] T006 [P] Crear pruebas unitarias para `TechnologyDomain`, `TechnologyComponent`, `BusinessService` y `ServiceComponentMap` en `Tests/Unit/EnterpriseInventoryValidationTest.py`
+- [X] T007 [P] Crear pruebas unitarias para `EvidenceRecord`, `EvidenceState` y reglas de evidencia faltante en `Tests/Unit/EnterpriseEvidenceValidationTest.py`
+- [X] T008 [P] Crear pruebas unitarias para `ScoreAssessment`, `RiskAssessment`, `RiskRegistryEntry`, `Recommendation` y `ForecastResult` en `Tests/Unit/EnterpriseAssessmentValidationTest.py`
+- [X] T009 Crear entidades enterprise en `CapacityEngine/Domain/EnterpriseEntities.py`
+- [X] T010 Crear constantes enterprise de dominios, estados, severidades, scores y clasificaciones en `CapacityEngine/Domain/EnterpriseConstants.py`
+- [X] T011 Crear validadores enterprise sin librerias externas en `CapacityEngine/Domain/EnterpriseValidators.py`
+- [X] T012 Crear puertos de aplicacion enterprise en `CapacityEngine/Application/EnterprisePorts.py`
+- [X] T013 Actualizar exports de dominio en `CapacityEngine/Domain/__init__.py`
+- [X] T014 Actualizar exports de aplicacion en `CapacityEngine/Application/__init__.py`
+- [X] T015 Ejecutar `Scripts/RunTests.sh` y confirmar que las pruebas foundational pasan
 
 ---
 
@@ -47,23 +47,23 @@
 
 ### Pruebas para US1 (escribir antes de implementar)
 
-- [ ] T016 [P] [US1] Crear pruebas unitarias de scoring 0-100 y clasificacion 90/75/60/40 en `Tests/Unit/EnterpriseScoringTest.py`
-- [ ] T017 [P] [US1] Crear pruebas unitarias de no inferir Healthy desde evidencia faltante en `Tests/Unit/EnterpriseScoringTest.py`
-- [ ] T018 [P] [US1] Crear prueba contract para paneles ejecutivos enterprise en `Tests/Contract/EnterpriseExecutiveDashboardContractTest.py`
-- [ ] T019 [P] [US1] Crear prueba contract para dataset de score y top riesgos en `Tests/Contract/EnterpriseDatasetContractTest.py`
-- [ ] T020 [US1] Ejecutar `Scripts/RunTests.sh` y confirmar fallas esperadas de US1
+- [X] T016 [P] [US1] Crear pruebas unitarias de scoring 0-100 y clasificacion 90/75/60/40 en `Tests/Unit/EnterpriseScoringTest.py`
+- [X] T017 [P] [US1] Crear pruebas unitarias de no inferir Healthy desde evidencia faltante en `Tests/Unit/EnterpriseScoringTest.py`
+- [X] T018 [P] [US1] Crear prueba contract para paneles ejecutivos enterprise en `Tests/Contract/EnterpriseExecutiveDashboardContractTest.py`
+- [X] T019 [P] [US1] Crear prueba contract para dataset de score y top riesgos en `Tests/Contract/EnterpriseDatasetContractTest.py`
+- [X] T020 [US1] Ejecutar `Scripts/RunTests.sh` y confirmar fallas esperadas de US1
 
 ### Implementacion para US1
 
-- [ ] T021 [P] [US1] Implementar calculadora de scores enterprise en `CapacityEngine/Application/EnterpriseScoringService.py`
-- [ ] T022 [P] [US1] Implementar servicio de registro de riesgos enterprise en `CapacityEngine/Application/EnterpriseRiskRegistryService.py`
-- [ ] T023 [US1] Implementar servicio de evaluacion Technology Health Score en `CapacityEngine/Application/EnterpriseAssessmentService.py`
-- [ ] T024 [US1] Extender SQL de PostgreSQL enterprise para scores, riesgos y recomendaciones en `CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py`
-- [ ] T025 [US1] Crear dashboard ejecutivo enterprise provisionado en `Config/Grafana/Dashboards/EnterpriseExecutiveDashboard.json`
-- [ ] T026 [US1] Registrar dashboard ejecutivo enterprise en `Config/Grafana/DashboardProviders/Provisioning.yml`
-- [ ] T027 [US1] Agregar datos sinteticos enterprise de score/riesgo/recomendacion en `CapacityEngine/Application/SyntheticDataService.py`
-- [ ] T028 [US1] Actualizar validacion de dashboards enterprise en `Scripts/ValidateStack.sh`
-- [ ] T029 [US1] Ejecutar `Scripts/RunTests.sh` y confirmar que US1 pasa de forma independiente
+- [X] T021 [P] [US1] Implementar calculadora de scores enterprise en `CapacityEngine/Application/EnterpriseScoringService.py`
+- [X] T022 [P] [US1] Implementar servicio de registro de riesgos enterprise en `CapacityEngine/Application/EnterpriseRiskRegistryService.py`
+- [X] T023 [US1] Implementar servicio de evaluacion Technology Health Score en `CapacityEngine/Application/EnterpriseAssessmentService.py`
+- [X] T024 [US1] Extender SQL de PostgreSQL enterprise para scores, riesgos y recomendaciones en `CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py`
+- [X] T025 [US1] Crear dashboard ejecutivo enterprise provisionado en `Config/Grafana/Dashboards/EnterpriseExecutiveDashboard.json`
+- [X] T026 [US1] Registrar dashboard ejecutivo enterprise en `Config/Grafana/DashboardProviders/Provisioning.yml`
+- [X] T027 [US1] Agregar datos sinteticos enterprise de score/riesgo/recomendacion en `CapacityEngine/Application/SyntheticDataService.py`
+- [X] T028 [US1] Actualizar validacion de dashboards enterprise en `Scripts/ValidateStack.sh`
+- [X] T029 [US1] Ejecutar `Scripts/RunTests.sh` y confirmar que US1 pasa de forma independiente
 
 ---
 
@@ -75,24 +75,24 @@
 
 ### Pruebas para US2 (escribir antes de implementar)
 
-- [ ] T030 [P] [US2] Crear pruebas unitarias de inventario y mapeo servicio-componente en `Tests/Unit/EnterpriseInventoryServiceTest.py`
-- [ ] T031 [P] [US2] Crear pruebas unitarias de lifecycle/compliance/monitoring confidence en `Tests/Unit/EnterpriseGovernanceAssessmentTest.py`
-- [ ] T032 [P] [US2] Crear prueba contract para CLI enterprise en `Tests/Contract/EnterpriseCliContractTest.py`
-- [ ] T033 [P] [US2] Crear prueba contract para dashboard de gobierno en `Tests/Contract/EnterpriseGovernanceDashboardContractTest.py`
-- [ ] T034 [US2] Ejecutar `Scripts/RunTests.sh` y confirmar fallas esperadas de US2
+- [X] T030 [P] [US2] Crear pruebas unitarias de inventario y mapeo servicio-componente en `Tests/Unit/EnterpriseInventoryServiceTest.py`
+- [X] T031 [P] [US2] Crear pruebas unitarias de lifecycle/compliance/monitoring confidence en `Tests/Unit/EnterpriseGovernanceAssessmentTest.py`
+- [X] T032 [P] [US2] Crear prueba contract para CLI enterprise en `Tests/Contract/EnterpriseCliContractTest.py`
+- [X] T033 [P] [US2] Crear prueba contract para dashboard de gobierno en `Tests/Contract/EnterpriseGovernanceDashboardContractTest.py`
+- [X] T034 [US2] Ejecutar `Scripts/RunTests.sh` y confirmar fallas esperadas de US2
 
 ### Implementacion para US2
 
-- [ ] T035 [P] [US2] Implementar servicio de inventario enterprise en `CapacityEngine/Application/EnterpriseInventoryService.py`
-- [ ] T036 [P] [US2] Implementar servicio de lifecycle y compliance en `CapacityEngine/Application/EnterpriseGovernanceService.py`
-- [ ] T037 [US2] Implementar sincronizacion de inventario enterprise con Zabbix en `CapacityEngine/Adapters/SyntheticZabbixAdapter.py`
-- [ ] T038 [US2] Crear comando `sync-enterprise-inventory` en `CapacityEngine/Scheduler/SyntheticDataCommand.py`
-- [ ] T039 [US2] Crear script `Scripts/RunEnterpriseAssessment.sh`
-- [ ] T040 [US2] Crear script `Scripts/ValidateEnterpriseGovernance.sh`
-- [ ] T041 [US2] Crear dashboard de gobierno enterprise en `Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json`
-- [ ] T042 [US2] Registrar dashboard de gobierno enterprise en `Config/Grafana/DashboardProviders/Provisioning.yml`
-- [ ] T043 [US2] Documentar uso de gobierno enterprise en `docs/EnterpriseGovernancePlatform.md`
-- [ ] T044 [US2] Ejecutar `Scripts/RunTests.sh` y confirmar que US2 pasa de forma independiente
+- [X] T035 [P] [US2] Implementar servicio de inventario enterprise en `CapacityEngine/Application/EnterpriseInventoryService.py`
+- [X] T036 [P] [US2] Implementar servicio de lifecycle y compliance en `CapacityEngine/Application/EnterpriseGovernanceService.py`
+- [X] T037 [US2] Implementar sincronizacion de inventario enterprise con Zabbix en `CapacityEngine/Adapters/SyntheticZabbixAdapter.py`
+- [X] T038 [US2] Crear comando `sync-enterprise-inventory` en `CapacityEngine/Scheduler/SyntheticDataCommand.py`
+- [X] T039 [US2] Crear script `Scripts/RunEnterpriseAssessment.sh`
+- [X] T040 [US2] Crear script `Scripts/ValidateEnterpriseGovernance.sh`
+- [X] T041 [US2] Crear dashboard de gobierno enterprise en `Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json`
+- [X] T042 [US2] Registrar dashboard de gobierno enterprise en `Config/Grafana/DashboardProviders/Provisioning.yml`
+- [X] T043 [US2] Documentar uso de gobierno enterprise en `docs/EnterpriseGovernancePlatform.md`
+- [X] T044 [US2] Ejecutar `Scripts/RunTests.sh` y confirmar que US2 pasa de forma independiente
 
 ---
 
@@ -104,24 +104,24 @@
 
 ### Pruebas para US3 (escribir antes de implementar)
 
-- [ ] T045 [P] [US3] Crear pruebas unitarias de forecast 30/90/180/365 con evidencia suficiente e insuficiente en `Tests/Unit/EnterpriseForecastTest.py`
-- [ ] T046 [P] [US3] Crear pruebas unitarias de frescura de evidencia y confianza de monitoreo en `Tests/Unit/EnterpriseEvidenceFreshnessTest.py`
-- [ ] T047 [P] [US3] Crear prueba contract para dashboard operativo enterprise en `Tests/Contract/EnterpriseOperationalDashboardContractTest.py`
-- [ ] T048 [P] [US3] Crear prueba integration de carga historica enterprise en `Tests/Integration/EnterpriseOperationalFlowTest.py`
-- [ ] T049 [US3] Ejecutar `Scripts/RunTests.sh` y confirmar fallas esperadas de US3
+- [X] T045 [P] [US3] Crear pruebas unitarias de forecast 30/90/180/365 con evidencia suficiente e insuficiente en `Tests/Unit/EnterpriseForecastTest.py`
+- [X] T046 [P] [US3] Crear pruebas unitarias de frescura de evidencia y confianza de monitoreo en `Tests/Unit/EnterpriseEvidenceFreshnessTest.py`
+- [X] T047 [P] [US3] Crear prueba contract para dashboard operativo enterprise en `Tests/Contract/EnterpriseOperationalDashboardContractTest.py`
+- [X] T048 [P] [US3] Crear prueba integration de carga historica enterprise en `Tests/Integration/EnterpriseOperationalFlowTest.py`
+- [X] T049 [US3] Ejecutar `Scripts/RunTests.sh` y confirmar fallas esperadas de US3
 
 ### Implementacion para US3
 
-- [ ] T050 [P] [US3] Implementar servicio de forecast enterprise en `CapacityEngine/Application/EnterpriseForecastService.py`
-- [ ] T051 [P] [US3] Implementar servicio de frescura de evidencia en `CapacityEngine/Application/EnterpriseEvidenceService.py`
-- [ ] T052 [US3] Extender publicacion VictoriaMetrics con labels enterprise en `CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py`
-- [ ] T053 [US3] Crear generador de datos enterprise historicos en `CapacityEngine/Application/SyntheticDataService.py`
-- [ ] T054 [US3] Crear comando de generacion enterprise en `CapacityEngine/Scheduler/SyntheticDataCommand.py`
-- [ ] T055 [US3] Crear script `Scripts/GenerateEnterpriseVerificationData.sh`
-- [ ] T056 [US3] Crear dashboard operativo enterprise en `Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json`
-- [ ] T057 [US3] Registrar dashboard operativo enterprise en `Config/Grafana/DashboardProviders/Provisioning.yml`
-- [ ] T058 [US3] Actualizar quickstart operativo en `docs/EnterpriseGovernancePlatform.md`
-- [ ] T059 [US3] Ejecutar `Scripts/RunTests.sh` y confirmar que US3 pasa de forma independiente
+- [X] T050 [P] [US3] Implementar servicio de forecast enterprise en `CapacityEngine/Application/EnterpriseForecastService.py`
+- [X] T051 [P] [US3] Implementar servicio de frescura de evidencia en `CapacityEngine/Application/EnterpriseEvidenceService.py`
+- [X] T052 [US3] Extender publicacion VictoriaMetrics con labels enterprise en `CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py`
+- [X] T053 [US3] Crear generador de datos enterprise historicos en `CapacityEngine/Application/SyntheticDataService.py`
+- [X] T054 [US3] Crear comando de generacion enterprise en `CapacityEngine/Scheduler/SyntheticDataCommand.py`
+- [X] T055 [US3] Crear script `Scripts/GenerateEnterpriseVerificationData.sh`
+- [X] T056 [US3] Crear dashboard operativo enterprise en `Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json`
+- [X] T057 [US3] Registrar dashboard operativo enterprise en `Config/Grafana/DashboardProviders/Provisioning.yml`
+- [X] T058 [US3] Actualizar quickstart operativo en `docs/EnterpriseGovernancePlatform.md`
+- [X] T059 [US3] Ejecutar `Scripts/RunTests.sh` y confirmar que US3 pasa de forma independiente
 
 ---
 
@@ -129,16 +129,16 @@
 
 **Proposito**: Validar consistencia final, documentacion, seguridad y ausencia de regresiones.
 
-- [ ] T060 [P] Actualizar `README.md` con comandos enterprise y dashboards nuevos
-- [ ] T061 [P] Actualizar `ARCH.md` con subsistema enterprise, flujos y datasets nuevos
-- [ ] T062 [P] Actualizar `docs/DatosDePruebaSinteticos.md` con cargas enterprise
-- [ ] T063 Verificar que no se agregaron librerias externas en `ContainerImages/CapacityEngine/Containerfile`
-- [ ] T064 Verificar excepciones PascalCase documentadas en `docs/PascalCaseExceptions.md`
-- [ ] T065 Ejecutar `Scripts/ValidateStack.sh`
-- [ ] T066 Ejecutar `Scripts/RunTests.sh`
-- [ ] T067 Ejecutar dry-run de comandos enterprise con `STACK_DRY_RUN=1`
-- [ ] T068 Revisar que dashboards muestren evidencia faltante como faltante y no como saludable en `Config/Grafana/Dashboards/`
-- [ ] T069 Actualizar versionado y notas de uso en `README.md`
+- [X] T060 [P] Actualizar `README.md` con comandos enterprise y dashboards nuevos
+- [X] T061 [P] Actualizar `ARCH.md` con subsistema enterprise, flujos y datasets nuevos
+- [X] T062 [P] Actualizar `docs/DatosDePruebaSinteticos.md` con cargas enterprise
+- [X] T063 Verificar que no se agregaron librerias externas en `ContainerImages/CapacityEngine/Containerfile`
+- [X] T064 Verificar excepciones PascalCase documentadas en `docs/PascalCaseExceptions.md`
+- [X] T065 Ejecutar `Scripts/ValidateStack.sh`
+- [X] T066 Ejecutar `Scripts/RunTests.sh`
+- [X] T067 Ejecutar dry-run de comandos enterprise con `STACK_DRY_RUN=1`
+- [X] T068 Revisar que dashboards muestren evidencia faltante como faltante y no como saludable en `Config/Grafana/Dashboards/`
+- [X] T069 Actualizar versionado y notas de uso en `README.md`
 
 ---
 

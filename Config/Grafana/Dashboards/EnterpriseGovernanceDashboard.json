@@ -1,0 +1,57 @@
+{
+  "uid": "enterprise-governance",
+  "title": "Enterprise Governance Dashboard",
+  "schemaVersion": 39,
+  "tags": ["Capacity", "Enterprise", "Governance"],
+  "templating": {
+    "list": [
+      {
+        "name": "LoadId",
+        "type": "query",
+        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "query": "select distinct LoadId from TestLoad order by LoadId desc",
+        "allValue": ".*",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Como leer este dashboard",
+      "type": "text",
+      "description": "Guia ejecutiva y operativa para interpretar gobierno enterprise, evidencia y riesgos.",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {"content": "Que muestra: inventario tecnologico, lifecycle, compliance y confianza de monitoreo por lote. Como interpretarlo: evidencia faltante o desconocida requiere accion. Accion sugerida: resolver brechas de inventario antes de aceptar riesgo como controlado.", "mode": "markdown"}
+    },
+    {
+      "id": 2,
+      "title": "Inventario Tecnologico",
+      "type": "table",
+      "description": "Componentes gobernados con dominio, servicio, owner, lifecycle y estado de evidencia.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ComponentName as HostName, TechnologyType, DomainName, BusinessServiceId, Owner, SupportStatus, LifecycleStatus, EvidenceState from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' order by ComponentName"}]
+    },
+    {
+      "id": 3,
+      "title": "Lifecycle y Compliance",
+      "type": "table",
+      "description": "Riesgos de ciclo de vida y cumplimiento por componente y servicio afectado.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select c.ComponentName as HostName, c.SupportStatus, c.LifecycleStatus, r.RiskCategory, r.Severity, r.Impact, r.RecommendedAction from EnterpriseTechnologyComponent c left join EnterpriseRiskRegistryEntry r on r.AffectedTechnologyId = c.ComponentId where c.LoadId ~ '^(${LoadId:regex})' and coalesce(r.RiskCategory,'') in ('Lifecycle','Compliance','') order by c.ComponentName"}]
+    },
+    {
+      "id": 4,
+      "title": "Confianza de Monitoreo",
+      "type": "table",
+      "description": "Estado de evidencia por fuente, frescura y componente para auditar cobertura de monitoreo.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 13},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select e.SourceSystem, c.ComponentName as HostName, e.EvidenceType, e.FreshnessStatus, e.EvidenceState, e.EvidenceReference from EnterpriseEvidenceRecord e left join EnterpriseTechnologyComponent c on c.ComponentId = e.ComponentId where e.LoadId ~ '^(${LoadId:regex})' order by e.EvidenceState, c.ComponentName"}]
+    }
+  ]
+}

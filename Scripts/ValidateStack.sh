@@ -21,6 +21,9 @@ Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
+Scripts/RunEnterpriseAssessment.sh
+Scripts/ValidateEnterpriseGovernance.sh
+Scripts/GenerateEnterpriseVerificationData.sh
 Scripts/GenerateVerificationBatches.sh
 Scripts/GenerateHistoricalVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
@@ -29,6 +32,9 @@ Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
 Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json
 Config/Grafana/Dashboards/CapacityPlanningDashboard.json
 Config/Grafana/Dashboards/ApplicationDashboard.json
+Config/Grafana/Dashboards/EnterpriseExecutiveDashboard.json
+Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json
+Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
@@ -95,6 +101,13 @@ fi
 for ExpectedText in "Top 5 Capacity Risks" "Top Consumers And Outliers" "Overprovisioned Resources" "Service Capacity Risk"; do
   if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
     echo "Falta panel optimizado requerido: $ExpectedText" >&2
+    exit 1
+  fi
+done
+
+for ExpectedText in "Technology Health Score" "Inventario Tecnologico" "Confianza de Monitoreo" "Top Consumers Enterprise" "Forecast 30 90 180 365"; do
+  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+    echo "Falta panel enterprise requerido: $ExpectedText" >&2
     exit 1
   fi
 done

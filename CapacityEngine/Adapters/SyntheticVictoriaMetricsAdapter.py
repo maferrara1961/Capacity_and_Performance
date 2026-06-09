@@ -49,6 +49,9 @@ class SyntheticVictoriaMetricsAdapter:
                 "load_id": Sample["LoadId"],
                 "resource_id": Sample["ResourceId"],
                 "host_name": Sample.get("HostName", Sample["ResourceId"]),
+                "technology_domain": Sample.get("TechnologyDomain", "Infrastructure"),
+                "business_service": Sample.get("BusinessService", "Unknown"),
+                "business_service_id": Sample.get("BusinessServiceId", "Unknown"),
                 "source": Sample["Source"],
             }
             Key = json.dumps(Metric, sort_keys=True)
@@ -76,6 +79,9 @@ class SyntheticVictoriaMetricsAdapter:
                 "load_id": Sample["LoadId"],
                 "resource_id": Sample["ResourceId"],
                 "host_name": Sample.get("HostName", Sample["ResourceId"]),
+                "technology_domain": Sample.get("TechnologyDomain", "Infrastructure"),
+                "business_service": Sample.get("BusinessService", "Unknown"),
+                "business_service_id": Sample.get("BusinessServiceId", "Unknown"),
                 "source": Sample["Source"],
             }
             Key = json.dumps(Metric, sort_keys=True)

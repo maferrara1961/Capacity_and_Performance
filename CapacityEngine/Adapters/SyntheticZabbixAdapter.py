@@ -131,6 +131,27 @@ class SyntheticZabbixAdapter:
         )
         return [self.NormalizeInventoryHost(Host) for Host in Hosts]
 
+    def ListEnterpriseInventoryComponents(self) -> list[dict]:
+        Components = []
+        for Host in self.ListInventoryHosts():
+            Components.append(
+                {
+                    "HostId": Host["HostId"],
+                    "HostName": Host["HostName"],
+                    "VisibleName": Host["HostName"],
+                    "Status": Host["Status"],
+                    "AssetTag": Host["AssetTag"],
+                    "Type": Host["Type"],
+                    "Os": Host["Os"],
+                    "Location": Host["Location"],
+                    "Notes": Host["Notes"],
+                    "TechnologyDomain": "Infrastructure",
+                    "BusinessService": "Servicio inventariado desde Zabbix",
+                    "InventorySource": "Zabbix",
+                }
+            )
+        return Components
+
     def ListStoredInventoryHosts(self) -> list[dict]:
         Store = self.LoadStore()
         Hosts = []

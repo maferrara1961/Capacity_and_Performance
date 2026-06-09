@@ -185,6 +185,9 @@ La provision de Grafana incluye vistas en la carpeta `Capacity`:
 - Technical Performance Dashboard
 - Capacity Planning Dashboard
 - Application Dashboard
+- Enterprise Executive Dashboard
+- Enterprise Governance Dashboard
+- Enterprise Operational Dashboard
 
 Los dashboards cubren estado OK/Warning/Critical, forecast 30/60/90 dias, utilizacion promedio,
 pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias y recomendaciones.
@@ -202,6 +205,31 @@ Uso recomendado:
   dias a saturacion, recursos sobredimensionados y subdimensionados.
 - **Application Dashboard**: contexto de aplicacion con salud, infraestructura asociada,
   dependencias criticas y performance end-to-end.
+- **Enterprise Executive Dashboard**: salud tecnologica consolidada, scores 0-100, top riesgos,
+  evidencia faltante y prioridades ejecutivas.
+- **Enterprise Governance Dashboard**: inventario, ciclo de vida, cumplimiento, confianza de
+  monitoreo y registro de riesgos.
+- **Enterprise Operational Dashboard**: tendencias, forecast 30/90/180/365, top consumidores y
+  frescura de evidencia.
+
+## Gobierno Enterprise
+
+El feature enterprise agrega evaluaciones de salud tecnologica, riesgo, scoring, inventario,
+ciclo de vida, cumplimiento y confianza de monitoreo. La evidencia faltante se muestra como tal y
+nunca se interpreta como estado saludable.
+
+Comandos previstos:
+
+```bash
+Scripts/RunEnterpriseAssessment.sh --scope enterprise
+Scripts/ValidateEnterpriseGovernance.sh
+Scripts/GenerateEnterpriseVerificationData.sh --profile mixed --volume small --days 90 --load-id EnterpriseDemo001
+Scripts/ValidateEnterpriseGovernance.sh --load-id EnterpriseDemo001
+```
+
+La carga enterprise reutiliza el generador sintetico existente y agrega tablas enterprise en
+PostgreSQL, labels `technology_domain`, `business_service` y `business_service_id` en
+VictoriaMetrics, y hosts `SRV-#####` congruentes con el inventario de Zabbix.
 
 Si Grafana muestra que PostgreSQL no tiene base por defecto configurada, actualizar y reiniciar:
 

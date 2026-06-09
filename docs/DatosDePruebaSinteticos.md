@@ -35,13 +35,26 @@ Cada lote incluye muestras diarias aleatorias por recurso y metrica para validar
 percentil 95, forecast 30/60/90, saturacion, capacity planning y paneles tecnicos en Grafana y
 VictoriaMetrics.
 
+Generar datos enterprise para validar los dashboards de salud tecnologica, gobierno y tendencias:
+
+```bash
+Scripts/GenerateEnterpriseVerificationData.sh --profile mixed --volume small --days 90 --load-id EnterpriseDemo001
+Scripts/RunEnterpriseAssessment.sh --scope enterprise --load-id EnterpriseDemo001
+Scripts/ValidateEnterpriseGovernance.sh --load-id EnterpriseDemo001
+```
+
+La carga enterprise agrega scores 0-100, riesgos, recomendaciones, evidencia y labels
+`technology_domain`, `business_service` y `business_service_id` en VictoriaMetrics. Tambien conserva
+la identidad `SRV-#####` en Zabbix, PostgreSQL y Grafana.
+
 Los recursos se generan con host name `SRV-#####`, por ejemplo `SRV-48291`. Ese valor se usa como
 nombre visible y como host tecnico en Zabbix, y queda registrado en PostgreSQL e inventario junto
 con asset tag, tipo, sistema operativo, ubicacion y notas del lote.
 
 La identidad del host es congruente entre herramientas: Zabbix usa `SRV-#####` como `host`,
 PostgreSQL lo guarda en `MonitoredResource.Name`, VictoriaMetrics lo publica como etiqueta
-`host_name` y Grafana lo muestra como `HostName` en tablas y leyendas.
+`host_name` junto con `technology_domain` y `business_service`, y Grafana lo muestra como
+`HostName` en tablas y leyendas.
 
 Para inventario operativo, Zabbix es la fuente. Luego de alta, baja o modificacion manual de hosts
 en Zabbix, ejecutar:
