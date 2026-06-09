@@ -21,6 +21,20 @@
         "includeAll": true,
         "multi": true,
         "refresh": 1
+      },
+      {
+        "name": "MetricName",
+        "label": "Metrica",
+        "type": "custom",
+        "query": "CPU,RAM,Storage,StorageIO,NetworkIO",
+        "allValue": ".*",
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -45,7 +59,7 @@
       "id": 2,
       "title": "Top Consumers Enterprise",
       "type": "table",
-      "description": "Hosts con mayor consumo promedio y percentil alto por servicio y dominio.",
+      "description": "Hosts con mayor consumo promedio y percentil alto por servicio, dominio y metrica seleccionada.",
       "datasource": {
         "type": "postgres",
         "uid": "CapacityPostgreSQL"
@@ -60,7 +74,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.Name as HostName, c.DomainName, s.Name as BusinessService, k.MetricName, k.AverageUtilization, k.P95Utilization, k.PeakUtilization from CapacityKpi k join MonitoredResource r on r.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = r.Name and c.LoadId = k.LoadId left join Service s on s.ServiceId = c.BusinessServiceId where k.LoadId ~ '^(${LoadId:regex})' order by k.P95Utilization desc limit 20"
+          "rawSql": "select coalesce(r.Name, k.ResourceId) as HostName, c.DomainName, coalesce(s.Name, c.BusinessServiceId) as BusinessService, k.MetricName, k.AverageUtilization, k.P95Utilization, k.PeakUtilization from CapacityKpi k left join MonitoredResource r on r.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = r.Name and c.LoadId = k.LoadId left join Service s on s.ServiceId = c.BusinessServiceId where coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) ~ '^(${LoadId:regex})' and k.MetricName ~ '^(${MetricName:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"
         }
       ],
       "fieldConfig": {
@@ -82,7 +96,7 @@
       "id": 3,
       "title": "Forecast 30 90 180 365",
       "type": "table",
-      "description": "Horizontes de forecast para decisiones de capacidad y fechas estimadas de agotamiento.",
+      "description": "Horizontes de forecast para decisiones de capacidad, filtrables por CPU, RAM, Storage, StorageIO y NetworkIO.",
       "datasource": {
         "type": "postgres",
         "uid": "CapacityPostgreSQL"
@@ -97,7 +111,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.Name as HostName, f.MetricName, f.Forecast30Days, f.Forecast90Days, f.Forecast180Days, f.Forecast365Days, f.DaysToSaturation from ForecastResult f join MonitoredResource r on r.ResourceId = f.ResourceId where f.LoadId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc"
+          "rawSql": "select coalesce(r.Name, f.ResourceId) as HostName, f.MetricName, f.Forecast30Days, f.Forecast90Days, f.Forecast180Days, f.Forecast365Days, f.DaysToSaturation from ForecastResult f left join MonitoredResource r on r.ResourceId = f.ResourceId where f.LoadId ~ '^(${LoadId:regex})' and f.MetricName ~ '^(${MetricName:regex})' order by f.DaysToSaturation asc, f.Forecast90Days desc"
         }
       ],
       "fieldConfig": {

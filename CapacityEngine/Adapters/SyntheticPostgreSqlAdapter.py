@@ -198,9 +198,9 @@ class SyntheticPostgreSqlAdapter:
             )
         for Kpi in Dataset["Kpis"]:
             Lines.append(
-                "insert into CapacityKpi (CapacityKpiId, ResourceId, MetricName, CalculatedAt, WindowStart, WindowEnd, "
+                "insert into CapacityKpi (CapacityKpiId, LoadId, ResourceId, MetricName, CalculatedAt, WindowStart, WindowEnd, "
                 "AverageUtilization, PeakUtilization, P95Utilization, MonthlyGrowthRate, HeadroomAvailable, BaselineDelta) values "
-                f"({self.Q(Kpi['KpiId'])}, {self.Q(Kpi['ResourceId'])}, {self.Q(Kpi['MetricName'])}, {self.Q(Kpi['CalculatedAt'])}, "
+                f"({self.Q(Kpi['KpiId'])}, {self.Q(Kpi['LoadId'])}, {self.Q(Kpi['ResourceId'])}, {self.Q(Kpi['MetricName'])}, {self.Q(Kpi['CalculatedAt'])}, "
                 f"{self.Q(Kpi['CalculatedAt'])}, {self.Q(Kpi['CalculatedAt'])}, {Kpi['AverageUtilization']}, {Kpi['PeakUtilization']}, "
                 f"{Kpi['P95Utilization']}, {Kpi['MonthlyGrowthRate']}, {Kpi['HeadroomAvailable']}, 0) on conflict (CapacityKpiId) do nothing;"
             )

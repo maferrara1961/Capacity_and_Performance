@@ -14,6 +14,11 @@ class EnterpriseOperationalDashboardContractTest(unittest.TestCase):
         self.assertIn("Frescura de Evidencia", Text)
         self.assertIn("technology_domain", Text)
         self.assertIn("business_service", Text)
+        self.assertIn('"name": "MetricName"', Text)
+        self.assertIn("CPU,RAM,Storage,StorageIO,NetworkIO", Text)
+        self.assertIn("${MetricName:regex}", Text)
+        self.assertIn("CapacityKpi", Text)
+        self.assertIn("ForecastResult", Text)
         self.assertIn('load_id=~\\"${LoadId:regex}\\"', Text)
 
 

@@ -233,7 +233,8 @@ Uso recomendado:
 - **Enterprise Governance Dashboard**: semaforo inicial con porcentaje de inventario, ciclo de
   vida/compliance y confianza de monitoreo; luego inventario, evidencia y registro de riesgos.
 - **Enterprise Operational Dashboard**: tendencias, forecast 30/90/180/365, top consumidores y
-  frescura de evidencia.
+  frescura de evidencia. El forecast y top consumers se pueden filtrar por `CPU`, `RAM`, `Storage`,
+  `StorageIO` y `NetworkIO`.
 - **Enterprise License Compliance Dashboard**: licencias por host/servicio, estado compliant,
   non-compliant, unknown y acciones para auditoria.
 - **Enterprise Software Backlevel Dashboard**: software backlevel, end-of-support, end-of-life,

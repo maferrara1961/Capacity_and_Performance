@@ -63,6 +63,7 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("insert into RiskAssessment", Sql)
         self.assertIn("insert into Recommendation", Sql)
         self.assertIn("insert into Service", Sql)
+        self.assertIn("insert into CapacityKpi (CapacityKpiId, LoadId", Sql)
         self.assertIn("-SubsistemaDefinido", Sql)
         self.assertIn("'SqlDemo001-Resource-1'", Sql)
         self.assertIn("'Revisar capacidad del host asociado", Sql)
@@ -210,6 +211,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
             self.assertEqual(Dataset["Load"]["ScenarioProfile"], Profile)
             self.assertGreater(Dataset["Load"]["GeneratedMetricSampleCount"], 0)
             self.assertGreater(Dataset["Load"]["GeneratedKpiCount"], 0)
+
+    def test_kpis_y_forecasts_generan_metricas_de_trend(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("TrendMetrics001", "mixed", "small", 30, 1)
+        ExpectedMetrics = {"CPU", "RAM", "Storage", "StorageIO", "NetworkIO"}
+
+        self.assertEqual(ExpectedMetrics, {Kpi["MetricName"] for Kpi in Dataset["Kpis"]})
+        self.assertEqual(ExpectedMetrics, {Forecast["MetricName"] for Forecast in Dataset["Forecasts"]})
+        self.assertTrue(all(Kpi["LoadId"] == "TrendMetrics001" for Kpi in Dataset["Kpis"]))
 
     def test_historia_sintetica_genera_muestras_diarias(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("HistoryDaily001", "mixed", "small", 30, 1)

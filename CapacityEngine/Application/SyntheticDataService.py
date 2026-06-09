@@ -8,6 +8,7 @@ from CapacityEngine.Domain.SyntheticData import BuildToolValidationResult, TestL
 
 class SyntheticDataService:
     VolumeScale = {"small": 3, "medium": 8, "large": 15}
+    PlanningMetrics = ["CPU", "RAM", "Storage", "StorageIO", "NetworkIO"]
 
     def GenerateLoadId(self) -> str:
         return f"Load{datetime.now(UTC).strftime('%Y%m%d%H%M%S')}"
@@ -140,10 +141,18 @@ class SyntheticDataService:
         return Mapping.get(Resource.get("ResourceType"), "Infrastructure")
 
     def BuildKpis(self, LoadId: str, Resources: list[dict], Profile: str, Random: random.Random) -> list[dict]:
-        return [self.BuildMetricOutput(LoadId, Resource, "Kpi", Profile, Random) for Resource in Resources]
+        return [
+            self.BuildMetricOutput(LoadId, Resource, "Kpi", Profile, Random, Metric)
+            for Resource in Resources
+            for Metric in self.PlanningMetrics
+        ]
 
     def BuildForecasts(self, LoadId: str, Resources: list[dict], Profile: str, Random: random.Random) -> list[dict]:
-        return [self.BuildMetricOutput(LoadId, Resource, "Forecast", Profile, Random) for Resource in Resources]
+        return [
+            self.BuildMetricOutput(LoadId, Resource, "Forecast", Profile, Random, Metric)
+            for Resource in Resources
+            for Metric in self.PlanningMetrics
+        ]
 
     def BuildRisks(self, LoadId: str, Resources: list[dict], Profile: str) -> list[dict]:
         return [
@@ -177,13 +186,13 @@ class SyntheticDataService:
             for Risk in Risks
         ]
 
-    def BuildMetricOutput(self, LoadId: str, Resource: dict, Kind: str, Profile: str, Random: random.Random) -> dict:
+    def BuildMetricOutput(self, LoadId: str, Resource: dict, Kind: str, Profile: str, Random: random.Random, Metric: str) -> dict:
         Base = self.ValueFor(Profile, 0, 90, Random)
         return {
-            f"{Kind}Id": f"{LoadId}-{Kind}-{Resource['ResourceId']}",
+            f"{Kind}Id": f"{LoadId}-{Kind}-{Resource['ResourceId']}-{Metric}",
             "LoadId": LoadId,
             "ResourceId": Resource["ResourceId"],
-            "MetricName": "CPU",
+            "MetricName": Metric,
             "CalculatedAt": datetime.now(UTC).isoformat(),
             "AverageUtilization": round(max(0, Base - 8), 2),
             "PeakUtilization": round(min(100, Base + 8), 2),

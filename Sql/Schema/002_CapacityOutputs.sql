@@ -10,6 +10,7 @@ create table if not exists CapacityRun (
 
 create table if not exists CapacityKpi (
   CapacityKpiId text primary key,
+  LoadId text,
   ResourceId text not null,
   MetricName text not null,
   CalculatedAt timestamp not null,
@@ -22,6 +23,8 @@ create table if not exists CapacityKpi (
   HeadroomAvailable numeric not null,
   BaselineDelta numeric not null default 0
 );
+
+alter table CapacityKpi add column if not exists LoadId text;
 
 create table if not exists ForecastResult (
   ForecastResultId text primary key,
