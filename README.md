@@ -73,6 +73,16 @@ Scripts/ManageTestData.sh delete --load-id DemoCritical001
 Scripts/ManageTestData.sh delete --all --confirmar
 ```
 
+Generar lotes de verificacion para todas las herramientas:
+
+```bash
+Scripts/GenerateVerificationBatches.sh
+Scripts/GenerateVerificationBatches.sh DemoFull001
+```
+
+El generador crea lotes `normal`, `warning`, `critical` y `mixed`. La carga escribe KPIs en
+PostgreSQL para Grafana, series en VictoriaMetrics y hosts/items sinteticos en Zabbix.
+
 Validar una serie sintetica en VictoriaMetrics:
 
 ```bash

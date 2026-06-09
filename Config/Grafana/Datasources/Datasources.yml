@@ -1,15 +1,19 @@
 apiVersion: 1
 datasources:
   - name: VictoriaMetrics
+    uid: VictoriaMetrics
     type: prometheus
     access: proxy
     url: http://capacity-performance-victoriametrics:8428
     isDefault: true
   - name: CapacityPostgreSQL
+    uid: CapacityPostgreSQL
     type: postgres
     access: proxy
     url: capacity-performance-postgresql:5432
     database: capacity
     user: capacity
+    jsonData:
+      sslmode: disable
     secureJsonData:
       password: capacity

@@ -3,6 +3,7 @@ import sys
 
 from CapacityEngine.Adapters.SyntheticPostgreSqlAdapter import SyntheticPostgreSqlAdapter
 from CapacityEngine.Adapters.SyntheticVictoriaMetricsAdapter import SyntheticVictoriaMetricsAdapter
+from CapacityEngine.Adapters.SyntheticZabbixAdapter import SyntheticZabbixAdapter
 from CapacityEngine.Application.SyntheticDataService import SyntheticDataService
 from CapacityEngine.Domain.Exceptions import ValidationError
 from CapacityEngine.Domain.SyntheticData import ValidateDays, ValidateLoadId, ValidateProfile, ValidateSeed, ValidateStatus, ValidateVolume
@@ -38,27 +39,32 @@ def Main(Argv: list[str] | None = None) -> int:
         Service = SyntheticDataService()
         PostgreSql = SyntheticPostgreSqlAdapter()
         Victoria = SyntheticVictoriaMetricsAdapter()
+        Zabbix = SyntheticZabbixAdapter()
         if Args.Action == "load":
-            return Load(Args, Service, PostgreSql, Victoria)
+            return Load(Args, Service, PostgreSql, Victoria, Zabbix)
         if Args.Action == "list":
             return ListLoads(Args, PostgreSql)
         if Args.Action == "validate":
-            return Validate(Args, Service, PostgreSql, Victoria)
+            return Validate(Args, Service, PostgreSql, Victoria, Zabbix)
         if Args.Action == "delete":
-            return Delete(Args, PostgreSql, Victoria)
+            return Delete(Args, PostgreSql, Victoria, Zabbix)
     except ValidationError as Error:
         print(f"ERROR: {Error}", file=sys.stderr)
         return 1
     except ValueError as Error:
         print(f"ERROR: {Error}", file=sys.stderr)
         return 1
+    except RuntimeError as Error:
+        print(f"ERROR: {Error}", file=sys.stderr)
+        return 1
     return 1
 
 
-def Load(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter) -> int:
+def Load(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter, Zabbix: SyntheticZabbixAdapter) -> int:
     Dataset = Service.BuildSyntheticDataset(Args.load_id, ValidateProfile(Args.profile), ValidateVolume(Args.volume), ValidateDays(Args.days), ValidateSeed(Args.seed))
     PostgreSql.SaveDataset(Dataset)
     Victoria.SaveSamples(Dataset["Load"]["LoadId"], Dataset["Samples"])
+    Zabbix.SaveDataset(Dataset["Load"]["LoadId"], Dataset)
     LoadValue = Dataset["Load"]
     print("INFO: carga sintetica completada")
     print(f"  lote: {LoadValue['LoadId']}")
@@ -84,30 +90,33 @@ def ListLoads(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter) 
     return 0
 
 
-def Validate(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter) -> int:
+def Validate(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter, Zabbix: SyntheticZabbixAdapter) -> int:
     LoadId = ValidateLoadId(Args.load_id) if Args.load_id else None
     print("INFO: validacion sintetica completada")
     for Result in Service.ValidateTools(LoadId):
         print(f"  {Result.ToolName}: {Result.Status} ({Result.Protocol}) {Result.Message}")
     print(f"  PostgreSQL datos sinteticos: {'OK' if PostgreSql.HasData(LoadId) else 'Sin datos'}")
     print(f"  VictoriaMetrics muestras sinteticas: {'OK' if Victoria.HasRemoteSamples(LoadId) else 'Sin datos'}")
+    print(f"  Zabbix hosts/items sinteticos: {'OK' if Zabbix.HasData(LoadId) else 'Sin datos'}")
     return 0
 
 
-def Delete(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter) -> int:
+def Delete(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter, Zabbix: SyntheticZabbixAdapter) -> int:
     if Args.all:
         if not Args.confirmar:
             raise ValidationError("delete --all requiere --confirmar")
         LoadCount, RecordCount = PostgreSql.DeleteAll()
         MetricCount = Victoria.DeleteAll()
+        ZabbixCount = Zabbix.DeleteAll()
     else:
         LoadId = ValidateLoadId(Args.load_id)
         RecordCount = PostgreSql.DeleteLoad(LoadId)
         MetricCount = Victoria.DeleteSamples(LoadId)
-        LoadCount = 1 if RecordCount or MetricCount else 0
+        ZabbixCount = Zabbix.DeleteDataset(LoadId)
+        LoadCount = 1 if RecordCount or MetricCount or ZabbixCount else 0
     print("INFO: limpieza sintetica completada")
     print(f"  lotes eliminados: {LoadCount}")
-    print(f"  registros eliminados: {RecordCount + MetricCount}")
+    print(f"  registros eliminados: {RecordCount + MetricCount + ZabbixCount}")
     return 0
 
 

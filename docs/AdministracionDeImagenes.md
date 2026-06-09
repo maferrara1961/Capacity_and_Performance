@@ -76,6 +76,15 @@ Scripts/ManageTestData.sh validate
 Scripts/ManageTestData.sh delete --all --confirmar
 ```
 
+Generar lotes de verificacion para Grafana, VictoriaMetrics, PostgreSQL y Zabbix:
+
+```bash
+Scripts/GenerateVerificationBatches.sh DemoFull001
+```
+
+En Zabbix ingresar con `Admin` / `zabbix` y revisar `Monitoring > Latest data` filtrando por el
+grupo `Capacity Synthetic`.
+
 ## Stop
 
 ```bash

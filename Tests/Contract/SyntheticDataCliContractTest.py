@@ -6,6 +6,7 @@ from pathlib import Path
 
 from CapacityEngine.Adapters.SyntheticPostgreSqlAdapter import SyntheticPostgreSqlAdapter
 from CapacityEngine.Adapters.SyntheticVictoriaMetricsAdapter import SyntheticVictoriaMetricsAdapter
+from CapacityEngine.Adapters.SyntheticZabbixAdapter import SyntheticZabbixAdapter
 from CapacityEngine.Application.SyntheticDataService import SyntheticDataService
 
 
@@ -44,6 +45,7 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("Grafana", Result.stdout)
         self.assertIn("VictoriaMetrics", Result.stdout)
         self.assertIn("PostgreSQL", Result.stdout)
+        self.assertIn("Zabbix hosts/items sinteticos", Result.stdout)
 
     def test_postgresql_sql_incluye_tablas_de_dashboard(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("SqlDemo001", "mixed", "small", 30, 1)
@@ -72,6 +74,16 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn('"__name__": "synthetic_cpu"', Payload)
         self.assertIn('"load_id": "VmDemo001"', Payload)
         self.assertIn('"timestamps": [', Payload)
+
+    def test_zabbix_adapter_define_items_de_capacity(self):
+        Adapter = SyntheticZabbixAdapter()
+        self.assertEqual(Adapter.ItemKey("CPU"), "capacity.synthetic[cpu]")
+        self.assertEqual(Adapter.ItemKey("Network IOPS"), "capacity.synthetic[network_iops]")
+
+    def test_script_de_lotes_de_verificacion_existe(self):
+        Script = ROOT / "Scripts" / "GenerateVerificationBatches.sh"
+        self.assertTrue(Script.exists())
+        self.assertIn("RunLoad critical", Script.read_text())
 
 
 if __name__ == "__main__":

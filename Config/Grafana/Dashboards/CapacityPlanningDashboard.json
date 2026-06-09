@@ -2,9 +2,41 @@
   "title": "Capacity Planning Dashboard",
   "tags": ["capacity", "planning"],
   "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "30s",
   "panels": [
-    {"title": "Monthly Growth", "type": "table", "targets": [{"rawSql": "select ResourceId, MetricName, MonthlyGrowthRate from CapacityKpi"}]},
-    {"title": "Exhaustion Date Estimate", "type": "table", "targets": [{"rawSql": "select ResourceId, DaysToSaturation from ForecastResult"}]},
-    {"title": "Headroom And Baseline", "type": "table", "targets": [{"rawSql": "select ResourceId, HeadroomAvailable, BaselineDelta from CapacityKpi"}]}
+    {
+      "id": 1,
+      "title": "Monthly Growth",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, MonthlyGrowthRate from CapacityKpi order by CalculatedAt desc limit 30"}]
+    },
+    {
+      "id": 2,
+      "title": "Exhaustion Date Estimate",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, DaysToSaturation from ForecastResult order by CalculatedAt desc limit 30"}]
+    },
+    {
+      "id": 3,
+      "title": "Headroom And Baseline",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, HeadroomAvailable, BaselineDelta from CapacityKpi order by CalculatedAt desc limit 30"}]
+    },
+    {
+      "id": 4,
+      "title": "Saturation Trend",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 8},
+      "targets": [{"refId": "A", "expr": "synthetic_saturation", "legendFormat": "{{resource_id}} {{load_id}}"}]
+    }
   ]
 }

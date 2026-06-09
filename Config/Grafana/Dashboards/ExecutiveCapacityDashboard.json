@@ -2,10 +2,49 @@
   "title": "Executive Capacity Dashboard",
   "tags": ["capacity", "executive"],
   "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "30s",
   "panels": [
-    {"title": "Overall Capacity State", "type": "stat", "targets": [{"rawSql": "select OverallRisk from RiskAssessment order by CalculatedAt desc limit 1"}]},
-    {"title": "Top 10 Saturation Risks", "type": "table", "targets": [{"rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment order by CalculatedAt desc limit 10"}]},
-    {"title": "Forecast 30/60/90 Days", "type": "table", "targets": [{"rawSql": "select ResourceId, Forecast30Days, Forecast60Days, Forecast90Days, DaysToSaturation from ForecastResult"}]},
-    {"title": "Recommendations", "type": "table", "targets": [{"rawSql": "select Priority, Action, Reason from Recommendation where Status = 'Open'"}]}
+    {
+      "id": 1,
+      "title": "Overall Capacity State",
+      "type": "stat",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select OverallRisk from RiskAssessment order by CalculatedAt desc limit 1"}]
+    },
+    {
+      "id": 2,
+      "title": "Services With Saturation Risk",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 12, "x": 6, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeId, OverallRisk, Reason, CalculatedAt from RiskAssessment where OverallRisk in ('Warning','Critical') order by CalculatedAt desc limit 20"}]
+    },
+    {
+      "id": 3,
+      "title": "Capacity Used Vs Available",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 6, "x": 18, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, AverageUtilization as UsedPercent, HeadroomAvailable as AvailablePercent from CapacityKpi order by CalculatedAt desc limit 20"}]
+    },
+    {
+      "id": 4,
+      "title": "Forecast 30/60/90 Days",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 14, "x": 0, "y": 9},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, Forecast30Days, Forecast60Days, Forecast90Days, DaysToSaturation from ForecastResult order by CalculatedAt desc limit 30"}]
+    },
+    {
+      "id": 5,
+      "title": "Recommendations",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 10, "x": 14, "y": 9},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select Priority, Action, Reason, Status from Recommendation where Status = 'Open' order by Priority desc limit 30"}]
+    }
   ]
 }

@@ -4,9 +4,9 @@ El stack incluye un comando operativo para generar, listar, validar y borrar dat
 monitoreo, performance y capacity. El objetivo es validar dashboards y herramientas instaladas sin
 usar mediciones reales.
 
-Cuando el stack esta iniciado, la carga escribe datos en PostgreSQL para los paneles SQL de Grafana
-y publica series en VictoriaMetrics para los paneles tecnicos. En `STACK_DRY_RUN=1`, la carga queda
-limitada al almacenamiento local de prueba.
+Cuando el stack esta iniciado, la carga escribe datos en PostgreSQL para los paneles SQL de Grafana,
+publica series en VictoriaMetrics para los paneles tecnicos y crea hosts/items sinteticos en Zabbix.
+En `STACK_DRY_RUN=1`, la carga queda limitada al almacenamiento local de prueba.
 
 ## Cargar Datos
 
@@ -14,6 +14,17 @@ limitada al almacenamiento local de prueba.
 Scripts/ManageTestData.sh load --profile mixed --volume small
 Scripts/ManageTestData.sh load --profile critical --volume small --load-id DemoCritical001
 ```
+
+Generar una bateria de lotes para verificar todas las vistas:
+
+```bash
+Scripts/GenerateVerificationBatches.sh
+Scripts/GenerateVerificationBatches.sh DemoFull001
+```
+
+El script genera lotes `normal`, `warning`, `critical` y `mixed`. Para Zabbix usa la API web
+en `http://localhost:8080/api_jsonrpc.php` con `ZABBIX_USER=Admin` y `ZABBIX_PASSWORD=zabbix`
+por defecto.
 
 Perfiles permitidos:
 
@@ -49,7 +60,7 @@ Scripts/ManageTestData.sh validate --load-id DemoCritical001
 ```
 
 La validacion informa estado de Grafana, Zabbix Web, VictoriaMetrics, PostgreSQL y Zabbix Server,
-ademas de presencia de datos sinteticos.
+ademas de presencia de datos sinteticos en PostgreSQL, VictoriaMetrics y Zabbix.
 
 Validar una serie publicada en VictoriaMetrics:
 

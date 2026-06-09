@@ -2,9 +2,45 @@
   "title": "Application Dashboard",
   "tags": ["capacity", "application"],
   "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "30s",
   "panels": [
-    {"title": "Application Health", "type": "stat", "targets": [{"rawSql": "select Name, HealthStatus from Application"}]},
-    {"title": "Associated Infrastructure", "type": "table", "targets": [{"rawSql": "select ServiceId, ResourceId, Role, ImpactWeight from ServiceResourceMap"}]},
-    {"title": "Critical Dependencies", "type": "table", "targets": [{"rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical')"}]}
+    {
+      "id": 1,
+      "title": "Application Health",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application order by Name"}]
+    },
+    {
+      "id": 2,
+      "title": "Associated Infrastructure",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ServiceId, ResourceId, Role, ImpactWeight from ServiceResourceMap order by ServiceId, ResourceId"}]
+    },
+    {
+      "id": 3,
+      "title": "Critical Dependencies",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical') order by CalculatedAt desc"}]
+    },
+    {
+      "id": 4,
+      "title": "End To End Performance",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 8},
+      "targets": [
+        {"refId": "A", "expr": "synthetic_latency", "legendFormat": "latency {{resource_id}}"},
+        {"refId": "B", "expr": "synthetic_throughput", "legendFormat": "throughput {{resource_id}}"},
+        {"refId": "C", "expr": "synthetic_errors", "legendFormat": "errors {{resource_id}}"}
+      ]
+    }
   ]
 }

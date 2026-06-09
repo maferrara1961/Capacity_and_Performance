@@ -19,6 +19,7 @@ Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ManageTestData.sh
+Scripts/GenerateVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
 Config/Grafana/Dashboards/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
@@ -48,8 +49,28 @@ if ! grep -q "http://capacity-performance-victoriametrics:8428" Config/Grafana/D
   exit 1
 fi
 
+if ! grep -q "uid: VictoriaMetrics" Config/Grafana/Datasources/Datasources.yml; then
+  echo "Datasource VictoriaMetrics no declara UID estable" >&2
+  exit 1
+fi
+
 if ! grep -q "capacity-performance-postgresql:5432" Config/Grafana/Datasources/Datasources.yml; then
   echo "Datasource PostgreSQL no apunta al contenedor esperado" >&2
+  exit 1
+fi
+
+if ! grep -q "uid: CapacityPostgreSQL" Config/Grafana/Datasources/Datasources.yml; then
+  echo "Datasource PostgreSQL no declara UID estable" >&2
+  exit 1
+fi
+
+if ! grep -R "CapacityPostgreSQL" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  echo "Dashboards no declaran datasource PostgreSQL explicito" >&2
+  exit 1
+fi
+
+if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  echo "Dashboards no declaran datasource VictoriaMetrics explicito" >&2
   exit 1
 fi
 
