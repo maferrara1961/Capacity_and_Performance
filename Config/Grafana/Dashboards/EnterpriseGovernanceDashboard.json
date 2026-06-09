@@ -42,6 +42,234 @@
       }
     },
     {
+      "id": 20,
+      "title": "Semaforo Inventario",
+      "type": "stat",
+      "description": "Porcentaje de componentes con inventario minimo completo: host, tipo, dominio, subsistema y owner. Rojo <60%, amarillo 60-84.99%, verde >=85%.",
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(round(100.0 * count(*) filter (where nullif(ComponentName,'') is not null and nullif(TechnologyType,'') is not null and nullif(DomainName,'') is not null and nullif(BusinessServiceId,'') is not null and nullif(Owner,'') is not null) / nullif(count(*), 0), 2), 0) as InventarioPct from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
+            },
+            {
+              "title": "Ver graficos del subsistema",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
+            }
+          ]
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 21,
+      "title": "Semaforo Ciclo de Vida / Compliance",
+      "type": "stat",
+      "description": "Porcentaje de componentes sin backlevel, sin fin de soporte y con compliance/licencia compliant. Rojo <60%, amarillo 60-84.99%, verde >=85%.",
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(round(100.0 * count(*) filter (where LifecycleStatus in ('Supported','Current') and SupportStatus not in ('EndOfSupport','EndOfLife','Backlevel','Unknown') and ComplianceStatus = 'Compliant' and LicenseStatus = 'Compliant' and BacklevelStatus = 'Current') / nullif(count(*), 0), 2), 0) as CicloVidaCompliancePct from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
+            },
+            {
+              "title": "Ver graficos del subsistema",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
+            }
+          ]
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 22,
+      "title": "Semaforo Confianza de Monitoreo",
+      "type": "stat",
+      "description": "Porcentaje de evidencias disponibles y frescas. La evidencia faltante, desconocida, incompleta o no verificada reduce la confianza. Rojo <60%, amarillo 60-84.99%, verde >=85%.",
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(round(100.0 * count(*) filter (where EvidenceState = 'Available' and FreshnessStatus = 'Fresh') / nullif(count(*), 0), 2), 0) as ConfianzaMonitoreoPct from EnterpriseEvidenceRecord where LoadId ~ '^(${LoadId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "green",
+                "value": 85
+              }
+            ]
+          },
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
+            },
+            {
+              "title": "Ver graficos del subsistema",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
+            }
+          ]
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name"
+      }
+    },
+    {
       "id": 2,
       "title": "Inventario Tecnologico",
       "type": "table",
@@ -54,7 +282,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 8
       },
       "targets": [
         {
@@ -91,7 +319,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 4
+        "y": 8
       },
       "targets": [
         {
@@ -128,7 +356,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 17
       },
       "targets": [
         {

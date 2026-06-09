@@ -230,8 +230,8 @@ Uso recomendado:
   dependencias criticas y performance end-to-end.
 - **Enterprise Executive Dashboard**: salud tecnologica consolidada, scores 0-100, top riesgos,
   evidencia faltante y prioridades ejecutivas.
-- **Enterprise Governance Dashboard**: inventario, ciclo de vida, cumplimiento, confianza de
-  monitoreo y registro de riesgos.
+- **Enterprise Governance Dashboard**: semaforo inicial con porcentaje de inventario, ciclo de
+  vida/compliance y confianza de monitoreo; luego inventario, evidencia y registro de riesgos.
 - **Enterprise Operational Dashboard**: tendencias, forecast 30/90/180/365, top consumidores y
   frescura de evidencia.
 - **Enterprise License Compliance Dashboard**: licencias por host/servicio, estado compliant,

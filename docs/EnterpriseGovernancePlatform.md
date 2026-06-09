@@ -76,6 +76,8 @@ python3 -m CapacityEngine.Scheduler.SyntheticDataCommand sync-enterprise-invento
 - Enterprise Software Backlevel Dashboard
 
 Los dashboards deben distinguir "sin evidencia" de "sin riesgo".
+El Enterprise Governance Dashboard inicia con tres semaforos porcentuales:
+inventario minimo completo, ciclo de vida/compliance saludable y confianza de monitoreo.
 
 ## Datos y Correlacion
 
