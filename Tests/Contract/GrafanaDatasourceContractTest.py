@@ -8,6 +8,9 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
         Text = Path("Config/Grafana/Datasources/Datasources.yml").read_text()
         self.assertIn("uid: VictoriaMetrics", Text)
         self.assertIn("uid: CapacityPostgreSQL", Text)
+        self.assertIn("deleteDatasources:", Text)
+        self.assertIn("prune: true", Text)
+        self.assertIn("orgId: 1", Text)
         self.assertIn("sslmode: disable", Text)
 
     def test_paneles_sql_usan_postgresql_explicito(self):
