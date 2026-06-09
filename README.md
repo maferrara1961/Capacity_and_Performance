@@ -9,7 +9,8 @@ servicios, aplicaciones e infraestructura.
 
 ## Componentes
 
-- **Zabbix**: monitoreo de sistemas y subsistemas.
+- **ZabbixServer**: monitoreo de sistemas y subsistemas.
+- **ZabbixWeb**: interfaz web de Zabbix.
 - **VictoriaMetrics**: almacenamiento de metricas de series temporales.
 - **Grafana**: capa principal de dashboards.
 - **PostgreSQL**: catalogo de servicios, umbrales, baselines, KPIs, forecasts y recomendaciones.
@@ -148,9 +149,10 @@ Con el stack iniciado, acceder desde el navegador o desde herramientas cliente:
 
 ```text
 Grafana:          http://localhost:3000
-Zabbix:           http://localhost:8080
+Zabbix Web:       http://localhost:8080
 VictoriaMetrics:  http://localhost:8428
 PostgreSQL:       localhost:5432
+Zabbix Server:    localhost:10051
 ```
 
 Credenciales por defecto para Grafana:
@@ -164,6 +166,9 @@ Para una instancia remota de Ubuntu, reemplazar `localhost` por la IP publica o 
 servidor, por ejemplo `http://IP_DEL_SERVIDOR:3000`. En Oracle Cloud, AWS, Azure u otro proveedor,
 abrir los puertos requeridos en el firewall del sistema operativo y en las reglas de red del
 proveedor antes de acceder desde otra maquina.
+
+PostgreSQL y Zabbix Server no son endpoints HTTP. No se validan con `curl`; se acceden con clientes
+especificos o desde otros contenedores del stack.
 
 Consultar estado:
 
@@ -208,7 +213,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 38 tests OK
+Scripts/RunTests.sh        -> 40 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```

@@ -1,0 +1,3 @@
+FROM zabbix/zabbix-server-pgsql:latest
+LABEL org.opencontainers.image.title="Capacity Zabbix Server"
+LABEL org.opencontainers.image.description="Self-hosted Zabbix server runtime for capacity observability"

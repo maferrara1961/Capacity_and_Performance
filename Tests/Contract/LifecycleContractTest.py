@@ -51,7 +51,8 @@ class LifecycleContractTest(unittest.TestCase):
         Result = RunScript("bash", "Scripts/StartStack.sh")
         self.assertEqual(Result.returncode, 0, Result.stderr)
         Output = Result.stdout
-        self.assertLess(Output.index("iniciando PostgreSQL"), Output.index("iniciando Zabbix"))
+        self.assertLess(Output.index("iniciando PostgreSQL"), Output.index("iniciando ZabbixServer"))
+        self.assertLess(Output.index("iniciando ZabbixServer"), Output.index("iniciando ZabbixWeb"))
         self.assertLess(Output.index("iniciando VictoriaMetrics"), Output.index("iniciando Grafana"))
 
     def test_start_crea_red_comun(self):

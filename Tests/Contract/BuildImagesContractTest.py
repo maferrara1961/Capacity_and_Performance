@@ -19,6 +19,8 @@ class BuildImagesContractTest(unittest.TestCase):
         self.assertEqual(Result.returncode, 0, Result.stderr)
         self.assertIn("resumen de build", Result.stdout)
         self.assertIn("capacity-performance-grafana:latest", Result.stdout)
+        self.assertIn("capacity-performance-zabbix-server:latest", Result.stdout)
+        self.assertIn("capacity-performance-zabbix-web:latest", Result.stdout)
 
     def test_build_individual_grafana_con_version(self):
         Result = RunScript("bash", "Scripts/BuildImages.sh", "Grafana", "v1.0.0")

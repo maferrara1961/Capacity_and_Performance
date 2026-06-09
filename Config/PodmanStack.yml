@@ -10,9 +10,14 @@ services:
     containerfile: ContainerImages/VictoriaMetrics/Containerfile
     ports:
       - "8428:8428"
-  zabbix:
-    image: localhost/capacity-zabbix:latest
-    containerfile: ContainerImages/Zabbix/Containerfile
+  zabbix-server:
+    image: localhost/capacity-zabbix-server:latest
+    containerfile: ContainerImages/ZabbixServer/Containerfile
+    ports:
+      - "10051:10051"
+  zabbix-web:
+    image: localhost/capacity-zabbix-web:latest
+    containerfile: ContainerImages/ZabbixWeb/Containerfile
     ports:
       - "8080:8080"
   grafana:

@@ -34,9 +34,10 @@ URLs locales luego de iniciar el stack:
 
 ```text
 Grafana:          http://localhost:3000
-Zabbix:           http://localhost:8080
+Zabbix Web:       http://localhost:8080
 VictoriaMetrics:  http://localhost:8428
 PostgreSQL:       localhost:5432
+Zabbix Server:    localhost:10051
 ```
 
 Credenciales por defecto para Grafana:
@@ -48,6 +49,9 @@ Password: admin
 
 En servidores remotos, reemplazar `localhost` por la IP publica o nombre DNS del servidor. Tambien
 se deben habilitar los puertos en el firewall local y en las reglas de red del proveedor cloud.
+
+PostgreSQL y Zabbix Server no son servicios HTTP. Un `curl` contra `localhost:5432` puede devolver
+respuesta vacia, y eso no indica una falla de PostgreSQL.
 
 ## Stop
 
@@ -78,4 +82,5 @@ Scripts/StackStatus.sh CapacityEngine
 `CapacityEngine` es una tarea batch. Cuando finaliza con exit code `0`, el estado esperado es
 `salud: completado correctamente`.
 
-Los servicios permitidos son: PostgreSQL, VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
+Los servicios permitidos son: PostgreSQL, VictoriaMetrics, ZabbixServer, ZabbixWeb, Grafana y
+CapacityEngine. `Zabbix` se conserva como alias operativo de `ZabbixWeb`.

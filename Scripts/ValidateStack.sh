@@ -4,7 +4,8 @@ set -eu
 RequiredFiles="
 Config/StackManifest.yml
 Config/PodmanStack.yml
-ContainerImages/Zabbix/Containerfile
+ContainerImages/ZabbixServer/Containerfile
+ContainerImages/ZabbixWeb/Containerfile
 ContainerImages/VictoriaMetrics/Containerfile
 ContainerImages/Grafana/Containerfile
 ContainerImages/PostgreSQL/Containerfile

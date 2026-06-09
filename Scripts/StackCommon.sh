@@ -8,9 +8,9 @@ DEFAULT_VERSION="${STACK_VERSION:-latest}"
 STACK_DRY_RUN="${STACK_DRY_RUN:-0}"
 PODMAN_BIN="${PODMAN_BIN:-podman}"
 
-STACK_SERVICES="PostgreSQL VictoriaMetrics Zabbix Grafana CapacityEngine"
-STACK_START_ORDER="PostgreSQL VictoriaMetrics Zabbix Grafana CapacityEngine"
-STACK_STOP_ORDER="CapacityEngine Grafana Zabbix VictoriaMetrics PostgreSQL"
+STACK_SERVICES="PostgreSQL VictoriaMetrics ZabbixServer ZabbixWeb Grafana CapacityEngine"
+STACK_START_ORDER="PostgreSQL VictoriaMetrics ZabbixServer ZabbixWeb Grafana CapacityEngine"
+STACK_STOP_ORDER="CapacityEngine Grafana ZabbixWeb ZabbixServer VictoriaMetrics PostgreSQL"
 
 FindRepoRoot() {
   CurrentDir="$(pwd)"
@@ -37,7 +37,7 @@ Error() {
 
 IsAllowedService() {
   case "${1:-}" in
-    PostgreSQL|VictoriaMetrics|Zabbix|Grafana|CapacityEngine) return 0 ;;
+    PostgreSQL|VictoriaMetrics|Zabbix|ZabbixServer|ZabbixWeb|Grafana|CapacityEngine) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -70,8 +70,13 @@ RequirePositiveLines() {
 }
 
 ContainerfileFor() {
-  RequireService "$1"
-  printf '%s\n' "$REPO_ROOT/ContainerImages/$1/Containerfile"
+  Service="$1"
+  RequireService "$Service"
+  case "$Service" in
+    Zabbix) Directory="ZabbixWeb" ;;
+    *) Directory="$Service" ;;
+  esac
+  printf '%s\n' "$REPO_ROOT/ContainerImages/$Directory/Containerfile"
 }
 
 ImageFor() {
@@ -82,7 +87,8 @@ ImageFor() {
   case "$Service" in
     PostgreSQL) Suffix="postgresql" ;;
     VictoriaMetrics) Suffix="victoriametrics" ;;
-    Zabbix) Suffix="zabbix" ;;
+    Zabbix|ZabbixWeb) Suffix="zabbix-web" ;;
+    ZabbixServer) Suffix="zabbix-server" ;;
     Grafana) Suffix="grafana" ;;
     CapacityEngine) Suffix="capacity-engine" ;;
   esac
@@ -94,7 +100,8 @@ ContainerFor() {
   case "$1" in
     PostgreSQL) echo "${PROJECT_NAME}-postgresql" ;;
     VictoriaMetrics) echo "${PROJECT_NAME}-victoriametrics" ;;
-    Zabbix) echo "${PROJECT_NAME}-zabbix" ;;
+    Zabbix|ZabbixWeb) echo "${PROJECT_NAME}-zabbix-web" ;;
+    ZabbixServer) echo "${PROJECT_NAME}-zabbix-server" ;;
     Grafana) echo "${PROJECT_NAME}-grafana" ;;
     CapacityEngine) echo "${PROJECT_NAME}-capacity-engine" ;;
   esac
@@ -105,7 +112,8 @@ PortArgsFor() {
   case "$1" in
     PostgreSQL) echo "-p 5432:5432" ;;
     VictoriaMetrics) echo "-p 8428:8428" ;;
-    Zabbix) echo "-p 8080:8080" ;;
+    Zabbix|ZabbixWeb) echo "-p 8080:8080" ;;
+    ZabbixServer) echo "-p 10051:10051" ;;
     Grafana) echo "-p 3000:3000" ;;
     CapacityEngine) echo "" ;;
   esac
@@ -116,7 +124,8 @@ VolumeArgsFor() {
   case "$1" in
     PostgreSQL) echo "-v ${PROJECT_NAME}-postgresql-data:/var/lib/postgresql/data" ;;
     VictoriaMetrics) echo "-v ${PROJECT_NAME}-victoriametrics-data:/victoria-metrics-data" ;;
-    Zabbix) echo "-v ${PROJECT_NAME}-zabbix-data:/var/lib/zabbix" ;;
+    ZabbixServer) echo "-v ${PROJECT_NAME}-zabbix-server-data:/var/lib/zabbix" ;;
+    Zabbix|ZabbixWeb) echo "" ;;
     Grafana) echo "-v ${PROJECT_NAME}-grafana-data:/var/lib/grafana" ;;
     CapacityEngine) echo "" ;;
   esac
@@ -126,7 +135,8 @@ EnvironmentArgsFor() {
   RequireService "$1"
   case "$1" in
     PostgreSQL) echo "-e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
-    Zabbix) echo "-e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
+    ZabbixServer) echo "-e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
+    Zabbix|ZabbixWeb) echo "-e ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server -e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
     Grafana) echo "-e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin" ;;
     VictoriaMetrics|CapacityEngine) echo "" ;;
   esac
@@ -136,7 +146,8 @@ DependenciesFor() {
   RequireService "$1"
   case "$1" in
     PostgreSQL|VictoriaMetrics) echo "" ;;
-    Zabbix) echo "PostgreSQL" ;;
+    ZabbixServer) echo "PostgreSQL" ;;
+    Zabbix|ZabbixWeb) echo "PostgreSQL ZabbixServer" ;;
     Grafana) echo "PostgreSQL VictoriaMetrics" ;;
     CapacityEngine) echo "PostgreSQL VictoriaMetrics" ;;
   esac
