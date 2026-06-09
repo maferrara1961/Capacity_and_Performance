@@ -20,6 +20,9 @@ services:
     containerfile: ContainerImages/ZabbixWeb/Containerfile
     ports:
       - "8080:8080"
+  zabbix-agent:
+    image: localhost/capacity-performance-zabbix-agent:latest
+    containerfile: ContainerImages/ZabbixAgent/Containerfile
   grafana:
     image: localhost/capacity-performance-grafana:latest
     containerfile: ContainerImages/Grafana/Containerfile

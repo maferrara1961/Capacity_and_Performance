@@ -48,6 +48,20 @@ compliance, software backlevel, lifecycle y labels `technology_domain`, `busines
 `business_service_id` en VictoriaMetrics. Tambien conserva la identidad `SRV-#####` en Zabbix,
 PostgreSQL y Grafana.
 
+En Zabbix, la informacion de licencias y software backlevel queda expuesta por el agente en
+`Monitoring > Latest data` del host `SRV-#####`. Buscar estos items:
+
+```text
+Enterprise Licencia - Estado
+Enterprise Compliance - Estado
+Enterprise Software Backlevel - Estado
+Enterprise Lifecycle - Estado
+Enterprise Software - Fecha fin de soporte
+```
+
+El agente lee `.capacity-test-data/ZabbixAgent/EnterpriseFacts.tsv`, montado en el contenedor
+`capacity-performance-zabbix-agent`, mediante `capacity.enterprise.fact[HostName,FactName]`.
+
 Dashboards especificos para estos datos:
 
 - `Enterprise License Compliance Dashboard`

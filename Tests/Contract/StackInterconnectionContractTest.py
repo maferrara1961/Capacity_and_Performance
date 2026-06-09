@@ -20,6 +20,7 @@ class StackInterconnectionContractTest(unittest.TestCase):
             "localhost/capacity-performance-victoriametrics:latest",
             "localhost/capacity-performance-zabbix-server:latest",
             "localhost/capacity-performance-zabbix-web:latest",
+            "localhost/capacity-performance-zabbix-agent:latest",
             "localhost/capacity-performance-grafana:latest",
             "localhost/capacity-performance-capacity-engine:latest",
         ]
@@ -30,6 +31,17 @@ class StackInterconnectionContractTest(unittest.TestCase):
         Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")
         self.assertIn("ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server", Common)
         self.assertIn("DB_SERVER_HOST=${PROJECT_NAME}-postgresql", Common)
+
+    def test_zabbix_agent_levanta_licencias_y_backlevel(self):
+        Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")
+        Adapter = (ROOT / "CapacityEngine/Adapters/SyntheticZabbixAdapter.py").read_text(encoding="utf-8")
+        UserParameters = (ROOT / "Config/ZabbixAgent/UserParameters.conf").read_text(encoding="utf-8")
+        self.assertIn("ZabbixAgent", Common)
+        self.assertIn("${PROJECT_NAME}-zabbix-agent", Common)
+        self.assertIn("capacity.enterprise.fact[*]", UserParameters)
+        self.assertIn("LicenseStatus", Adapter)
+        self.assertIn("BacklevelStatus", Adapter)
+        self.assertIn('"type": 0', Adapter)
 
     def test_grafana_monta_provisioning_desde_el_repositorio(self):
         Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")

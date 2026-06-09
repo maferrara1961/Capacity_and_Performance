@@ -8,9 +8,9 @@ DEFAULT_VERSION="${STACK_VERSION:-latest}"
 STACK_DRY_RUN="${STACK_DRY_RUN:-0}"
 PODMAN_BIN="${PODMAN_BIN:-podman}"
 
-STACK_SERVICES="PostgreSQL VictoriaMetrics ZabbixServer ZabbixWeb Grafana CapacityEngine"
-STACK_START_ORDER="PostgreSQL VictoriaMetrics ZabbixServer ZabbixWeb Grafana CapacityEngine"
-STACK_STOP_ORDER="CapacityEngine Grafana ZabbixWeb ZabbixServer VictoriaMetrics PostgreSQL"
+STACK_SERVICES="PostgreSQL VictoriaMetrics ZabbixServer ZabbixWeb ZabbixAgent Grafana CapacityEngine"
+STACK_START_ORDER="PostgreSQL VictoriaMetrics ZabbixServer ZabbixWeb ZabbixAgent Grafana CapacityEngine"
+STACK_STOP_ORDER="CapacityEngine Grafana ZabbixAgent ZabbixWeb ZabbixServer VictoriaMetrics PostgreSQL"
 
 FindRepoRoot() {
   CurrentDir="$(pwd)"
@@ -37,7 +37,7 @@ Error() {
 
 IsAllowedService() {
   case "${1:-}" in
-    PostgreSQL|VictoriaMetrics|Zabbix|ZabbixServer|ZabbixWeb|Grafana|CapacityEngine) return 0 ;;
+    PostgreSQL|VictoriaMetrics|Zabbix|ZabbixServer|ZabbixWeb|ZabbixAgent|Grafana|CapacityEngine) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -89,6 +89,7 @@ ImageFor() {
     VictoriaMetrics) Suffix="victoriametrics" ;;
     Zabbix|ZabbixWeb) Suffix="zabbix-web" ;;
     ZabbixServer) Suffix="zabbix-server" ;;
+    ZabbixAgent) Suffix="zabbix-agent" ;;
     Grafana) Suffix="grafana" ;;
     CapacityEngine) Suffix="capacity-engine" ;;
   esac
@@ -102,6 +103,7 @@ ContainerFor() {
     VictoriaMetrics) echo "${PROJECT_NAME}-victoriametrics" ;;
     Zabbix|ZabbixWeb) echo "${PROJECT_NAME}-zabbix-web" ;;
     ZabbixServer) echo "${PROJECT_NAME}-zabbix-server" ;;
+    ZabbixAgent) echo "${PROJECT_NAME}-zabbix-agent" ;;
     Grafana) echo "${PROJECT_NAME}-grafana" ;;
     CapacityEngine) echo "${PROJECT_NAME}-capacity-engine" ;;
   esac
@@ -114,6 +116,7 @@ PortArgsFor() {
     VictoriaMetrics) echo "-p 8428:8428" ;;
     Zabbix|ZabbixWeb) echo "-p 8080:8080" ;;
     ZabbixServer) echo "-p 10051:10051" ;;
+    ZabbixAgent) echo "" ;;
     Grafana) echo "-p 3000:3000" ;;
     CapacityEngine) echo "" ;;
   esac
@@ -126,6 +129,7 @@ VolumeArgsFor() {
     VictoriaMetrics) echo "-v ${PROJECT_NAME}-victoriametrics-data:/victoria-metrics-data" ;;
     ZabbixServer) echo "-v ${PROJECT_NAME}-zabbix-server-data:/var/lib/zabbix" ;;
     Zabbix|ZabbixWeb) echo "" ;;
+    ZabbixAgent) echo "-v ${REPO_ROOT}/.capacity-test-data/ZabbixAgent:/var/lib/zabbix/capacity-agent:ro,Z" ;;
     Grafana) echo "-v ${PROJECT_NAME}-grafana-data:/var/lib/grafana -v ${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z -v ${REPO_ROOT}/Config/Grafana/DashboardProviders:/etc/grafana/provisioning/dashboards:ro,Z -v ${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/dashboards:ro,Z" ;;
     CapacityEngine) echo "" ;;
   esac
@@ -137,6 +141,7 @@ EnvironmentArgsFor() {
     PostgreSQL) echo "-e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
     ZabbixServer) echo "-e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
     Zabbix|ZabbixWeb) echo "-e ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server -e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
+    ZabbixAgent) echo "-e ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server -e ZBX_HOSTNAME=${PROJECT_NAME}-zabbix-agent" ;;
     Grafana) echo "-e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin" ;;
     VictoriaMetrics|CapacityEngine) echo "" ;;
   esac
@@ -148,6 +153,7 @@ DependenciesFor() {
     PostgreSQL|VictoriaMetrics) echo "" ;;
     ZabbixServer) echo "PostgreSQL" ;;
     Zabbix|ZabbixWeb) echo "PostgreSQL ZabbixServer" ;;
+    ZabbixAgent) echo "ZabbixServer" ;;
     Grafana) echo "PostgreSQL VictoriaMetrics" ;;
     CapacityEngine) echo "PostgreSQL VictoriaMetrics" ;;
   esac

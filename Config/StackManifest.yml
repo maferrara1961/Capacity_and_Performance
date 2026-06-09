@@ -2,6 +2,7 @@ approved_runtime_components:
   - Podman
   - ZabbixServer
   - ZabbixWeb
+  - ZabbixAgent
   - VictoriaMetrics
   - Grafana
   - PostgreSQL

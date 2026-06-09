@@ -94,6 +94,8 @@ Componentes:
 
 - **ZabbixServer**: monitoreo de sistemas y subsistemas.
 - **ZabbixWeb**: interfaz web de Zabbix.
+- **ZabbixAgent**: agente con checks custom para levantar licencias, compliance, backlevel,
+  lifecycle y fecha de fin de soporte por host.
 - **VictoriaMetrics**: almacenamiento de metricas de series temporales.
 - **Grafana**: capa principal de dashboards.
 - **PostgreSQL**: catalogo de servicios, umbrales, baselines, KPIs, forecasts y recomendaciones.
@@ -146,6 +148,7 @@ Grafana -> capacity-performance-postgresql:5432
 ZabbixWeb -> capacity-performance-zabbix-server:10051
 ZabbixWeb -> capacity-performance-postgresql:5432
 ZabbixServer -> capacity-performance-postgresql:5432
+ZabbixServer -> capacity-performance-zabbix-agent:10050
 ManageTestData -> PostgreSQL, VictoriaMetrics y Zabbix
 CapacityEngine -> PostgreSQL y VictoriaMetrics
 ```
@@ -237,6 +240,20 @@ La carga enterprise reutiliza el generador sintetico existente y agrega tablas e
 PostgreSQL, datos de testing de licencias/backlevel/compliance/lifecycle, labels
 `technology_domain`, `business_service` y `business_service_id` en VictoriaMetrics, y hosts
 `SRV-#####` congruentes con el inventario de Zabbix.
+
+En Zabbix, esos datos se ven por host en `Monitoring > Latest data` como items de agente:
+
+```text
+Enterprise Licencia - Estado
+Enterprise Compliance - Estado
+Enterprise Software Backlevel - Estado
+Enterprise Lifecycle - Estado
+Enterprise Software - Fecha fin de soporte
+```
+
+La fuente es `ZabbixAgent`, usando el UserParameter `capacity.enterprise.fact[HostName,FactName]`.
+Despues de cargar datos, esperar el intervalo de polling del agente o ejecutar manualmente
+`Check now` sobre los items si la UI lo permite.
 
 Si Grafana muestra que PostgreSQL no tiene base por defecto configurada, actualizar y reiniciar:
 

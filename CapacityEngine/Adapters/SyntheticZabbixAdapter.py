@@ -10,9 +10,11 @@ class SyntheticZabbixAdapter:
     def __init__(self, DataDir: str | None = None, BaseUrl: str | None = None) -> None:
         self.DataDir = Path(DataDir or os.environ.get("SYNTHETIC_DATA_DIR", ".capacity-test-data"))
         self.DataPath = self.DataDir / "ZabbixObjects.json"
+        self.AgentFactPath = self.DataDir / "ZabbixAgent" / "EnterpriseFacts.tsv"
         self.BaseUrl = (BaseUrl or os.environ.get("ZABBIX_URL", "http://localhost:8080/api_jsonrpc.php")).rstrip("/")
         self.User = os.environ.get("ZABBIX_USER", "Admin")
         self.Password = os.environ.get("ZABBIX_PASSWORD", "zabbix")
+        self.AgentDns = os.environ.get("ZABBIX_AGENT_DNS", "capacity-performance-zabbix-agent")
 
     def SaveDataset(self, LoadId: str, Dataset: dict) -> None:
         Store = self.LoadStore()
@@ -20,6 +22,7 @@ class SyntheticZabbixAdapter:
             "Hosts": [Resource["Name"] for Resource in Dataset["Resources"]],
             "Samples": len(Dataset["Samples"]),
         }
+        self.SaveAgentFacts(Dataset)
         self.SaveStore(Store)
         if os.environ.get("STACK_DRY_RUN", "0") != "1":
             self.ImportDataset(Dataset)
@@ -27,6 +30,7 @@ class SyntheticZabbixAdapter:
     def DeleteDataset(self, LoadId: str) -> int:
         Store = self.LoadStore()
         Record = Store.pop(LoadId, None)
+        self.DeleteAgentFactsForHosts((Record or {}).get("Hosts", []))
         self.SaveStore(Store)
         if os.environ.get("STACK_DRY_RUN", "0") != "1":
             self.DeleteRemoteDataset(LoadId)
@@ -39,6 +43,7 @@ class SyntheticZabbixAdapter:
         LoadIds = list(Store.keys())
         Count = sum(len(Record.get("Hosts", [])) + int(Record.get("Samples", 0)) for Record in Store.values())
         self.SaveStore({})
+        self.SaveAgentFactsFile({})
         if os.environ.get("STACK_DRY_RUN", "0") != "1":
             for LoadId in LoadIds:
                 self.DeleteRemoteDataset(LoadId)
@@ -56,9 +61,12 @@ class SyntheticZabbixAdapter:
         Token = self.Login()
         GroupId = self.EnsureHostGroup(Token, "Capacity Synthetic")
         LatestSamples = self.LatestSamplesByResourceAndMetric(Dataset["Samples"])
+        EnterpriseByHost = self.EnterpriseComponentsByHost(Dataset)
         ItemIdsByResourceMetric = {}
         for Resource in Dataset["Resources"]:
             HostId = self.EnsureHost(Token, GroupId, Resource)
+            InterfaceId = self.EnsureAgentInterface(Token, HostId)
+            self.EnsureEnterpriseAgentItems(Token, HostId, InterfaceId, Resource["Name"], EnterpriseByHost.get(Resource["Name"], {}))
             ItemIds = []
             for Sample in LatestSamples.get(Resource["ResourceId"], {}).values():
                 ItemId = self.EnsureItem(Token, HostId, Sample)
@@ -77,6 +85,60 @@ class SyntheticZabbixAdapter:
                     file=sys.stderr,
                 )
                 return
+
+    def SaveAgentFacts(self, Dataset: dict) -> None:
+        CurrentFacts = self.LoadAgentFacts()
+        for Component in Dataset.get("EnterpriseComponents", []):
+            CurrentFacts[Component["ComponentName"]] = {
+                "LicenseStatus": Component.get("LicenseStatus", "Unknown"),
+                "ComplianceStatus": Component.get("ComplianceStatus", "Unknown"),
+                "BacklevelStatus": Component.get("BacklevelStatus", "Unknown"),
+                "LifecycleStatus": Component.get("LifecycleStatus", "Unknown"),
+                "EndOfSupportDate": Component.get("EndOfSupportDate", "Unknown"),
+            }
+        self.AgentFactPath.parent.mkdir(parents=True, exist_ok=True)
+        Header = ["HostName", "LicenseStatus", "ComplianceStatus", "BacklevelStatus", "LifecycleStatus", "EndOfSupportDate"]
+        Lines = ["\t".join(Header)]
+        for HostName in sorted(CurrentFacts):
+            Facts = CurrentFacts[HostName]
+            Lines.append("\t".join([HostName] + [Facts.get(Field, "Unknown") for Field in Header[1:]]))
+        self.AgentFactPath.write_text("\n".join(Lines) + "\n", encoding="utf-8")
+
+    def SaveAgentFactsFile(self, FactsByHost: dict) -> None:
+        self.AgentFactPath.parent.mkdir(parents=True, exist_ok=True)
+        Header = ["HostName", "LicenseStatus", "ComplianceStatus", "BacklevelStatus", "LifecycleStatus", "EndOfSupportDate"]
+        Lines = ["\t".join(Header)]
+        for HostName in sorted(FactsByHost):
+            Facts = FactsByHost[HostName]
+            Lines.append("\t".join([HostName] + [Facts.get(Field, "Unknown") for Field in Header[1:]]))
+        self.AgentFactPath.write_text("\n".join(Lines) + "\n", encoding="utf-8")
+
+    def DeleteAgentFactsForHosts(self, HostNames: list[str]) -> None:
+        if not HostNames:
+            return
+        Facts = self.LoadAgentFacts()
+        for HostName in HostNames:
+            Facts.pop(HostName, None)
+        self.SaveAgentFactsFile(Facts)
+
+    def LoadAgentFacts(self) -> dict:
+        if not self.AgentFactPath.exists():
+            return {}
+        Lines = self.AgentFactPath.read_text(encoding="utf-8").splitlines()
+        if not Lines:
+            return {}
+        Header = Lines[0].split("\t")
+        Facts = {}
+        for Line in Lines[1:]:
+            Values = Line.split("\t")
+            Row = dict(zip(Header, Values))
+            HostName = Row.pop("HostName", "")
+            if HostName:
+                Facts[HostName] = Row
+        return Facts
+
+    def EnterpriseComponentsByHost(self, Dataset: dict) -> dict:
+        return {Component["ComponentName"]: Component for Component in Dataset.get("EnterpriseComponents", [])}
 
     def BuildHistoryPushPayload(self, Samples: list[dict], ItemIdsByResourceMetric: dict[tuple[str, str], str]) -> list[dict]:
         History = []
@@ -213,11 +275,30 @@ class SyntheticZabbixAdapter:
                 "host": Resource["Name"],
                 "name": Resource["Name"],
                 "groups": [{"groupid": GroupId}],
+                "interfaces": [self.AgentInterfaceDefinition()],
                 "inventory_mode": 0,
                 "inventory": self.BuildZabbixInventory(Resource),
             },
         )
         return Created["hostids"][0]
+
+    def AgentInterfaceDefinition(self) -> dict:
+        return {
+            "type": 1,
+            "main": 1,
+            "useip": 0,
+            "ip": "",
+            "dns": self.AgentDns,
+            "port": "10050",
+        }
+
+    def EnsureAgentInterface(self, Token: str, HostId: str) -> str:
+        Existing = self.ApiCall(Token, "hostinterface.get", {"output": ["interfaceid", "dns", "type"], "hostids": HostId})
+        for Interface in Existing:
+            if str(Interface.get("type")) == "1":
+                return Interface["interfaceid"]
+        Created = self.ApiCall(Token, "hostinterface.create", {"hostid": HostId, **self.AgentInterfaceDefinition()})
+        return Created["interfaceids"][0]
 
     def UpdateHostInventory(self, Token: str, HostId: str, Resource: dict) -> None:
         self.ApiCall(
@@ -242,6 +323,36 @@ class SyntheticZabbixAdapter:
             "location": Inventory.get("Location", "CapacityLab"),
             "notes": Inventory.get("Notes", "Host sintetico de capacity"),
         }
+
+    def EnsureEnterpriseAgentItems(self, Token: str, HostId: str, InterfaceId: str, HostName: str, Component: dict) -> None:
+        Facts = [
+            ("LicenseStatus", "Licencia - Estado", "license_status"),
+            ("ComplianceStatus", "Compliance - Estado", "compliance_status"),
+            ("BacklevelStatus", "Software Backlevel - Estado", "backlevel_status"),
+            ("LifecycleStatus", "Lifecycle - Estado", "lifecycle_status"),
+            ("EndOfSupportDate", "Software - Fecha fin de soporte", "end_of_support_date"),
+        ]
+        for FactName, ItemName, KeySuffix in Facts:
+            Key = f"capacity.enterprise.fact[{HostName},{FactName}]"
+            Existing = self.ApiCall(Token, "item.get", {"output": ["itemid"], "hostids": HostId, "filter": {"key_": [Key]}})
+            if Existing:
+                continue
+            self.ApiCall(
+                Token,
+                "item.create",
+                {
+                    "hostid": HostId,
+                    "interfaceid": InterfaceId,
+                    "name": f"Enterprise {ItemName}",
+                    "key_": Key,
+                    "type": 0,
+                    "value_type": 4,
+                    "delay": "1h",
+                    "history": "90d",
+                    "trends": "0",
+                    "description": f"Dato levantado por Zabbix Agent desde inventario enterprise sintetico: {KeySuffix}. Valor esperado inicial: {Component.get(FactName, 'Unknown')}",
+                },
+            )
 
     def EnsureItem(self, Token: str, HostId: str, Sample: dict) -> str:
         Key = self.ItemKey(Sample["MetricName"])

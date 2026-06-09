@@ -7,6 +7,7 @@ Config/PodmanStack.yml
 ARCH.md
 ContainerImages/ZabbixServer/Containerfile
 ContainerImages/ZabbixWeb/Containerfile
+ContainerImages/ZabbixAgent/Containerfile
 ContainerImages/VictoriaMetrics/Containerfile
 ContainerImages/Grafana/Containerfile
 ContainerImages/PostgreSQL/Containerfile
@@ -37,6 +38,8 @@ Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json
 Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json
 Config/Grafana/Dashboards/EnterpriseLicenseComplianceDashboard.json
 Config/Grafana/Dashboards/EnterpriseSoftwareBacklevelDashboard.json
+Config/ZabbixAgent/UserParameters.conf
+Config/ZabbixAgent/ReadEnterpriseFact.sh
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
@@ -125,6 +128,23 @@ if ! grep -q "ZBX_SERVER_HOST=.*zabbix-server" Scripts/StackCommon.sh; then
   echo "Zabbix Web no declara conexion con Zabbix Server" >&2
   exit 1
 fi
+
+if ! grep -q "ZabbixAgent" Scripts/StackCommon.sh; then
+  echo "El stack no declara ZabbixAgent para levantar licencias y backlevel" >&2
+  exit 1
+fi
+
+if ! grep -q "capacity.enterprise.fact" Config/ZabbixAgent/UserParameters.conf; then
+  echo "ZabbixAgent no declara UserParameter enterprise" >&2
+  exit 1
+fi
+
+for ExpectedFact in "LicenseStatus" "ComplianceStatus" "BacklevelStatus" "LifecycleStatus" "EndOfSupportDate"; do
+  if ! grep -q "$ExpectedFact" CapacityEngine/Adapters/SyntheticZabbixAdapter.py Config/ZabbixAgent/ReadEnterpriseFact.sh; then
+    echo "Falta fact levantado por agente Zabbix: $ExpectedFact" >&2
+    exit 1
+  fi
+done
 
 if [ "${1:-}" = "--load-sample-data" ]; then
   echo "Datos de ejemplo disponibles en Sql/Seed/SampleCatalog.sql"

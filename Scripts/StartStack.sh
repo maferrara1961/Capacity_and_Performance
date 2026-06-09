@@ -11,6 +11,9 @@ StartOne() {
   Volumes="$(VolumeArgsFor "$Service")"
   EnvArgs="$(EnvironmentArgsFor "$Service")"
   Deps="$(DependenciesFor "$Service")"
+  if [ "$Service" = "ZabbixAgent" ]; then
+    mkdir -p "$REPO_ROOT/.capacity-test-data/ZabbixAgent"
+  fi
   if [ -n "$Deps" ]; then
     Info "validando dependencias de $Service: $Deps"
   fi

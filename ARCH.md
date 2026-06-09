@@ -25,6 +25,9 @@ ZabbixWeb
   |-- TCP 10051 ------------------> ZabbixServer
   |-- TCP 5432 -------------------> PostgreSQL
 
+ZabbixServer
+  |-- TCP 10050 ------------------> ZabbixAgent
+
 CapacityEngine / ManageTestData
   |-- TCP 5432 -------------------> PostgreSQL
   |-- HTTP 8428 ------------------> VictoriaMetrics
@@ -45,6 +48,7 @@ capacity-performance-net
 | VictoriaMetrics | `capacity-performance-victoriametrics` | `8428` | Almacenamiento de series temporales sinteticas y metricas de performance. |
 | ZabbixServer | `capacity-performance-zabbix-server` | `10051` | Motor de monitoreo Zabbix, items, triggers y procesamiento de datos. |
 | ZabbixWeb | `capacity-performance-zabbix-web` | `8080` | Consola web/API JSON-RPC de Zabbix. |
+| ZabbixAgent | `capacity-performance-zabbix-agent` | interno `10050` | Checks custom de licencia, compliance, software backlevel, lifecycle y fin de soporte. |
 | Grafana | `capacity-performance-grafana` | `3000` | Capa principal de dashboards ejecutivos, tecnicos, capacity planning y aplicacion. |
 | CapacityEngine | `capacity-performance-capacity-engine` | sin puerto | Tarea batch Python para calculo de capacidad. |
 
@@ -57,6 +61,7 @@ capacity-performance-net
 | ZabbixWeb | ZabbixServer | TCP `10051` | Consola web conectada al motor Zabbix. |
 | ZabbixWeb | PostgreSQL | TCP `5432` | Persistencia de configuracion y datos de Zabbix. |
 | ZabbixServer | PostgreSQL | TCP `5432` | Persistencia operativa de Zabbix. |
+| ZabbixServer | ZabbixAgent | TCP `10050` | Levantar facts enterprise por host con UserParameter. |
 | ManageTestData | PostgreSQL | `podman exec` + `psql` | Carga y borrado de catalogo, KPIs y forecasts sinteticos. |
 | ManageTestData | VictoriaMetrics | HTTP API | Importacion y borrado de series temporales sinteticas. |
 | ManageTestData | ZabbixWeb | HTTP JSON-RPC | Creacion de hosts, inventario, items, graficos y triggers sinteticos. |
@@ -101,6 +106,8 @@ Responsabilidades:
 
 - Registrar hosts sinteticos `SRV-#####`.
 - Mantener items, graficos y triggers Warning/Critical en Zabbix.
+- Levantar por agente los items enterprise `LicenseStatus`, `ComplianceStatus`,
+  `BacklevelStatus`, `LifecycleStatus` y `EndOfSupportDate`.
 - Almacenar series temporales en VictoriaMetrics.
 - Exponer metricas por `load_id`, `resource_id` y `host_name`.
 
@@ -225,6 +232,7 @@ Responsabilidades:
 | PostgreSQL | Base `capacity` | `capacity-performance-postgresql-data` | Catalogo, KPIs, forecasts, riesgos, recomendaciones, lotes de prueba. |
 | VictoriaMetrics | TSDB interna | `capacity-performance-victoriametrics-data` | Series temporales sinteticas por metrica, lote y host. |
 | ZabbixServer/ZabbixWeb | PostgreSQL `capacity` | `capacity-performance-postgresql-data` y `capacity-performance-zabbix-server-data` | Configuracion Zabbix, hosts, items, triggers, graficos y datos operativos. |
+| ZabbixAgent | Archivo TSV montado | `.capacity-test-data/ZabbixAgent` | Facts enterprise que el agente expone como UserParameters. |
 | Grafana | SQLite interna | `capacity-performance-grafana-data` | Estado de Grafana; dashboards y datasources se reprovisionan desde `Config/Grafana`. |
 | CapacityEngine | Sin persistencia propia | sin volumen dedicado | Tarea batch; resultados previstos en PostgreSQL. |
 
@@ -272,6 +280,8 @@ GenerateHistoricalVerificationBatches.sh
           -> publica series con load_id, resource_id, host_name, technology_domain y business_service
       -> SyntheticZabbixAdapter
           -> crea hosts SRV-#####, inventario, items, graficos, triggers e historia
+          -> escribe facts enterprise para ZabbixAgent
+          -> crea items tipo Zabbix agent para licencias y backlevel
 ```
 
 ## Puertos Publicados
@@ -283,6 +293,7 @@ GenerateHistoricalVerificationBatches.sh
 | VictoriaMetrics | `8428` | UI/API VictoriaMetrics. |
 | PostgreSQL | `5432` | Cliente SQL y conexiones internas. |
 | ZabbixServer | `10051` | Protocolo Zabbix server. |
+| ZabbixAgent | interno `10050` | Checks custom consumidos por ZabbixServer. |
 
 PostgreSQL y ZabbixServer no son endpoints HTTP.
 

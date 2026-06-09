@@ -93,6 +93,15 @@ PostgreSQL conserva los datasets enterprise en tablas `Enterprise*`. Zabbix sigu
 operativa de inventario; cuando se modifique un host, ejecutar sincronizacion para reflejarlo en el
 catalogo relacional.
 
+ZabbixAgent levanta facts enterprise por host mediante UserParameters. Los items quedan visibles en
+Zabbix como datos de agente:
+
+- `Enterprise Licencia - Estado`
+- `Enterprise Compliance - Estado`
+- `Enterprise Software Backlevel - Estado`
+- `Enterprise Lifecycle - Estado`
+- `Enterprise Software - Fecha fin de soporte`
+
 Los datos de testing enterprise incluyen:
 
 - `LicenseStatus`: Compliant, NonCompliant, Unverified, Unknown.
