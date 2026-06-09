@@ -61,6 +61,61 @@ Ejecutar el motor diario de capacidad:
 Scripts/RunCapacityDaily.sh
 ```
 
+## Uso de CapacityEngine
+
+`CapacityEngine` es el motor Python que calcula KPIs de capacidad, forecast 30/60/90 dias, riesgo
+de saturacion y recomendaciones. La implementacion actual ejecuta una corrida diaria deterministica
+con datos de ejemplo internos para validar el flujo completo.
+
+Ejecutar localmente desde la raiz del repositorio:
+
+```bash
+Scripts/RunCapacityDaily.sh
+```
+
+Salida esperada:
+
+```text
+Run-YYYYMMDDHHMMSS Succeeded resources=1
+```
+
+Ejecutar como modulo Python:
+
+```bash
+python3 -m CapacityEngine.Scheduler.DailyCapacityRun
+```
+
+Si el stack esta iniciado, consultar la ejecucion del contenedor:
+
+```bash
+Scripts/StackLogs.sh CapacityEngine 100
+Scripts/StackStatus.sh CapacityEngine
+```
+
+Uso desde codigo Python:
+
+```python
+from CapacityEngine.Scheduler.DailyCapacityRun import RunDailyCapacity
+
+Run = RunDailyCapacity()
+print(Run.Status)
+print(Run.Kpis)
+print(Run.Forecasts)
+print(Run.Risks)
+print(Run.Recommendations)
+```
+
+La corrida devuelve un objeto `CapacityRun` con:
+
+- `Kpis`: utilizacion promedio, pico, percentil 95, crecimiento mensual y headroom.
+- `Forecasts`: proyecciones 30/60/90 dias y dias estimados hasta saturacion.
+- `Risks`: riesgo por recurso segun umbrales.
+- `Recommendations`: acciones recomendadas cuando existe riesgo relevante.
+
+Para conectarlo a datos reales, el siguiente paso es reemplazar las muestras internas de
+`CapacityEngine/Scheduler/DailyCapacityRun.py` por lecturas desde VictoriaMetrics y escritura de
+resultados en PostgreSQL.
+
 ## Administracion de imagenes y stack
 
 Construir todas las imagenes:
