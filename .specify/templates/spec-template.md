@@ -97,11 +97,15 @@
 - **FR-008**: System MUST enforce authorization wherever user identity changes data access or allowed actions
 - **FR-009**: System MUST satisfy the feature without adding external libraries, SDKs, packages, or hosted services
 - **FR-010**: Project-defined code symbols and artifacts MUST use PascalCase unless a documented platform convention requires otherwise
+- **FR-011**: System MUST explicitly represent missing, unknown, incomplete, and unverified evidence states
+- **FR-012**: System MUST NOT present missing evidence as healthy status
+- **FR-013**: System MUST calculate risk or score outputs using objective and reproducible criteria
+- **FR-014**: System MUST identify affected technologies and services for every risk assessment or recommendation
 
 *Example of marking unclear requirements:*
 
-- **FR-011**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-012**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-015**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-016**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -130,6 +134,11 @@
 - **Protected Access**: [List protected routes/screens/commands/API endpoints and authentication expectations]
 - **Dependency Constraint**: [Confirm no new external libraries/services are required, or mark constitution conflict]
 - **Naming**: [Confirm PascalCase applies to project-defined symbols/artifacts or document required exceptions]
+- **Platform Domains**: [Identify affected domains: Capacity, Performance, Availability, Lifecycle, Compliance, Monitoring Governance]
+- **Evidence Model**: [List measurable evidence sources and missing/unknown/incomplete/unverified behavior]
+- **Risk and Scoring**: [Define objective criteria, affected technologies/services, and 0-100 score behavior if applicable]
+- **Trend Priority**: [Describe historical trend or forecast behavior, or state why snapshots are sufficient]
+- **Decision Support**: [Explain recommendation outputs and how authorized personnel retain final decision authority]
 
 ## Assumptions
 

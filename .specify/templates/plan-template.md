@@ -36,6 +36,13 @@
 
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
+**Technology Domains Affected**: [Capacity, Performance, Availability, Lifecycle, Compliance,
+Monitoring Governance, or N/A]
+
+**Evidence Sources**: [Zabbix, VictoriaMetrics, PostgreSQL, user input, generated dataset, or N/A]
+
+**Assessment Outputs**: [risk assessment, confidence assessment, score, dashboard, report, or N/A]
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -52,6 +59,17 @@
   external dependencies. Any such need is a constitution violation requiring amendment first.
 - **Validation and Auth**: User-controlled inputs, validation failures, protected routes, and
   authentication/authorization checks are explicitly identified.
+- **Platform Scope**: The feature preserves technology-agnostic extensibility across enterprise
+  infrastructure, operating systems, databases, middleware, container, messaging, monitoring, and
+  application domains.
+- **Evidence Handling**: Missing, unknown, incomplete, and unverified evidence states are modeled
+  explicitly and never presented as healthy.
+- **Risk and Trend Logic**: Risk criteria are objective and reproducible; trend or forecast logic
+  uses historical evidence where sufficient data exists.
+- **Scoring**: Any Capacity, Performance, Availability, Lifecycle, Compliance, Monitoring
+  Confidence, or Technology Health score is defined on a 0-100 range with traceable inputs.
+- **Human Decision Support**: Recommendations identify affected technologies/services and support
+  authorized human decisions without replacing operational judgment.
 
 ## Project Structure
 

@@ -11,6 +11,9 @@ description: "Task list template for feature implementation"
 
 **Tests**: Tests are mandatory by constitution. Include failing test tasks before implementation
 tasks for every user story, validation rule, protected route, and affected architecture boundary.
+When a feature produces assessments, include failing tests for evidence states, objective risk
+criteria, affected technology/service mapping, trend behavior, scoring ranges, and recommendation
+outputs.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -71,6 +74,8 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] T008 Configure validation, error handling, and logging infrastructure
 - [ ] T009 Setup environment configuration management
 - [ ] T010 Define Clean Architecture boundaries and inward dependency interfaces
+- [ ] T011 Define evidence states and data quality rules for missing, unknown, incomplete, and unverified data
+- [ ] T012 Define objective risk/scoring criteria and affected technology/service mapping
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -86,19 +91,22 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T011 [P] [US1] Unit test for [domain rule/validation] in tests/unit/[Name]Test.[ext]
-- [ ] T012 [P] [US1] Contract test for [endpoint] in tests/contract/[Name]ContractTest.[ext]
-- [ ] T013 [P] [US1] Integration test for [user journey/protected route] in tests/integration/[Name]FlowTest.[ext]
+- [ ] T013 [P] [US1] Unit test for [domain rule/validation] in tests/unit/[Name]Test.[ext]
+- [ ] T014 [P] [US1] Contract test for [endpoint] in tests/contract/[Name]ContractTest.[ext]
+- [ ] T015 [P] [US1] Integration test for [user journey/protected route] in tests/integration/[Name]FlowTest.[ext]
+- [ ] T016 [P] [US1] Unit test for [evidence/risk/score behavior] in tests/unit/[Name]Test.[ext]
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Create [Entity1] model in src/models/[Entity1].[ext]
-- [ ] T015 [P] [US1] Create [Entity2] model in src/models/[Entity2].[ext]
-- [ ] T016 [US1] Implement [Service] in src/services/[Service].[ext] (depends on T014, T015)
-- [ ] T017 [US1] Implement [endpoint/feature] in src/[Location]/[File].[ext]
-- [ ] T018 [US1] Add input validation and deterministic error handling
-- [ ] T019 [US1] Add authentication/authorization checks for protected access
-- [ ] T020 [US1] Add logging for user story 1 operations
+- [ ] T017 [P] [US1] Create [Entity1] model in src/models/[Entity1].[ext]
+- [ ] T018 [P] [US1] Create [Entity2] model in src/models/[Entity2].[ext]
+- [ ] T019 [US1] Implement [Service] in src/services/[Service].[ext] (depends on T017, T018)
+- [ ] T020 [US1] Implement [endpoint/feature] in src/[Location]/[File].[ext]
+- [ ] T021 [US1] Add input validation and deterministic error handling
+- [ ] T022 [US1] Add authentication/authorization checks for protected access
+- [ ] T023 [US1] Implement evidence classification and missing-data behavior
+- [ ] T024 [US1] Implement risk, trend, scoring, or recommendation output if applicable
+- [ ] T025 [US1] Add logging for user story 1 operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -112,17 +120,17 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (MANDATORY - write before implementation) ⚠️
 
-- [ ] T021 [P] [US2] Unit test for [domain rule/validation] in tests/unit/[Name]Test.[ext]
-- [ ] T022 [P] [US2] Contract test for [endpoint] in tests/contract/[Name]ContractTest.[ext]
-- [ ] T023 [P] [US2] Integration test for [user journey/protected route] in tests/integration/[Name]FlowTest.[ext]
+- [ ] T026 [P] [US2] Unit test for [domain rule/validation] in tests/unit/[Name]Test.[ext]
+- [ ] T027 [P] [US2] Contract test for [endpoint] in tests/contract/[Name]ContractTest.[ext]
+- [ ] T028 [P] [US2] Integration test for [user journey/protected route] in tests/integration/[Name]FlowTest.[ext]
 
 ### Implementation for User Story 2
 
-- [ ] T024 [P] [US2] Create [Entity] model in src/models/[Entity].[ext]
-- [ ] T025 [US2] Implement [Service] in src/services/[Service].[ext]
-- [ ] T026 [US2] Implement [endpoint/feature] in src/[Location]/[File].[ext]
-- [ ] T027 [US2] Add input validation and protected access checks
-- [ ] T028 [US2] Integrate with User Story 1 components (if needed)
+- [ ] T029 [P] [US2] Create [Entity] model in src/models/[Entity].[ext]
+- [ ] T030 [US2] Implement [Service] in src/services/[Service].[ext]
+- [ ] T031 [US2] Implement [endpoint/feature] in src/[Location]/[File].[ext]
+- [ ] T032 [US2] Add input validation and protected access checks
+- [ ] T033 [US2] Integrate with User Story 1 components (if needed)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -136,16 +144,16 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (MANDATORY - write before implementation) ⚠️
 
-- [ ] T029 [P] [US3] Unit test for [domain rule/validation] in tests/unit/[Name]Test.[ext]
-- [ ] T030 [P] [US3] Contract test for [endpoint] in tests/contract/[Name]ContractTest.[ext]
-- [ ] T031 [P] [US3] Integration test for [user journey/protected route] in tests/integration/[Name]FlowTest.[ext]
+- [ ] T034 [P] [US3] Unit test for [domain rule/validation] in tests/unit/[Name]Test.[ext]
+- [ ] T035 [P] [US3] Contract test for [endpoint] in tests/contract/[Name]ContractTest.[ext]
+- [ ] T036 [P] [US3] Integration test for [user journey/protected route] in tests/integration/[Name]FlowTest.[ext]
 
 ### Implementation for User Story 3
 
-- [ ] T032 [P] [US3] Create [Entity] model in src/models/[Entity].[ext]
-- [ ] T033 [US3] Implement [Service] in src/services/[Service].[ext]
-- [ ] T034 [US3] Implement [endpoint/feature] in src/[Location]/[File].[ext]
-- [ ] T035 [US3] Add input validation and protected access checks
+- [ ] T037 [P] [US3] Create [Entity] model in src/models/[Entity].[ext]
+- [ ] T038 [US3] Implement [Service] in src/services/[Service].[ext]
+- [ ] T039 [US3] Implement [endpoint/feature] in src/[Location]/[File].[ext]
+- [ ] T040 [US3] Add input validation and protected access checks
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -164,6 +172,9 @@ Examples of foundational tasks (adjust based on your project):
 - [ ] TXXX Remove duplicated domain logic introduced during implementation
 - [ ] TXXX Verify project-defined symbols and artifacts use PascalCase
 - [ ] TXXX Verify no new external libraries, SDKs, packages, or hosted services were introduced
+- [ ] TXXX Verify missing, unknown, incomplete, and unverified evidence is visible and not treated as healthy
+- [ ] TXXX Verify risk assessments identify affected technologies and services
+- [ ] TXXX Verify 0-100 scores are reproducible and traceable to evidence
 - [ ] TXXX Performance optimization across all stories
 - [ ] TXXX [P] Additional unit tests for uncovered domain rules in tests/unit/
 - [ ] TXXX Security hardening
