@@ -17,7 +17,7 @@ class SyntheticZabbixAdapter:
     def SaveDataset(self, LoadId: str, Dataset: dict) -> None:
         Store = self.LoadStore()
         Store[LoadId] = {
-            "Hosts": [Resource["ResourceId"] for Resource in Dataset["Resources"]],
+            "Hosts": [Resource["Name"] for Resource in Dataset["Resources"]],
             "Samples": len(Dataset["Samples"]),
         }
         self.SaveStore(Store)
@@ -64,7 +64,7 @@ class SyntheticZabbixAdapter:
                 ItemId = self.EnsureItem(Token, HostId, Sample)
                 ItemIds.append(ItemId)
                 ItemIdsByResourceMetric[(Resource["ResourceId"], Sample["MetricName"])] = ItemId
-                self.EnsureTriggers(Token, Resource["ResourceId"], Resource["Name"], Sample)
+                self.EnsureTriggers(Token, Resource["Name"], Resource["Name"], Sample)
             self.EnsureGraph(Token, HostId, Resource["Name"], ItemIds)
         History = self.BuildHistoryPushPayload(Dataset["Samples"], ItemIdsByResourceMetric)
         for Chunk in self.Chunks(History, 100):
@@ -95,15 +95,25 @@ class SyntheticZabbixAdapter:
 
     def DeleteRemoteDataset(self, LoadId: str) -> None:
         Token = self.Login()
-        Hosts = self.ApiCall(Token, "host.get", {"output": ["hostid"], "search": {"host": f"{LoadId}-Resource-"}})
+        Hosts = self.ApiCall(
+            Token,
+            "host.get",
+            {
+                "output": ["hostid"],
+                "selectInventory": ["asset_tag"],
+                "searchInventory": {"asset_tag": f"{LoadId}-"},
+            },
+        )
         HostIds = [Host["hostid"] for Host in Hosts]
         if HostIds:
             self.ApiCall(Token, "host.delete", HostIds)
 
     def HasRemoteData(self, LoadId: str | None = None) -> bool:
         Token = self.Login()
-        Search = {"host": f"{LoadId}-Resource-"} if LoadId else {"host": "-Resource-"}
-        Hosts = self.ApiCall(Token, "host.get", {"output": ["hostid"], "search": Search})
+        Params = {"output": ["hostid"], "selectInventory": ["asset_tag"], "search": {"host": "SRV-"}}
+        if LoadId:
+            Params = {"output": ["hostid"], "selectInventory": ["asset_tag"], "searchInventory": {"asset_tag": f"{LoadId}-"}}
+        Hosts = self.ApiCall(Token, "host.get", Params)
         return bool(Hosts)
 
     def Login(self) -> str:
@@ -120,7 +130,7 @@ class SyntheticZabbixAdapter:
         return Created["groupids"][0]
 
     def EnsureHost(self, Token: str, GroupId: str, Resource: dict) -> str:
-        Existing = self.ApiCall(Token, "host.get", {"output": ["hostid"], "filter": {"host": [Resource["ResourceId"]]}})
+        Existing = self.ApiCall(Token, "host.get", {"output": ["hostid"], "filter": {"host": [Resource["Name"]]}})
         if Existing:
             self.UpdateHostInventory(Token, Existing[0]["hostid"], Resource)
             return Existing[0]["hostid"]
@@ -128,7 +138,7 @@ class SyntheticZabbixAdapter:
             Token,
             "host.create",
             {
-                "host": Resource["ResourceId"],
+                "host": Resource["Name"],
                 "name": Resource["Name"],
                 "groups": [{"groupid": GroupId}],
                 "inventory_mode": 0,

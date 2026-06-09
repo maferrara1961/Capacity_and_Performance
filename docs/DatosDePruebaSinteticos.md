@@ -35,9 +35,9 @@ Cada lote incluye muestras diarias aleatorias por recurso y metrica para validar
 percentil 95, forecast 30/60/90, saturacion, capacity planning y paneles tecnicos en Grafana y
 VictoriaMetrics.
 
-Los recursos se generan con nombres visibles de host `SRV-#####`, por ejemplo `SRV-48291`. Ese
-nombre queda registrado en PostgreSQL y en el inventario de Zabbix junto con asset tag, tipo,
-sistema operativo, ubicacion y notas del lote.
+Los recursos se generan con host name `SRV-#####`, por ejemplo `SRV-48291`. Ese valor se usa como
+nombre visible y como host tecnico en Zabbix, y queda registrado en PostgreSQL e inventario junto
+con asset tag, tipo, sistema operativo, ubicacion y notas del lote.
 
 Los dashboards de Grafana incluyen el filtro `Lote`. Seleccionar `All` muestra todos los lotes
 cargados; seleccionar un lote como `HistoryFull001-90d-critical` filtra PostgreSQL y

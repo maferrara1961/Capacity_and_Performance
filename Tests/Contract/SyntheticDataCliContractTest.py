@@ -101,6 +101,15 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertEqual(Inventory["name"], "SRV-12345")
         self.assertEqual(Inventory["asset_tag"], "SrvDemo001-1")
 
+    def test_zabbix_host_name_visible_y_tecnico_usa_srv(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxSrv001", "mixed", "small", 30, 1)
+        Resource = Dataset["Resources"][0]
+        self.assertRegex(Resource["Name"], r"^SRV-[0-9]{5}$")
+        self.assertNotEqual(Resource["Name"], Resource["ResourceId"])
+        AdapterSource = (ROOT / "CapacityEngine" / "Adapters" / "SyntheticZabbixAdapter.py").read_text()
+        self.assertIn('"host": Resource["Name"]', AdapterSource)
+        self.assertIn("searchInventory", AdapterSource)
+
     def test_zabbix_latest_samples_por_recurso_y_metrica(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxDemo001", "mixed", "small", 30, 1)
         Latest = SyntheticZabbixAdapter().LatestSamplesByResourceAndMetric(Dataset["Samples"])

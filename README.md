@@ -7,16 +7,7 @@ El objetivo es ofrecer una arquitectura moderna, escalable y sin costos de licen
 estado operativo, capacidad usada, riesgo de saturacion, forecast, top consumidores y relacion entre
 servicios, aplicaciones e infraestructura.
 
-## Orden de Implementacion
-
-La documentacion esta ordenada por ramas funcionales:
-
-1. `002-image-admin-scripts`: administracion de imagenes y stack.
-2. `001-capacity-observability-stack`: arquitectura base e interconexion.
-3. `004-grafana-dashboard-optimization`: dashboards de Grafana.
-4. `003-test-data-loader`: datos sinteticos e historicos para pruebas.
-
-## Rama 002: Administracion de Imagenes y Stack
+## Administracion de Imagenes y Stack
 
 Validar archivos requeridos:
 
@@ -97,7 +88,7 @@ STACK_DRY_RUN=1 Scripts/StopStack.sh
 STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 ```
 
-## Rama 001: Arquitectura Base de Observabilidad
+## Arquitectura Base de Observabilidad
 
 Componentes:
 
@@ -174,7 +165,7 @@ Run-YYYYMMDDHHMMSS Succeeded resources=1
 `CapacityEngine` es una tarea batch: si termino con exit code `0`, el estado esperado es
 `salud: completado correctamente`. No queda escuchando un puerto ni ejecutandose permanentemente.
 
-## Rama 004: Dashboards de Grafana
+## Dashboards de Grafana
 
 La provision de Grafana incluye vistas en la carpeta `Capacity`:
 
@@ -208,7 +199,7 @@ Scripts/StopStack.sh
 Scripts/StartStack.sh
 ```
 
-## Rama 003: Datos Sinteticos e Historicos
+## Datos Sinteticos e Historicos
 
 Gestionar datos sinteticos de prueba:
 
@@ -240,9 +231,10 @@ Este script crea lotes como `HistoryFull001-30d-critical`, `HistoryFull001-60d-w
 Grafana y VictoriaMetrics tengan datos historicos suficientes en paneles de tendencia, percentil 95,
 forecast 30/60/90, saturacion y capacity planning.
 
-Los recursos sinteticos usan nombres de host visibles con nomenclatura `SRV-#####`, por ejemplo
-`SRV-48291`. Ese nombre se guarda en el catalogo PostgreSQL y en el inventario de Zabbix junto con
-asset tag, tipo, sistema operativo, ubicacion y notas del lote.
+Los recursos sinteticos usan nombres de host con nomenclatura `SRV-#####`, por ejemplo `SRV-48291`.
+Ese valor se usa como nombre visible y como host name tecnico en Zabbix, y tambien se guarda en el
+catalogo PostgreSQL e inventario junto con asset tag, tipo, sistema operativo, ubicacion y notas del
+lote.
 
 En Zabbix se crean hosts sinteticos con items, inventario, graficos por host y triggers
 Warning/Critical para validar alertamientos. Revisar:
