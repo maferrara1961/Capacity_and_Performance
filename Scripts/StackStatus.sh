@@ -27,6 +27,15 @@ StatusOne() {
     echo "  salud: saludable"
     return 0
   fi
+  if "$PODMAN_BIN" container exists "$Container" >/dev/null 2>&1 && IsBatchService "$StatusService"; then
+    ExitCode="$("$PODMAN_BIN" inspect -f '{{.State.ExitCode}}' "$Container")"
+    if [ "$ExitCode" = "0" ]; then
+      echo "  salud: completado correctamente"
+      return 0
+    fi
+    echo "  salud: fallo batch (exit code $ExitCode)"
+    return 1
+  fi
   echo "  salud: detenido"
   return 1
 }

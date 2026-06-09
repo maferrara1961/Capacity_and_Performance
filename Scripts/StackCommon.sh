@@ -142,6 +142,14 @@ DependenciesFor() {
   esac
 }
 
+IsBatchService() {
+  RequireService "$1"
+  case "$1" in
+    CapacityEngine) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 RequireRuntime() {
   if [ "$STACK_DRY_RUN" = "1" ]; then
     Info "modo simulacion activo; no se requiere Podman"

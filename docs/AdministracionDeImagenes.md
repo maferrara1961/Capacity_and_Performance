@@ -72,6 +72,10 @@ defecto.
 Scripts/StackLogs.sh Grafana 100
 Scripts/StackStatus.sh
 Scripts/StackStatus.sh Grafana
+Scripts/StackStatus.sh CapacityEngine
 ```
+
+`CapacityEngine` es una tarea batch. Cuando finaliza con exit code `0`, el estado esperado es
+`salud: completado correctamente`.
 
 Los servicios permitidos son: PostgreSQL, VictoriaMetrics, Zabbix, Grafana y CapacityEngine.

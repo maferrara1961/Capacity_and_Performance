@@ -92,6 +92,9 @@ Scripts/StackLogs.sh CapacityEngine 100
 Scripts/StackStatus.sh CapacityEngine
 ```
 
+`CapacityEngine` es una tarea batch: si termino con exit code `0`, el estado esperado es
+`salud: completado correctamente`. No queda escuchando un puerto ni ejecutandose permanentemente.
+
 Uso desde codigo Python:
 
 ```python

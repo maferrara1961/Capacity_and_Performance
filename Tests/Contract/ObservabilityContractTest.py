@@ -1,5 +1,6 @@
 import os
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -14,6 +15,42 @@ def RunScript(*Args):
 
 
 class ObservabilityContractTest(unittest.TestCase):
+    def test_status_capacity_engine_batch_completado_es_saludable(self):
+        Result = self.RunStatusWithFakePodman("0")
+        self.assertEqual(Result.returncode, 0, Result.stderr)
+        self.assertIn("salud: completado correctamente", Result.stdout)
+
+    def test_status_capacity_engine_batch_fallido_reporta_error(self):
+        Result = self.RunStatusWithFakePodman("2")
+        self.assertNotEqual(Result.returncode, 0)
+        self.assertIn("salud: fallo batch (exit code 2)", Result.stdout)
+
+    def RunStatusWithFakePodman(self, ExitCode):
+        with tempfile.TemporaryDirectory() as TempDir:
+            Podman = Path(TempDir) / "podman"
+            Podman.write_text(
+                "#!/usr/bin/env bash\n"
+                "set -eu\n"
+                "if [ \"$1\" = \"container\" ] && [ \"$2\" = \"exists\" ]; then exit 0; fi\n"
+                "if [ \"$1\" = \"inspect\" ] && [ \"$2\" = \"-f\" ]; then\n"
+                "  if [ \"$3\" = \"{{.State.Running}}\" ]; then echo false; exit 0; fi\n"
+                f"  if [ \"$3\" = \"{{{{.State.ExitCode}}}}\" ]; then echo {ExitCode}; exit 0; fi\n"
+                "fi\n"
+                "echo \"podman inesperado: $*\" >&2\n"
+                "exit 2\n",
+                encoding="utf-8",
+            )
+            Podman.chmod(0o755)
+            Env = os.environ.copy()
+            Env["PODMAN_BIN"] = str(Podman)
+            return subprocess.run(
+                ["bash", "Scripts/StackStatus.sh", "CapacityEngine"],
+                cwd=ROOT,
+                env=Env,
+                text=True,
+                capture_output=True,
+            )
+
     def test_logs_de_servicio_permitido(self):
         Result = RunScript("bash", "Scripts/StackLogs.sh", "Grafana", "10")
         self.assertEqual(Result.returncode, 0, Result.stderr)
