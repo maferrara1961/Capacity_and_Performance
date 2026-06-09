@@ -54,7 +54,7 @@ ademas de presencia de datos sinteticos.
 Validar una serie publicada en VictoriaMetrics:
 
 ```bash
-curl "http://localhost:8428/api/v1/query?query=synthetic_cpu%7Bload_id%3D%22DemoCritical001%22%7D"
+curl "http://localhost:8428/api/v1/query?query=count_over_time%28synthetic_cpu%7Bload_id%3D%22DemoCritical001%22%7D%5B400d%5D%29"
 ```
 
 ## Borrar Datos

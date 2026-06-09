@@ -61,6 +61,10 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertEqual(Adapter.NormalizeMetricName("Network IOPS"), "synthetic_network_iops")
         FirstSample = Dataset["Samples"][0]
         self.assertIsInstance(Adapter.TimestampMillis(FirstSample["ObservedAt"]), int)
+        Payload = Adapter.BuildImportPayload(Dataset["Samples"])
+        self.assertIn('"__name__": "synthetic_cpu"', Payload)
+        self.assertIn('"load_id": "VmDemo001"', Payload)
+        self.assertIn('"timestamps": [', Payload)
 
 
 if __name__ == "__main__":

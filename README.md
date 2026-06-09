@@ -76,7 +76,7 @@ Scripts/ManageTestData.sh delete --all --confirmar
 Validar una serie sintetica en VictoriaMetrics:
 
 ```bash
-curl "http://localhost:8428/api/v1/query?query=synthetic_cpu%7Bload_id%3D%22DemoCritical001%22%7D"
+curl "http://localhost:8428/api/v1/query?query=count_over_time%28synthetic_cpu%7Bload_id%3D%22DemoCritical001%22%7D%5B400d%5D%29"
 ```
 
 ## Uso de CapacityEngine
