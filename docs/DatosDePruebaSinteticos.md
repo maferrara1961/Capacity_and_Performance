@@ -56,8 +56,8 @@ cuadro explica que muestra la vista, como interpretar los resultados y que accio
 Antes de recrear cada lote, el script intenta borrar el lote con el mismo identificador para que la
 ejecucion sea repetible. En Zabbix se crean hosts, items, graficos por host y triggers
 Warning/Critical para validar `Monitoring > Latest data`, `Monitoring > Hosts` y los alertamientos.
-Si Zabbix rechaza muestras historicas por permisos o cache de configuracion, la carga continua con
-hosts/items/graficos sinteticos creados.
+Las muestras historicas se publican por `itemid` para evitar rechazos por resolucion de host/key en
+Zabbix.
 
 Perfiles permitidos:
 

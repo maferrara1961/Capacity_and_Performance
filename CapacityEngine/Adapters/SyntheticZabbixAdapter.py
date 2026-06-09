@@ -56,24 +56,17 @@ class SyntheticZabbixAdapter:
         Token = self.Login()
         GroupId = self.EnsureHostGroup(Token, "Capacity Synthetic")
         LatestSamples = self.LatestSamplesByResourceAndMetric(Dataset["Samples"])
-        History = []
+        ItemIdsByResourceMetric = {}
         for Resource in Dataset["Resources"]:
             HostId = self.EnsureHost(Token, GroupId, Resource)
             ItemIds = []
             for Sample in LatestSamples.get(Resource["ResourceId"], {}).values():
                 ItemId = self.EnsureItem(Token, HostId, Sample)
                 ItemIds.append(ItemId)
+                ItemIdsByResourceMetric[(Resource["ResourceId"], Sample["MetricName"])] = ItemId
                 self.EnsureTriggers(Token, Resource["ResourceId"], Sample)
-                History.append(
-                    {
-                        "host": Resource["ResourceId"],
-                        "key": self.ItemKey(Sample["MetricName"]),
-                        "value": Sample["Value"],
-                        "clock": self.TimestampSeconds(Sample["ObservedAt"]),
-                        "ns": 0,
-                    }
-                )
             self.EnsureGraph(Token, HostId, Resource["Name"], ItemIds)
+        History = self.BuildHistoryPushPayload(Dataset["Samples"], ItemIdsByResourceMetric)
         for Chunk in self.Chunks(History, 100):
             Result = self.ApiCall(Token, "history.push", Chunk)
             Errors = [Item for Item in Result.get("data", []) if Item.get("error")]
@@ -84,6 +77,21 @@ class SyntheticZabbixAdapter:
                     file=sys.stderr,
                 )
                 return
+
+    def BuildHistoryPushPayload(self, Samples: list[dict], ItemIdsByResourceMetric: dict[tuple[str, str], str]) -> list[dict]:
+        History = []
+        for Sample in Samples:
+            ItemId = ItemIdsByResourceMetric.get((Sample["ResourceId"], Sample["MetricName"]))
+            if ItemId:
+                History.append(
+                    {
+                        "itemid": ItemId,
+                        "value": Sample["Value"],
+                        "clock": self.TimestampSeconds(Sample["ObservedAt"]),
+                        "ns": 0,
+                    }
+                )
+        return History
 
     def DeleteRemoteDataset(self, LoadId: str) -> None:
         Token = self.Login()

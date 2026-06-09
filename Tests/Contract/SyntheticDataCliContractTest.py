@@ -97,6 +97,18 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn(("Warning", 2, 75), CpuThresholds)
         self.assertIn(("Critical", 4, 90), CpuThresholds)
 
+    def test_zabbix_history_push_usa_itemid_y_todas_las_muestras(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxHistory001", "critical", "small", 30, 1)
+        ItemIds = {
+            (Sample["ResourceId"], Sample["MetricName"]): f"Item-{Sample['ResourceId']}-{Sample['MetricName']}"
+            for Sample in Dataset["Samples"]
+        }
+        Payload = SyntheticZabbixAdapter().BuildHistoryPushPayload(Dataset["Samples"], ItemIds)
+        self.assertEqual(len(Payload), len(Dataset["Samples"]))
+        self.assertIn("itemid", Payload[0])
+        self.assertNotIn("host", Payload[0])
+        self.assertNotIn("key", Payload[0])
+
     def test_script_de_lotes_de_verificacion_existe(self):
         Script = ROOT / "Scripts" / "GenerateVerificationBatches.sh"
         self.assertTrue(Script.exists())
