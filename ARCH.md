@@ -194,8 +194,8 @@ Responsabilidades:
 | Campo | Herramienta | Proposito |
 |---|---|---|
 | `LoadId` / `load_id` | PostgreSQL, VictoriaMetrics, Grafana | Identificar lote sintetico y filtrar dashboards. |
-| `ResourceId` / `resource_id` | PostgreSQL, VictoriaMetrics | Identificador tecnico estable para relaciones y borrado. |
-| `HostName` / `host_name` | PostgreSQL, VictoriaMetrics, Grafana | Nombre operativo comun `SRV-#####`. |
+| `ResourceId` / `resource_id` | PostgreSQL, VictoriaMetrics | Identificador tecnico estable para relaciones, borrado y correlacion historica. No debe usarse como nombre principal en tableros ejecutivos. |
+| `HostName` / `host_name` | PostgreSQL, VictoriaMetrics, Grafana | Nombre operativo comun `SRV-#####` para lectura, decision y validacion visual. |
 | `host` | Zabbix | Host tecnico y visible `SRV-#####`. |
 | `asset_tag` | Zabbix inventory | Relacionar host con lote y permitir limpieza por `LoadId`. |
 

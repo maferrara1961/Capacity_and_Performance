@@ -64,6 +64,9 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("insert into Recommendation", Sql)
         self.assertIn("insert into Service", Sql)
         self.assertIn("Servicio Sintetico SqlDemo001 1", Sql)
+        self.assertIn("'SqlDemo001-Resource-1'", Sql)
+        self.assertIn("'Revisar capacidad del host asociado", Sql)
+        self.assertEqual(Dataset["Recommendations"][0]["ScopeId"], Dataset["Risks"][0]["ScopeId"])
 
     def test_postgresql_sincroniza_inventario_desde_zabbix(self):
         Hosts = [

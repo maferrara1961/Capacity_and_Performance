@@ -36,11 +36,11 @@
     {
       "id": 1,
       "title": "Overall Capacity State",
-      "description": "Executive decision summary. Missing data means the selected range has no capacity evidence, not that the estate is OK.",
+      "description": "Resumen ejecutivo de decision calculado desde riesgos de capacidad del lote seleccionado. SIN DATOS significa que el filtro no encontro evidencia.",
       "type": "stat",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 5, "w": 6, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select OverallRisk from RiskAssessment where RiskAssessmentId ~ '^(${LoadId:regex})' order by case OverallRisk when 'Critical' then 3 when 'Warning' then 2 when 'OK' then 1 else 0 end desc, CalculatedAt desc limit 1"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select case when count(*) = 0 then 'SIN DATOS' when sum(case when OverallRisk = 'Critical' then 1 else 0 end) > 0 then 'CRITICAL' when sum(case when OverallRisk = 'Warning' then 1 else 0 end) > 0 then 'WARNING' else 'OK' end as State from RiskAssessment where RiskAssessmentId ~ '^(${LoadId:regex})'"}]
     },
     {
       "id": 2,
@@ -49,7 +49,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 5"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 5"}]
     },
     {
       "id": 3,
@@ -58,7 +58,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 6, "x": 18, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization as UsedPercent, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable as AvailablePercent from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 10"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.MetricName, k.AverageUtilization as UsedPercent, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable as AvailablePercent from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 10"}]
     },
     {
       "id": 4,
@@ -67,16 +67,16 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 14, "x": 0, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.ResourceId, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation, f.Confidence from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 20"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation, f.Confidence from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 20"}]
     },
     {
       "id": 5,
       "title": "Recommendations",
-      "description": "Prioritized recommended actions. Missing data means no open recommendation exists for the selected scope.",
+      "description": "Acciones priorizadas por host. SIN DATOS significa que no hay recomendaciones abiertas para el lote seleccionado.",
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 10, "x": 14, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select Priority, Action, Reason, Status from Recommendation where RecommendationId ~ '^(${LoadId:regex})' and Status = 'Open' order by case Priority when 'High' then 3 when 'Medium' then 2 when 'Low' then 1 else 0 end desc limit 20"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, rec.ScopeId) as HostName, rec.Priority, rec.Action, rec.Reason, rec.Status from Recommendation rec left join MonitoredResource mr on mr.ResourceId = rec.ScopeId where rec.RecommendationId ~ '^(${LoadId:regex})' and rec.Status = 'Open' order by case rec.Priority when 'High' then 3 when 'Medium' then 2 when 'Low' then 1 else 0 end desc, HostName limit 20"}]
     },
     {
       "id": 6,
@@ -85,7 +85,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 7, "w": 24, "x": 0, "y": 20},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.MonthlyGrowthRate, k.BaselineDelta, k.HeadroomAvailable from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 20"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.MetricName, k.MonthlyGrowthRate, k.BaselineDelta, k.HeadroomAvailable from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 20"}]
     }
   ]
 }

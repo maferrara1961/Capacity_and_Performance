@@ -31,7 +31,15 @@ class ExecutiveDashboardContractTest(unittest.TestCase):
         Dashboard = LoadDashboard("ExecutiveCapacityDashboard.json")
         self.assertIn("decision", PanelByTitle(Dashboard, "Overall Capacity State")["description"].lower())
         self.assertIn("top 5", PanelByTitle(Dashboard, "Top 5 Capacity Risks")["description"].lower())
-        self.assertIn("missing data", DashboardText("ExecutiveCapacityDashboard.json").lower())
+        self.assertIn("sin datos", DashboardText("ExecutiveCapacityDashboard.json").lower())
+
+    def test_paneles_ejecutivos_usan_host_visible(self):
+        Text = DashboardText("ExecutiveCapacityDashboard.json")
+        self.assertIn("HostName", Text)
+        self.assertIn("MonitoredResource", Text)
+        self.assertIn("rec.ScopeId", Text)
+        self.assertIn("as State", Text)
+        self.assertNotIn("r.ScopeId as ResourceId", Text)
 
 
 if __name__ == "__main__":

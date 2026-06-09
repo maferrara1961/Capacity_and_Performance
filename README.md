@@ -255,6 +255,10 @@ La misma identidad de host queda disponible en todas las herramientas:
 - VictoriaMetrics: etiqueta `host_name="SRV-#####"`.
 - Grafana: columnas `HostName` y leyendas basadas en `{{host_name}}`.
 
+`ResourceId` queda reservado como clave tecnica estable para relaciones, borrado y correlacion
+historica. Las vistas ejecutivas muestran `HostName` para que recomendaciones y riesgos sean
+accionables por equipo.
+
 Para inventario operativo, Zabbix gobierna altas, bajas y modificaciones. Ejecutar
 `Scripts/SyncZabbixInventory.sh` despues de cambiar hosts en Zabbix para reflejar el cambio en
 PostgreSQL y Grafana.

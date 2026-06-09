@@ -222,8 +222,8 @@ class SyntheticPostgreSqlAdapter:
         for Recommendation in Dataset["Recommendations"]:
             Lines.append(
                 "insert into Recommendation (RecommendationId, RiskAssessmentId, ScopeType, ScopeId, Priority, Action, Reason, Status) values "
-                f"({self.Q(Recommendation['RecommendationId'])}, {self.Q(Recommendation['RiskAssessmentId'])}, {self.Q('Resource')}, "
-                f"{self.Q(Recommendation['RiskAssessmentId'])}, {self.Q(Recommendation['Priority'])}, {self.Q(Recommendation['Action'])}, "
+                f"({self.Q(Recommendation['RecommendationId'])}, {self.Q(Recommendation['RiskAssessmentId'])}, {self.Q(Recommendation['ScopeType'])}, "
+                f"{self.Q(Recommendation['ScopeId'])}, {self.Q(Recommendation['Priority'])}, {self.Q(Recommendation['Action'])}, "
                 f"{self.Q(Recommendation['Reason'])}, {self.Q(Recommendation['Status'])}) on conflict (RecommendationId) do nothing;"
             )
         return "\n".join(Lines)
