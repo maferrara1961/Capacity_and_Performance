@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-Version change: 1.0.0 -> 1.1.0
+Version change: 1.0.0 -> 2.0.0
 Modified principles:
 - I. Test-Driven Delivery -> I. Test-Driven Delivery
 - II. SOLID and Clean Architecture -> II. SOLID and Clean Architecture
@@ -450,4 +450,4 @@ Versioning follows semantic versioning:
 MAJOR for incompatible principle removals or redefinitions, MINOR for new principles or materially
 expanded governance, and PATCH for wording clarifications that do not change obligations.
 
-**Version**: 1.1.0 | **Ratified**: 2026-06-08 | **Last Amended**: 2026-06-09
+**Version**: 2.0.0 | **Ratified**: 2026-06-08 | **Last Amended**: 2026-06-09
