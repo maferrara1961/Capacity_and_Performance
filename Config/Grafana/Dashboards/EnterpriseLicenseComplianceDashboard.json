@@ -1,0 +1,57 @@
+{
+  "uid": "enterprise-license-compliance",
+  "title": "Enterprise License Compliance Dashboard",
+  "schemaVersion": 39,
+  "tags": ["Enterprise", "Compliance", "License"],
+  "templating": {
+    "list": [
+      {
+        "name": "LoadId",
+        "type": "query",
+        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "query": "select distinct LoadId from TestLoad order by LoadId desc",
+        "allValue": ".*",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Como leer este dashboard",
+      "type": "text",
+      "description": "Guia para interpretar cumplimiento de licencias y riesgos asociados.",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {"content": "Que muestra: estado de licencias por host, servicio, dominio y tecnologia. Como interpretarlo: NonCompliant, Unknown o Unverified requieren evidencia o remediacion; no son estado OK. Accion sugerida: priorizar hosts criticos y servicios afectados antes de auditorias o renovaciones.", "mode": "markdown"}
+    },
+    {
+      "id": 2,
+      "title": "Resumen de Licencias",
+      "type": "table",
+      "description": "Conteo de hosts por estado de licencia y cumplimiento para identificar brechas de auditoria.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 7, "w": 10, "x": 0, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select LicenseStatus, ComplianceStatus, count(*) as HostCount from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' group by LicenseStatus, ComplianceStatus order by case LicenseStatus when 'NonCompliant' then 1 when 'Unverified' then 2 when 'Unknown' then 3 else 4 end, ComplianceStatus"}]
+    },
+    {
+      "id": 3,
+      "title": "Hosts con Riesgo de Licencia",
+      "type": "table",
+      "description": "Detalle operativo para decidir remediacion, compra, normalizacion o validacion de evidencia de licencia.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 7, "w": 14, "x": 10, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ComponentName as HostName, TechnologyType, DomainName, BusinessServiceId, Owner, LicenseStatus, ComplianceStatus, EvidenceState from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and LicenseStatus in ('NonCompliant','Unverified','Unknown') order by case LicenseStatus when 'NonCompliant' then 1 when 'Unverified' then 2 else 3 end, ComponentName"}]
+    },
+    {
+      "id": 4,
+      "title": "Riesgos y Acciones de Licencia",
+      "type": "table",
+      "description": "Riesgos de compliance asociados a licenciamiento con impacto y accion recomendada.",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 11},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select r.Severity, c.ComponentName as HostName, c.LicenseStatus, c.ComplianceStatus, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Compliance' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.ComponentName"}]
+    }
+  ]
+}

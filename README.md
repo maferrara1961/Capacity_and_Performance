@@ -188,6 +188,8 @@ La provision de Grafana incluye vistas en la carpeta `Capacity`:
 - Enterprise Executive Dashboard
 - Enterprise Governance Dashboard
 - Enterprise Operational Dashboard
+- Enterprise License Compliance Dashboard
+- Enterprise Software Backlevel Dashboard
 
 Los dashboards cubren estado OK/Warning/Critical, forecast 30/60/90 dias, utilizacion promedio,
 pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias y recomendaciones.
@@ -211,6 +213,10 @@ Uso recomendado:
   monitoreo y registro de riesgos.
 - **Enterprise Operational Dashboard**: tendencias, forecast 30/90/180/365, top consumidores y
   frescura de evidencia.
+- **Enterprise License Compliance Dashboard**: licencias por host/servicio, estado compliant,
+  non-compliant, unknown y acciones para auditoria.
+- **Enterprise Software Backlevel Dashboard**: software backlevel, end-of-support, end-of-life,
+  fecha de soporte y acciones de upgrade.
 
 ## Gobierno Enterprise
 
@@ -228,8 +234,9 @@ Scripts/ValidateEnterpriseGovernance.sh --load-id EnterpriseDemo001
 ```
 
 La carga enterprise reutiliza el generador sintetico existente y agrega tablas enterprise en
-PostgreSQL, labels `technology_domain`, `business_service` y `business_service_id` en
-VictoriaMetrics, y hosts `SRV-#####` congruentes con el inventario de Zabbix.
+PostgreSQL, datos de testing de licencias/backlevel/compliance/lifecycle, labels
+`technology_domain`, `business_service` y `business_service_id` en VictoriaMetrics, y hosts
+`SRV-#####` congruentes con el inventario de Zabbix.
 
 Si Grafana muestra que PostgreSQL no tiene base por defecto configurada, actualizar y reiniciar:
 

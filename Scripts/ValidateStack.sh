@@ -35,6 +35,8 @@ Config/Grafana/Dashboards/ApplicationDashboard.json
 Config/Grafana/Dashboards/EnterpriseExecutiveDashboard.json
 Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json
 Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json
+Config/Grafana/Dashboards/EnterpriseLicenseComplianceDashboard.json
+Config/Grafana/Dashboards/EnterpriseSoftwareBacklevelDashboard.json
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
@@ -105,7 +107,7 @@ for ExpectedText in "Top 5 Capacity Risks" "Top Consumers And Outliers" "Overpro
   fi
 done
 
-for ExpectedText in "Technology Health Score" "Inventario Tecnologico" "Confianza de Monitoreo" "Top Consumers Enterprise" "Forecast 30 90 180 365"; do
+for ExpectedText in "Technology Health Score" "Inventario Tecnologico" "Confianza de Monitoreo" "Top Consumers Enterprise" "Forecast 30 90 180 365" "Enterprise License Compliance Dashboard" "Enterprise Software Backlevel Dashboard"; do
   if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
     echo "Falta panel enterprise requerido: $ExpectedText" >&2
     exit 1

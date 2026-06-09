@@ -211,10 +211,19 @@ class SyntheticDataService:
         Scores = []
         RiskRegistry = []
         Recommendations = []
+        LicenseStatuses = ["Compliant", "NonCompliant", "Unverified", "Unknown"]
+        ComplianceStatuses = ["Compliant", "NonCompliant", "AttentionRequired", "Unknown"]
+        BacklevelStatuses = ["Current", "Backlevel", "Backlevel", "Current"]
+        LifecycleStatuses = ["Supported", "EndOfSupport", "EndOfLife", "Backlevel"]
         for Index, Resource in enumerate(Resources, start=1):
             Domain = Domains[(Index - 1) % len(Domains)]
             Service = Services[(Index - 1) % len(Services)]
             EvidenceStateValue = EvidenceStates[(Index - 1) % len(EvidenceStates)]
+            LicenseStatus = LicenseStatuses[(Index - 1) % len(LicenseStatuses)]
+            ComplianceStatus = ComplianceStatuses[(Index - 1) % len(ComplianceStatuses)]
+            BacklevelStatus = BacklevelStatuses[(Index - 1) % len(BacklevelStatuses)]
+            LifecycleStatus = LifecycleStatuses[(Index - 1) % len(LifecycleStatuses)]
+            EndOfSupportDate = (datetime.now(UTC) + timedelta(days=365 - (Index * 120))).date().isoformat()
             BaseScore = max(5, 100 - self.ValueFor(Profile, 0, 90, Random))
             AdjustedScore = Scoring.EvidenceAdjustedScore(BaseScore, EvidenceState(EvidenceStateValue))
             Classification = Scoring.Classify(AdjustedScore, EvidenceState(EvidenceStateValue)).value
@@ -232,8 +241,12 @@ class SyntheticDataService:
                     "Environment": "Demo",
                     "BusinessServiceId": Service["ServiceId"],
                     "Owner": Service["Owner"],
-                    "SupportStatus": "Unknown" if EvidenceStateValue == "Missing" else "Supported",
-                    "LifecycleStatus": "Unknown" if EvidenceStateValue == "Missing" else Classification,
+                    "SupportStatus": "Unknown" if EvidenceStateValue == "Missing" else LifecycleStatus,
+                    "LifecycleStatus": "Unknown" if EvidenceStateValue == "Missing" else LifecycleStatus,
+                    "LicenseStatus": LicenseStatus,
+                    "ComplianceStatus": ComplianceStatus,
+                    "BacklevelStatus": BacklevelStatus,
+                    "EndOfSupportDate": EndOfSupportDate,
                     "EvidenceState": EvidenceStateValue,
                     "IsTestData": True,
                 }
@@ -303,6 +316,40 @@ class SyntheticDataService:
                     "IsTestData": True,
                 }
             )
+            if LicenseStatus in {"NonCompliant", "Unverified", "Unknown"} or ComplianceStatus != "Compliant":
+                RiskRegistry.append(
+                    {
+                        "RiskId": f"{LoadId}-EnterpriseComplianceRisk-{Index}",
+                        "LoadId": LoadId,
+                        "RiskCategory": "Compliance",
+                        "Severity": "Critical" if LicenseStatus == "NonCompliant" else "High",
+                        "Impact": f"Riesgo de licencia/compliance sobre {Resource['Name']}",
+                        "AffectedTechnologyId": ComponentId,
+                        "AffectedServiceId": Service["ServiceId"],
+                        "RecommendedAction": "Validar licencia, normalizar compliance y documentar evidencia",
+                        "Owner": Service["Owner"],
+                        "EvidenceState": EvidenceStateValue,
+                        "Status": "Open",
+                        "IsTestData": True,
+                    }
+                )
+            if BacklevelStatus == "Backlevel" or LifecycleStatus in {"EndOfSupport", "EndOfLife"}:
+                RiskRegistry.append(
+                    {
+                        "RiskId": f"{LoadId}-EnterpriseLifecycleRisk-{Index}",
+                        "LoadId": LoadId,
+                        "RiskCategory": "Lifecycle",
+                        "Severity": "Critical" if LifecycleStatus == "EndOfLife" else "High",
+                        "Impact": f"Software backlevel o fuera de soporte en {Resource['Name']}",
+                        "AffectedTechnologyId": ComponentId,
+                        "AffectedServiceId": Service["ServiceId"],
+                        "RecommendedAction": "Planificar upgrade, validar soporte y reducir deuda tecnologica",
+                        "Owner": Service["Owner"],
+                        "EvidenceState": EvidenceStateValue,
+                        "Status": "Open",
+                        "IsTestData": True,
+                    }
+                )
             Recommendations.append(
                 {
                     "RecommendationId": f"{RiskId}-Recommendation",

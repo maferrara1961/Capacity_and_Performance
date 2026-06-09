@@ -72,6 +72,8 @@ python3 -m CapacityEngine.Scheduler.SyntheticDataCommand sync-enterprise-invento
 - Enterprise Executive Dashboard
 - Enterprise Governance Dashboard
 - Enterprise Operational Dashboard
+- Enterprise License Compliance Dashboard
+- Enterprise Software Backlevel Dashboard
 
 Los dashboards deben distinguir "sin evidencia" de "sin riesgo".
 
@@ -90,3 +92,11 @@ VictoriaMetrics publica labels enterprise:
 PostgreSQL conserva los datasets enterprise en tablas `Enterprise*`. Zabbix sigue siendo la fuente
 operativa de inventario; cuando se modifique un host, ejecutar sincronizacion para reflejarlo en el
 catalogo relacional.
+
+Los datos de testing enterprise incluyen:
+
+- `LicenseStatus`: Compliant, NonCompliant, Unverified, Unknown.
+- `ComplianceStatus`: Compliant, NonCompliant, AttentionRequired, Unknown.
+- `BacklevelStatus`: Current, Backlevel.
+- `LifecycleStatus`: Supported, EndOfSupport, EndOfLife, Backlevel.
+- `EndOfSupportDate`: fecha sintetica para priorizar upgrades.

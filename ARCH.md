@@ -153,6 +153,8 @@ Dashboards provisionados:
 - `Enterprise Executive Dashboard`
 - `Enterprise Governance Dashboard`
 - `Enterprise Operational Dashboard`
+- `Enterprise License Compliance Dashboard`
+- `Enterprise Software Backlevel Dashboard`
 
 Datasources:
 
@@ -211,6 +213,8 @@ Responsabilidades:
   confianza de monitoreo y salud tecnologica.
 - Mostrar `Missing`, `Unknown`, `Incomplete` y `Unverified` como brechas de evidencia.
 - Relacionar cada riesgo con host `SRV-#####`, dominio tecnologico y servicio afectado.
+- Exponer licenciamiento (`LicenseStatus`), cumplimiento (`ComplianceStatus`), backlevel
+  (`BacklevelStatus`) y fecha de soporte (`EndOfSupportDate`) como datos de testing consultables.
 - Publicar series con `host_name`, `technology_domain`, `business_service` y
   `business_service_id` para correlacionar VictoriaMetrics, PostgreSQL y Zabbix.
 

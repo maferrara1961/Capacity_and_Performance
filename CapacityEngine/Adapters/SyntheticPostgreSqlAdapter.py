@@ -254,8 +254,16 @@ create table if not exists EnterpriseTechnologyComponent (
   Owner text not null,
   SupportStatus text not null,
   LifecycleStatus text not null,
+  LicenseStatus text not null default 'Unknown',
+  ComplianceStatus text not null default 'Unknown',
+  BacklevelStatus text not null default 'Unknown',
+  EndOfSupportDate date,
   EvidenceState text not null
 );
+alter table EnterpriseTechnologyComponent add column if not exists LicenseStatus text not null default 'Unknown';
+alter table EnterpriseTechnologyComponent add column if not exists ComplianceStatus text not null default 'Unknown';
+alter table EnterpriseTechnologyComponent add column if not exists BacklevelStatus text not null default 'Unknown';
+alter table EnterpriseTechnologyComponent add column if not exists EndOfSupportDate date;
 create table if not exists EnterpriseEvidenceRecord (
   EvidenceId text primary key,
   LoadId text not null,
@@ -314,11 +322,20 @@ create table if not exists EnterpriseRecommendation (
             )
         for Component in Dataset.get("EnterpriseComponents", []):
             Lines.append(
-                "insert into EnterpriseTechnologyComponent (ComponentId, LoadId, ComponentName, TechnologyType, DomainId, DomainName, Version, Vendor, Environment, BusinessServiceId, Owner, SupportStatus, LifecycleStatus, EvidenceState) values "
+                "insert into EnterpriseTechnologyComponent (ComponentId, LoadId, ComponentName, TechnologyType, DomainId, DomainName, Version, Vendor, Environment, BusinessServiceId, Owner, SupportStatus, LifecycleStatus, LicenseStatus, ComplianceStatus, BacklevelStatus, EndOfSupportDate, EvidenceState) values "
                 f"({self.Q(Component['ComponentId'])}, {self.Q(Component['LoadId'])}, {self.Q(Component['ComponentName'])}, {self.Q(Component['TechnologyType'])}, "
                 f"{self.Q(Component['DomainId'])}, {self.Q(Component['DomainName'])}, {self.Q(Component['Version'])}, {self.Q(Component['Vendor'])}, "
                 f"{self.Q(Component['Environment'])}, {self.Q(Component['BusinessServiceId'])}, {self.Q(Component['Owner'])}, {self.Q(Component['SupportStatus'])}, "
-                f"{self.Q(Component['LifecycleStatus'])}, {self.Q(Component['EvidenceState'])}) on conflict (ComponentId) do nothing;"
+                f"{self.Q(Component['LifecycleStatus'])}, {self.Q(Component['LicenseStatus'])}, {self.Q(Component['ComplianceStatus'])}, "
+                f"{self.Q(Component['BacklevelStatus'])}, {self.Q(Component['EndOfSupportDate'])}, {self.Q(Component['EvidenceState'])}) "
+                "on conflict (ComponentId) do update set "
+                "SupportStatus = excluded.SupportStatus, "
+                "LifecycleStatus = excluded.LifecycleStatus, "
+                "LicenseStatus = excluded.LicenseStatus, "
+                "ComplianceStatus = excluded.ComplianceStatus, "
+                "BacklevelStatus = excluded.BacklevelStatus, "
+                "EndOfSupportDate = excluded.EndOfSupportDate, "
+                "EvidenceState = excluded.EvidenceState;"
             )
         for Evidence in Dataset.get("EnterpriseEvidence", []):
             Lines.append(

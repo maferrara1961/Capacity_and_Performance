@@ -43,9 +43,18 @@ Scripts/RunEnterpriseAssessment.sh --scope enterprise --load-id EnterpriseDemo00
 Scripts/ValidateEnterpriseGovernance.sh --load-id EnterpriseDemo001
 ```
 
-La carga enterprise agrega scores 0-100, riesgos, recomendaciones, evidencia y labels
-`technology_domain`, `business_service` y `business_service_id` en VictoriaMetrics. Tambien conserva
-la identidad `SRV-#####` en Zabbix, PostgreSQL y Grafana.
+La carga enterprise agrega scores 0-100, riesgos, recomendaciones, evidencia, licencias,
+compliance, software backlevel, lifecycle y labels `technology_domain`, `business_service` y
+`business_service_id` en VictoriaMetrics. Tambien conserva la identidad `SRV-#####` en Zabbix,
+PostgreSQL y Grafana.
+
+Dashboards especificos para estos datos:
+
+- `Enterprise License Compliance Dashboard`
+- `Enterprise Software Backlevel Dashboard`
+
+Para ver datos variados, usar `--volume medium` o `--volume large`; `small` crea pocos hosts y puede
+mostrar menos combinaciones.
 
 Los recursos se generan con host name `SRV-#####`, por ejemplo `SRV-48291`. Ese valor se usa como
 nombre visible y como host tecnico en Zabbix, y queda registrado en PostgreSQL e inventario junto
