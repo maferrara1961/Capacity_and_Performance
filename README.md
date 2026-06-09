@@ -73,6 +73,12 @@ Scripts/ManageTestData.sh delete --load-id DemoCritical001
 Scripts/ManageTestData.sh delete --all --confirmar
 ```
 
+Validar una serie sintetica en VictoriaMetrics:
+
+```bash
+curl "http://localhost:8428/api/v1/query?query=synthetic_cpu%7Bload_id%3D%22DemoCritical001%22%7D"
+```
+
 ## Uso de CapacityEngine
 
 `CapacityEngine` es el motor Python que calcula KPIs de capacidad, forecast 30/60/90 dias, riesgo

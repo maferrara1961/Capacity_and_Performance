@@ -59,6 +59,8 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         Adapter = SyntheticVictoriaMetricsAdapter()
         self.assertEqual(Adapter.NormalizeMetricName("CPU"), "synthetic_cpu")
         self.assertEqual(Adapter.NormalizeMetricName("Network IOPS"), "synthetic_network_iops")
+        FirstSample = Dataset["Samples"][0]
+        self.assertIsInstance(Adapter.TimestampMillis(FirstSample["ObservedAt"]), int)
 
 
 if __name__ == "__main__":

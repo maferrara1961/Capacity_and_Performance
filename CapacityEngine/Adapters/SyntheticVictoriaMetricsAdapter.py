@@ -1,6 +1,8 @@
 import json
 import os
 from pathlib import Path
+from datetime import datetime
+from urllib.parse import urlencode
 from urllib import request
 
 
@@ -44,7 +46,7 @@ class SyntheticVictoriaMetricsAdapter:
                 f'resource_id="{Sample["ResourceId"]}",'
                 f'source="{Sample["Source"]}"'
             )
-            Lines.append(f'{MetricName}{{{Labels}}} {Sample["Value"]}')
+            Lines.append(f'{MetricName}{{{Labels}}} {Sample["Value"]} {self.TimestampMillis(Sample["ObservedAt"])}')
         Body = ("\n".join(Lines) + "\n").encode("utf-8")
         Request = request.Request(
             f"{self.BaseUrl}/api/v1/import/prometheus",
@@ -58,6 +60,20 @@ class SyntheticVictoriaMetricsAdapter:
 
     def NormalizeMetricName(self, MetricName: str) -> str:
         return "synthetic_" + "".join(Character.lower() if Character.isalnum() else "_" for Character in MetricName)
+
+    def TimestampMillis(self, ObservedAt: str) -> int:
+        return int(datetime.fromisoformat(ObservedAt).timestamp() * 1000)
+
+    def HasRemoteSamples(self, LoadId: str | None = None) -> bool:
+        if os.environ.get("STACK_DRY_RUN", "0") == "1":
+            return self.HasSamples(LoadId)
+        Query = 'synthetic_cpu'
+        if LoadId:
+            Query = f'synthetic_cpu{{load_id="{LoadId}"}}'
+        Url = f"{self.BaseUrl}/api/v1/query?{urlencode({'query': Query})}"
+        with request.urlopen(Url, timeout=10) as Response:
+            Payload = json.loads(Response.read().decode("utf-8"))
+        return bool(Payload.get("data", {}).get("result"))
 
     def LoadStore(self) -> dict:
         if not self.DataPath.exists():

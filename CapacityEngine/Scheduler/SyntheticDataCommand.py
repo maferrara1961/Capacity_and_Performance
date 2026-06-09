@@ -90,7 +90,7 @@ def Validate(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql
     for Result in Service.ValidateTools(LoadId):
         print(f"  {Result.ToolName}: {Result.Status} ({Result.Protocol}) {Result.Message}")
     print(f"  PostgreSQL datos sinteticos: {'OK' if PostgreSql.HasData(LoadId) else 'Sin datos'}")
-    print(f"  VictoriaMetrics muestras sinteticas: {'OK' if Victoria.HasSamples(LoadId) else 'Sin datos'}")
+    print(f"  VictoriaMetrics muestras sinteticas: {'OK' if Victoria.HasRemoteSamples(LoadId) else 'Sin datos'}")
     return 0
 
 
