@@ -29,7 +29,22 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
         self.assertIn("HostName", Variables)
         self.assertIn("ServiceId", Variables)
         self.assertIn('host_name=~\\"${HostName:regex}\\"', Text)
+        self.assertIn('business_service_id=~\\"${ServiceId:regex}\\"', Text)
         self.assertIn("${ServiceId:regex}", Text)
+
+    def test_dashboard_tecnico_muestra_average_y_tendencia_del_rango(self):
+        Dashboard = json.loads((DashboardDirectory / "TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
+        Text = json.dumps(Dashboard)
+        TimeSeriesPanels = [Panel for Panel in Dashboard.get("panels", []) if Panel.get("type") == "timeseries"]
+
+        self.assertTrue(TimeSeriesPanels)
+        for Panel in TimeSeriesPanels:
+            PanelText = json.dumps(Panel)
+            self.assertIn("avg_over_time", PanelText, Panel.get("title"))
+            self.assertIn("predict_linear", PanelText, Panel.get("title"))
+            self.assertIn("$__range", PanelText, Panel.get("title"))
+            self.assertIn("average rango", PanelText, Panel.get("title"))
+            self.assertIn("tendencia rango", PanelText, Panel.get("title"))
 
 
 if __name__ == "__main__":

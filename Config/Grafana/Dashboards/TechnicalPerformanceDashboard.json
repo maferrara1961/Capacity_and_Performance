@@ -90,7 +90,7 @@
     {
       "id": 1,
       "title": "CPU Utilization",
-      "description": "CPU performance by resource and load identifier. Missing data means no CPU samples are available for the selected range.",
+      "description": "CPU performance by resource and load identifier. Missing data means no CPU samples are available for the selected range. Incluye linea actual, average del rango seleccionado y tendencia lineal segun el rango seleccionado.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -105,8 +105,18 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "CPU {{host_name}} {{load_id}}"
+          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "CPU actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "avg_over_time(synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "CPU average rango {{host_name}}"
+        },
+        {
+          "refId": "C",
+          "expr": "predict_linear(synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "CPU tendencia rango {{host_name}}"
         }
       ],
       "fieldConfig": {
@@ -129,7 +139,7 @@
     {
       "id": 2,
       "title": "RAM Utilization",
-      "description": "Memory performance by resource and load identifier.",
+      "description": "Memory performance by resource and load identifier. Incluye linea actual, average del rango seleccionado y tendencia lineal segun el rango seleccionado.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -144,8 +154,18 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "RAM {{host_name}} {{load_id}}"
+          "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "RAM actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "avg_over_time(synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "RAM average rango {{host_name}}"
+        },
+        {
+          "refId": "C",
+          "expr": "predict_linear(synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "RAM tendencia rango {{host_name}}"
         }
       ],
       "fieldConfig": {
@@ -168,7 +188,7 @@
     {
       "id": 3,
       "title": "Storage Utilization",
-      "description": "Storage performance by resource and load identifier.",
+      "description": "Storage performance by resource and load identifier. Incluye linea actual, average del rango seleccionado y tendencia lineal segun el rango seleccionado.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -183,8 +203,18 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "Storage {{host_name}} {{load_id}}"
+          "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "Storage actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "avg_over_time(synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "Storage average rango {{host_name}}"
+        },
+        {
+          "refId": "C",
+          "expr": "predict_linear(synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "Storage tendencia rango {{host_name}}"
         }
       ],
       "fieldConfig": {
@@ -207,7 +237,7 @@
     {
       "id": 4,
       "title": "IOPS And Network",
-      "description": "IOPS and network indicators for operational bottleneck diagnosis.",
+      "description": "IOPS and network indicators for operational bottleneck diagnosis. Incluye linea actual, average del rango seleccionado y tendencia lineal segun el rango seleccionado.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -222,13 +252,33 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "IOPS {{host_name}} {{load_id}}"
+          "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "IOPS actual {{host_name}} {{load_id}}"
         },
         {
           "refId": "B",
-          "expr": "synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "Network {{host_name}} {{load_id}}"
+          "expr": "avg_over_time(synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "IOPS average rango {{host_name}}"
+        },
+        {
+          "refId": "C",
+          "expr": "predict_linear(synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "IOPS tendencia rango {{host_name}}"
+        },
+        {
+          "refId": "D",
+          "expr": "synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "Network actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "E",
+          "expr": "avg_over_time(synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "Network average rango {{host_name}}"
+        },
+        {
+          "refId": "F",
+          "expr": "predict_linear(synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "Network tendencia rango {{host_name}}"
         }
       ],
       "fieldConfig": {
@@ -251,7 +301,7 @@
     {
       "id": 5,
       "title": "Latency Throughput Errors",
-      "description": "Application-style performance signals for end-to-end diagnosis.",
+      "description": "Application-style performance signals for end-to-end diagnosis. Incluye linea actual, average del rango seleccionado y tendencia lineal segun el rango seleccionado.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -266,18 +316,48 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "Latency {{host_name}} {{load_id}}"
+          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "Latency actual {{host_name}} {{load_id}}"
         },
         {
           "refId": "B",
-          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "Throughput {{host_name}} {{load_id}}"
+          "expr": "avg_over_time(synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "Latency average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "Errors {{host_name}} {{load_id}}"
+          "expr": "predict_linear(synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "Latency tendencia rango {{host_name}}"
+        },
+        {
+          "refId": "D",
+          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "Throughput actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "E",
+          "expr": "avg_over_time(synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "Throughput average rango {{host_name}}"
+        },
+        {
+          "refId": "F",
+          "expr": "predict_linear(synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "Throughput tendencia rango {{host_name}}"
+        },
+        {
+          "refId": "G",
+          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "Errors actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "H",
+          "expr": "avg_over_time(synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "Errors average rango {{host_name}}"
+        },
+        {
+          "refId": "I",
+          "expr": "predict_linear(synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "Errors tendencia rango {{host_name}}"
         }
       ],
       "fieldConfig": {
@@ -300,7 +380,7 @@
     {
       "id": 6,
       "title": "Saturation",
-      "description": "Saturation signal by resource and scenario.",
+      "description": "Saturation signal by resource and scenario. Incluye linea actual, average del rango seleccionado y tendencia lineal segun el rango seleccionado.",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -315,8 +395,18 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
-          "legendFormat": "Saturation {{host_name}} {{load_id}}"
+          "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "legendFormat": "Saturation actual {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "avg_over_time(synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "legendFormat": "Saturation average rango {{host_name}}"
+        },
+        {
+          "refId": "C",
+          "expr": "predict_linear(synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "legendFormat": "Saturation tendencia rango {{host_name}}"
         }
       ],
       "fieldConfig": {

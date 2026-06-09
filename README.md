@@ -216,6 +216,8 @@ Uso recomendado:
 - Cada panel no textual incluye enlaces de drill-down. Al hacer click sobre un host, servicio o
   serie, usar `Ver graficos del equipo` para abrir `Technical Performance Dashboard` filtrado por
   `LoadId`, `HostName` y `ServiceId`.
+- Cuando se filtra por equipo o subsistema, las series tecnicas muestran tres lineas: valor actual,
+  average del rango seleccionado y tendencia lineal calculada sobre el mismo rango.
 - **Executive Capacity Dashboard**: decision ejecutiva con estado general, top 5 riesgos,
   forecast 30/60/90, headroom y recomendaciones priorizadas.
 - **Technical Performance Dashboard**: mejora operativa con CPU, RAM, storage, IOPS, red,
