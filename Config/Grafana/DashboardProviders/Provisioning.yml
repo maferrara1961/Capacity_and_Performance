@@ -5,6 +5,7 @@ providers:
     folder: Capacity
     type: file
     disableDeletion: false
+    prune: true
     updateIntervalSeconds: 30
     options:
       path: /etc/grafana/dashboards

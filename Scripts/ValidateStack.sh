@@ -21,6 +21,7 @@ Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ValidateDatabaseConsistency.sh
+Scripts/CleanupGrafanaDashboards.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh
@@ -107,6 +108,11 @@ fi
 
 if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
   echo "Dashboards no declaran datasource VictoriaMetrics explicito" >&2
+  exit 1
+fi
+
+if ! grep -q "prune: true" Config/Grafana/DashboardProviders/Provisioning.yml; then
+  echo "Provider de dashboards Grafana no elimina dashboards removidos" >&2
   exit 1
 fi
 

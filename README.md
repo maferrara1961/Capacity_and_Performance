@@ -239,6 +239,17 @@ Uso recomendado:
 - **Enterprise Software Backlevel Dashboard**: software backlevel, end-of-support, end-of-life,
   fecha de soporte y acciones de upgrade.
 
+Si aparece mas de un `Technical Performance Dashboard` en Grafana, el duplicado quedo persistido en
+la base operacional de Grafana. El repositorio provisiona un solo dashboard tecnico con UID
+`technical-performance`. Para limpiar duplicados historicos:
+
+```bash
+Scripts/CleanupGrafanaDashboards.sh
+Scripts/CleanupGrafanaDashboards.sh --confirmar
+Scripts/StopStack.sh
+Scripts/StartStack.sh
+```
+
 ## Gobierno Enterprise
 
 El feature enterprise agrega evaluaciones de salud tecnologica, riesgo, scoring, inventario,

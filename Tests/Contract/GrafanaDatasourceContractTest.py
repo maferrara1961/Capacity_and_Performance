@@ -65,6 +65,25 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
     def test_provider_apunta_a_directorio_de_json_separado(self):
         Provider = Path("Config/Grafana/DashboardProviders/Provisioning.yml").read_text(encoding="utf-8")
         self.assertIn("path: /etc/grafana/dashboards", Provider)
+        self.assertIn("disableDeletion: false", Provider)
+        self.assertIn("prune: true", Provider)
+
+    def test_existe_un_solo_dashboard_tecnico_provisionado(self):
+        TechnicalDashboards = []
+        for DashboardPath in DashboardDirectory.glob("*.json"):
+            Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
+            if Dashboard.get("uid") == "technical-performance" or Dashboard.get("title") == "Technical Performance Dashboard":
+                TechnicalDashboards.append(DashboardPath.name)
+
+        self.assertEqual(["TechnicalPerformanceDashboard.json"], TechnicalDashboards)
+
+    def test_script_limpia_duplicados_tecnicos_en_grafana(self):
+        Script = Path("Scripts/CleanupGrafanaDashboards.sh").read_text(encoding="utf-8")
+
+        self.assertIn("Technical Performance Dashboard", Script)
+        self.assertIn("technical-performance", Script)
+        self.assertIn("uid <> '${GRAFANA_UID}'", Script)
+        self.assertIn("--confirmar", Script)
 
     def test_kpis_requeridos_tienen_cobertura_en_dashboards(self):
         Text = "\n".join(DashboardText(Path.name) for Path in DashboardDirectory.glob("*.json"))

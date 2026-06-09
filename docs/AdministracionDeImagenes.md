@@ -106,6 +106,16 @@ Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
 - `Capacity Planning Dashboard`: crecimiento, headroom, baseline y sizing.
 - `Application Dashboard`: salud, infraestructura, dependencias y performance end-to-end.
 
+Si Grafana muestra dashboards tecnicos duplicados, conservar solo el dashboard con UID
+`technical-performance`:
+
+```bash
+Scripts/CleanupGrafanaDashboards.sh
+Scripts/CleanupGrafanaDashboards.sh --confirmar
+Scripts/StopStack.sh
+Scripts/StartStack.sh
+```
+
 Si Grafana muestra que PostgreSQL no tiene base por defecto configurada, actualizar el repositorio y
 reiniciar el stack para reprovisionar `CapacityPostgreSQL` con `jsonData.database=capacity`:
 
