@@ -20,6 +20,7 @@ Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ManageTestData.sh
 Scripts/GenerateVerificationBatches.sh
+Scripts/GenerateHistoricalVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
 Config/Grafana/DashboardProviders/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json

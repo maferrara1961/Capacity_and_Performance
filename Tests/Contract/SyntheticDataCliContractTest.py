@@ -93,6 +93,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("RunLoad critical", Script.read_text())
         self.assertIn("delete --load-id", Script.read_text())
 
+    def test_script_de_lotes_historicos_genera_30_60_y_90_dias(self):
+        Script = ROOT / "Scripts" / "GenerateHistoricalVerificationBatches.sh"
+        Content = Script.read_text()
+        self.assertTrue(Script.exists())
+        self.assertIn("WINDOWS=\"${VERIFY_WINDOWS:-30 60 90}\"", Content)
+        self.assertIn("--days \"$Days\"", Content)
+        self.assertIn("${PREFIX}-${Days}d-${Profile}", Content)
+
     def test_perfiles_de_verificacion_requeridos_generan_datos(self):
         Service = SyntheticDataService()
         for Profile in ["normal", "warning", "critical", "mixed"]:
@@ -100,6 +108,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
             self.assertEqual(Dataset["Load"]["ScenarioProfile"], Profile)
             self.assertGreater(Dataset["Load"]["GeneratedMetricSampleCount"], 0)
             self.assertGreater(Dataset["Load"]["GeneratedKpiCount"], 0)
+
+    def test_historia_sintetica_genera_muestras_diarias(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("HistoryDaily001", "mixed", "small", 30, 1)
+        ResourceCount = Dataset["Load"]["GeneratedResourceCount"]
+        MetricCount = 9
+        ExpectedSamples = ResourceCount * MetricCount * 31
+        self.assertEqual(Dataset["Load"]["GeneratedMetricSampleCount"], ExpectedSamples)
+        self.assertEqual(len(Dataset["Samples"]), ExpectedSamples)
 
 
 if __name__ == "__main__":

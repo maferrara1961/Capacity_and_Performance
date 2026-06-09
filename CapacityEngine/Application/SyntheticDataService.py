@@ -75,10 +75,9 @@ class SyntheticDataService:
         Metrics = ["CPU", "RAM", "Storage", "IOPS", "Network", "Latency", "Throughput", "Errors", "Saturation"]
         Samples = []
         Now = datetime.now(UTC)
-        Step = max(1, Days // 10)
         for Resource in Resources:
             for Metric in Metrics:
-                for Offset in range(Days, -1, -Step):
+                for Offset in range(Days, -1, -1):
                     ObservedAt = Now - timedelta(days=Offset)
                     Samples.append(
                         {
