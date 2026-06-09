@@ -3,12 +3,12 @@ datasources:
   - name: VictoriaMetrics
     type: prometheus
     access: proxy
-    url: http://victoriametrics:8428
+    url: http://capacity-performance-victoriametrics:8428
     isDefault: true
   - name: CapacityPostgreSQL
     type: postgres
     access: proxy
-    url: postgresql:5432
+    url: capacity-performance-postgresql:5432
     database: capacity
     user: capacity
     secureJsonData:

@@ -40,6 +40,21 @@ if grep -R "pip install\\|requirements.txt\\|poetry\\|pipenv" CapacityEngine Con
   exit 1
 fi
 
+if ! grep -q "http://capacity-performance-victoriametrics:8428" Config/Grafana/Datasources/Datasources.yml; then
+  echo "Datasource VictoriaMetrics no apunta al contenedor esperado" >&2
+  exit 1
+fi
+
+if ! grep -q "capacity-performance-postgresql:5432" Config/Grafana/Datasources/Datasources.yml; then
+  echo "Datasource PostgreSQL no apunta al contenedor esperado" >&2
+  exit 1
+fi
+
+if ! grep -q "ZBX_SERVER_HOST=.*zabbix-server" Scripts/StackCommon.sh; then
+  echo "Zabbix Web no declara conexion con Zabbix Server" >&2
+  exit 1
+fi
+
 if [ "${1:-}" = "--load-sample-data" ]; then
   echo "Datos de ejemplo disponibles en Sql/Seed/SampleCatalog.sql"
 fi

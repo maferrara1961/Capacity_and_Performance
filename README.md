@@ -170,6 +170,17 @@ proveedor antes de acceder desde otra maquina.
 PostgreSQL y Zabbix Server no son endpoints HTTP. No se validan con `curl`; se acceden con clientes
 especificos o desde otros contenedores del stack.
 
+Interconexion interna del stack:
+
+```text
+Grafana -> capacity-performance-victoriametrics:8428
+Grafana -> capacity-performance-postgresql:5432
+ZabbixWeb -> capacity-performance-zabbix-server:10051
+ZabbixWeb -> capacity-performance-postgresql:5432
+ZabbixServer -> capacity-performance-postgresql:5432
+CapacityEngine -> PostgreSQL y VictoriaMetrics (pendiente de integracion con datos reales)
+```
+
 Consultar estado:
 
 ```bash
@@ -213,7 +224,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 40 tests OK
+Scripts/RunTests.sh        -> 43 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```
