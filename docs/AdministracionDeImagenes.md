@@ -23,8 +23,10 @@ Scripts/BuildImages.sh Grafana v1.0.0
 Scripts/StartStack.sh
 ```
 
-El arranque usa la red comun del stack e inicia servicios en orden compatible con dependencias:
-PostgreSQL, VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
+El arranque requiere que las imagenes locales ya existan. Si falta alguna imagen, el script se
+detiene antes de crear contenedores y solicita ejecutar `Scripts/BuildImages.sh`. Luego usa la red
+comun del stack e inicia servicios en orden compatible con dependencias: PostgreSQL,
+VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
 
 ## Stop
 

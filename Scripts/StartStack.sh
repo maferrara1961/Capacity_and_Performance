@@ -16,10 +16,11 @@ StartOne() {
   fi
   Info "iniciando $Service como $Container"
   # shellcheck disable=SC2086
-  RunPodman run -d --replace --name "$Container" --network "$STACK_NETWORK" $Ports $Volumes $EnvArgs "$Image"
+  RunPodman run -d --pull=never --replace --name "$Container" --network "$STACK_NETWORK" $Ports $Volumes $EnvArgs "$Image"
 }
 
 RequireRuntime
+RequireAllImages
 EnsureNetwork
 
 for Service in $STACK_START_ORDER; do

@@ -81,6 +81,9 @@ Iniciar el stack:
 Scripts/StartStack.sh
 ```
 
+`StartStack.sh` valida primero que existan todas las imagenes locales. Si falta alguna, ejecutar
+`Scripts/BuildImages.sh` antes de iniciar.
+
 Consultar estado:
 
 ```bash

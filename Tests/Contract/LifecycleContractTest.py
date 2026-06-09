@@ -1,5 +1,6 @@
 import os
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -14,6 +15,38 @@ def RunScript(*Args):
 
 
 class LifecycleContractTest(unittest.TestCase):
+    def test_start_falla_si_falta_una_imagen_local(self):
+        with tempfile.TemporaryDirectory() as TempDir:
+            Podman = Path(TempDir) / "podman"
+            Podman.write_text(
+                "#!/usr/bin/env bash\n"
+                "set -eu\n"
+                "if [ \"$1\" = \"image\" ] && [ \"$2\" = \"exists\" ]; then\n"
+                "  case \"$3\" in\n"
+                "    *victoriametrics*) exit 1 ;;\n"
+                "    *) exit 0 ;;\n"
+                "  esac\n"
+                "fi\n"
+                "echo \"podman inesperado: $*\" >&2\n"
+                "exit 2\n",
+                encoding="utf-8",
+            )
+            Podman.chmod(0o755)
+            Env = os.environ.copy()
+            Env["PODMAN_BIN"] = str(Podman)
+            Result = subprocess.run(
+                ["bash", "Scripts/StartStack.sh"],
+                cwd=ROOT,
+                env=Env,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertNotEqual(Result.returncode, 0)
+        self.assertIn("falta la imagen local requerida", Result.stderr)
+        self.assertIn("Scripts/BuildImages.sh", Result.stderr)
+        self.assertNotIn("iniciando PostgreSQL", Result.stdout)
+
     def test_start_respeta_orden_de_dependencias(self):
         Result = RunScript("bash", "Scripts/StartStack.sh")
         self.assertEqual(Result.returncode, 0, Result.stderr)

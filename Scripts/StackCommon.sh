@@ -167,6 +167,34 @@ RequireAllContainerfiles() {
   done
 }
 
+ImageExists() {
+  Service="$1"
+  Version="${2:-$DEFAULT_VERSION}"
+  Image="$(ImageFor "$Service" "$Version")"
+  if [ "$STACK_DRY_RUN" = "1" ]; then
+    Info "imagen local validada: $Image"
+    return 0
+  fi
+  "$PODMAN_BIN" image exists "$Image" >/dev/null 2>&1
+}
+
+RequireImage() {
+  Service="$1"
+  Version="${2:-$DEFAULT_VERSION}"
+  Image="$(ImageFor "$Service" "$Version")"
+  if ! ImageExists "$Service" "$Version"; then
+    Error "falta la imagen local requerida: $Image"
+    Error "construya las imagenes antes de iniciar: Scripts/BuildImages.sh"
+    return 1
+  fi
+}
+
+RequireAllImages() {
+  for Service in $STACK_SERVICES; do
+    RequireImage "$Service" "$DEFAULT_VERSION"
+  done
+}
+
 RunPodman() {
   if [ "$STACK_DRY_RUN" = "1" ]; then
     echo "SIMULACION: $PODMAN_BIN $*"
