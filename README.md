@@ -212,10 +212,12 @@ Uso recomendado:
 
 - Cada dashboard incluye un cuadro visible `Como leer este dashboard` con `Que muestra`,
   `Como interpretarlo` y `Accion sugerida`.
+- El rango de tiempo por defecto en Grafana es `ultimos 30 dias`; se puede cambiar desde el selector
+  de tiempo y las lineas de average/tendencia usan ese mismo rango.
 - Cada dashboard incluye filtro `Lote`; `All` muestra todos los lotes cargados.
 - Cada panel no textual incluye enlaces de drill-down. Al hacer click sobre un host, servicio o
   serie, usar `Ver graficos del equipo` para abrir `Technical Performance Dashboard` filtrado por
-  `LoadId`, `HostName` y `ServiceId`.
+  el host real; usar `Ver graficos del subsistema` para abrirlo filtrado por el subsistema real.
 - Cuando se filtra por equipo o subsistema, las series tecnicas muestran tres lineas: valor actual,
   average del rango seleccionado y tendencia lineal calculada sobre el mismo rango.
 - **Executive Capacity Dashboard**: decision ejecutiva con estado general, top 5 riesgos,
