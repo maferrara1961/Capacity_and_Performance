@@ -87,6 +87,12 @@ Generar lotes de verificacion para Grafana, VictoriaMetrics, PostgreSQL y Zabbix
 Scripts/GenerateVerificationBatches.sh DemoFull001
 ```
 
+Generar historia diaria de 30, 60 y 90 dias para validar tendencias y forecast:
+
+```bash
+Scripts/GenerateHistoricalVerificationBatches.sh HistoryFull001
+```
+
 Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
 
 - Cada dashboard comienza con `Como leer este dashboard`, que explica que muestra cada vista, como

@@ -22,6 +22,19 @@ Scripts/GenerateVerificationBatches.sh
 Scripts/GenerateVerificationBatches.sh DemoFull001
 ```
 
+Generar datos historicos diarios para ventanas de 30, 60 y 90 dias:
+
+```bash
+Scripts/GenerateHistoricalVerificationBatches.sh
+Scripts/GenerateHistoricalVerificationBatches.sh HistoryFull001
+```
+
+El script historico crea lotes por ventana y perfil, por ejemplo
+`HistoryFull001-30d-normal`, `HistoryFull001-60d-warning` y `HistoryFull001-90d-critical`.
+Cada lote incluye muestras diarias aleatorias por recurso y metrica para validar tendencias,
+percentil 95, forecast 30/60/90, saturacion, capacity planning y paneles tecnicos en Grafana y
+VictoriaMetrics.
+
 El script genera lotes `normal`, `warning`, `critical` y `mixed`. Para Zabbix usa la API web
 en `http://localhost:8080/api_jsonrpc.php` con `ZABBIX_USER=Admin` y `ZABBIX_PASSWORD=zabbix`
 por defecto.

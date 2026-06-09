@@ -98,6 +98,18 @@ PostgreSQL para Grafana, series en VictoriaMetrics y hosts/items sinteticos en Z
 El script borra primero cada lote con el mismo identificador para que pueda repetirse con el mismo
 prefijo.
 
+Generar historia diaria aleatoria de 30, 60 y 90 dias para validar tendencias y forecast:
+
+```bash
+Scripts/GenerateHistoricalVerificationBatches.sh
+Scripts/GenerateHistoricalVerificationBatches.sh HistoryFull001
+```
+
+Este script crea lotes como `HistoryFull001-30d-critical`, `HistoryFull001-60d-warning` y
+`HistoryFull001-90d-mixed`. Cada lote contiene muestras diarias por recurso y metrica para que
+Grafana y VictoriaMetrics tengan datos historicos suficientes en paneles de tendencia,
+percentil 95, forecast 30/60/90, saturacion y capacity planning.
+
 Para validar dashboards optimizados, usar un prefijo nuevo y revisar la carpeta `Capacity` en
 Grafana:
 
