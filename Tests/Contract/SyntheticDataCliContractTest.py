@@ -63,7 +63,7 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("insert into RiskAssessment", Sql)
         self.assertIn("insert into Recommendation", Sql)
         self.assertIn("insert into Service", Sql)
-        self.assertIn("Servicio Sintetico SqlDemo001 1", Sql)
+        self.assertIn("-SubsistemaDefinido", Sql)
         self.assertIn("'SqlDemo001-Resource-1'", Sql)
         self.assertIn("'Revisar capacidad del host asociado", Sql)
         self.assertEqual(Dataset["Recommendations"][0]["ScopeId"], Dataset["Risks"][0]["ScopeId"])
@@ -101,6 +101,22 @@ class SyntheticDataCliContractTest(unittest.TestCase):
             self.assertRegex(Resource["Name"], r"^SRV-[0-9]{5}$")
             self.assertEqual(Resource["Inventory"]["Alias"], Resource["Name"])
             self.assertEqual(Resource["Inventory"]["AssetTag"], f"SrvDemo001-{Dataset['Resources'].index(Resource) + 1}")
+
+    def test_subsistemas_usan_hostname_mas_subsistema_definido(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("SubsystemDemo001", "mixed", "small", 30, 1)
+
+        self.assertEqual(len(Dataset["Services"]), len(Dataset["Resources"]))
+        for Resource, Service in zip(Dataset["Resources"], Dataset["Services"], strict=True):
+            ExpectedSubsystem = f"{Resource['Name']}-SubsistemaDefinido"
+            self.assertEqual(Service["ServiceId"], ExpectedSubsystem)
+            self.assertEqual(Service["Name"], ExpectedSubsystem)
+
+        FirstSample = Dataset["Samples"][0]
+        self.assertEqual(FirstSample["BusinessServiceId"], f"{FirstSample['HostName']}-SubsistemaDefinido")
+        self.assertEqual(FirstSample["BusinessService"], FirstSample["BusinessServiceId"])
+
+        FirstComponent = Dataset["EnterpriseComponents"][0]
+        self.assertEqual(FirstComponent["BusinessServiceId"], f"{FirstComponent['ComponentName']}-SubsistemaDefinido")
 
     def test_victoriametrics_import_usa_formato_prometheus(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("VmDemo001", "mixed", "small", 30, 1)

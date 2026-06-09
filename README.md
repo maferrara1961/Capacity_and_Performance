@@ -318,6 +318,10 @@ Ese valor se usa como nombre visible y como host name tecnico en Zabbix, y tambi
 catalogo PostgreSQL e inventario junto con asset tag, tipo, sistema operativo, ubicacion y notas del
 lote.
 
+Los subsistemas sinteticos se cargan con nomenclatura `SRV-#####-SubsistemaDefinido`. El mismo valor
+se usa como `ServiceId`, nombre de servicio, `business_service_id` y `business_service`, para que el
+filtro de subsistema en Grafana coincida con el host que lo origino.
+
 La misma identidad de host queda disponible en todas las herramientas:
 
 - Zabbix: `host` y nombre visible `SRV-#####`.

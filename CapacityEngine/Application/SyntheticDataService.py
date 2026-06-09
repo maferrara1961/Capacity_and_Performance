@@ -20,10 +20,9 @@ class SyntheticDataService:
         LoadId = ValidateLoadId(LoadId or self.GenerateLoadId())
         Random = random.Random(f"{Seed}-{LoadId}" if Seed is not None else LoadId)
         ResourceCount = self.VolumeScale[Volume]
-        ServiceCount = max(1, ResourceCount // 2)
         Load = TestLoad.Create(LoadId, Profile, Volume).WithStatus("Running")
-        Services = self.BuildServices(LoadId, ServiceCount, Profile)
         Resources = self.BuildResources(LoadId, ResourceCount, Profile, Random)
+        Services = self.BuildServices(LoadId, Resources, Profile)
         Samples = self.BuildSamples(LoadId, Services, Resources, Profile, Days, Random)
         Kpis = self.BuildKpis(LoadId, Resources, Profile, Random)
         Forecasts = self.BuildForecasts(LoadId, Resources, Profile, Random)
@@ -43,20 +42,23 @@ class SyntheticDataService:
             **Enterprise,
         }
 
-    def BuildServices(self, LoadId: str, Count: int, Profile: str) -> list[dict]:
+    def BuildServices(self, LoadId: str, Resources: list[dict], Profile: str) -> list[dict]:
         Criticalities = ["Low", "Medium", "High", "Critical"]
         return [
             {
-                "ServiceId": f"{LoadId}-Service-{Index}",
+                "ServiceId": self.SubsystemNameFor(Resource),
                 "LoadId": LoadId,
-                "Name": f"Servicio Sintetico {LoadId} {Index}",
+                "Name": self.SubsystemNameFor(Resource),
                 "Owner": "CapacityLab",
                 "Criticality": Criticalities[Index % len(Criticalities)],
                 "Status": self.StatusFor(Profile),
                 "IsTestData": True,
             }
-            for Index in range(1, Count + 1)
+            for Index, Resource in enumerate(Resources, start=1)
         ]
+
+    def SubsystemNameFor(self, Resource: dict) -> str:
+        return f"{Resource['Name']}-SubsistemaDefinido"
 
     def BuildResources(self, LoadId: str, Count: int, Profile: str, Random: random.Random) -> list[dict]:
         Types = ["Server", "Database", "Storage", "Network", "Dependency"]
