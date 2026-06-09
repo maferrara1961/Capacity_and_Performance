@@ -5,5 +5,6 @@ required by platform conventions:
 
 - Containerfile base image names use vendor-provided lowercase image references.
 - Grafana dashboard JSON properties use Grafana schema field names.
+- Grafana metric expressions and legend labels use external datasource naming conventions.
 - SQL object names may preserve platform and query conventions.
 - Metrics labels and query strings may use external metric naming conventions.

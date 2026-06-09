@@ -18,10 +18,10 @@
 
 **Purpose**: Establish the dashboard optimization baseline and protect the Grafana provisioning path.
 
-- [ ] T001 Inspect current dashboard panel inventory and document gaps against `specs/004-grafana-dashboard-optimization/contracts/DashboardCatalogContract.md` in `specs/004-grafana-dashboard-optimization/research.md`
-- [ ] T002 Verify Grafana datasource provisioning remains idempotent and repository-mounted in `Config/Grafana/Datasources/Datasources.yml`
-- [ ] T003 [P] Verify dashboard provider path separation in `Config/Grafana/DashboardProviders/Provisioning.yml`
-- [ ] T004 [P] Verify no new external dependencies are needed by checking `ContainerImages/Grafana/Containerfile` and `Scripts/StackCommon.sh`
+- [X] T001 Inspect current dashboard panel inventory and document gaps against `specs/004-grafana-dashboard-optimization/contracts/DashboardCatalogContract.md` in `specs/004-grafana-dashboard-optimization/research.md`
+- [X] T002 Verify Grafana datasource provisioning remains idempotent and repository-mounted in `Config/Grafana/Datasources/Datasources.yml`
+- [X] T003 [P] Verify dashboard provider path separation in `Config/Grafana/DashboardProviders/Provisioning.yml`
+- [X] T004 [P] Verify no new external dependencies are needed by checking `ContainerImages/Grafana/Containerfile` and `Scripts/StackCommon.sh`
 
 ---
 
@@ -31,11 +31,11 @@
 
 **Critical**: No user story implementation should begin until this phase is complete.
 
-- [ ] T005 [P] Add shared dashboard JSON loading helpers for contract tests in `Tests/Contract/GrafanaDatasourceContractTest.py`
-- [ ] T006 [P] Add required KPI coverage assertions for average, peak, P95, growth, headroom, forecast, days-to-saturation, and baseline in `Tests/Contract/GrafanaDatasourceContractTest.py`
-- [ ] T007 [P] Add verification scenario profile coverage assertions for normal, warning, critical, and mixed in `Tests/Contract/SyntheticDataCliContractTest.py`
-- [ ] T008 Add stack validation checks for optimized dashboard files and provider paths in `Scripts/ValidateStack.sh`
-- [ ] T009 Add documentation placeholder for optimized dashboard usage in `docs/DatosDePruebaSinteticos.md`
+- [X] T005 [P] Add shared dashboard JSON loading helpers for contract tests in `Tests/Contract/GrafanaDatasourceContractTest.py`
+- [X] T006 [P] Add required KPI coverage assertions for average, peak, P95, growth, headroom, forecast, days-to-saturation, and baseline in `Tests/Contract/GrafanaDatasourceContractTest.py`
+- [X] T007 [P] Add verification scenario profile coverage assertions for normal, warning, critical, and mixed in `Tests/Contract/SyntheticDataCliContractTest.py`
+- [X] T008 Add stack validation checks for optimized dashboard files and provider paths in `Scripts/ValidateStack.sh`
+- [X] T009 Add documentation placeholder for optimized dashboard usage in `docs/DatosDePruebaSinteticos.md`
 
 **Checkpoint**: Foundation ready; user story phases can proceed.
 
@@ -49,18 +49,18 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Add executive dashboard contract tests for overall state, top risk, forecast, headroom, and recommendations in `Tests/Contract/ExecutiveDashboardContractTest.py`
-- [ ] T011 [P] [US1] Add executive dashboard integration expectations for critical verification data in `Tests/Integration/ExecutiveCapacityFlowTest.py`
-- [ ] T012 [P] [US1] Add executive panel purpose assertions against `contracts/DashboardCatalogContract.md` in `Tests/Contract/ExecutiveDashboardContractTest.py`
+- [X] T010 [P] [US1] Add executive dashboard contract tests for overall state, top risk, forecast, headroom, and recommendations in `Tests/Contract/ExecutiveDashboardContractTest.py`
+- [X] T011 [P] [US1] Add executive dashboard integration expectations for critical verification data in `Tests/Integration/ExecutiveCapacityFlowTest.py`
+- [X] T012 [P] [US1] Add executive panel purpose assertions against `contracts/DashboardCatalogContract.md` in `Tests/Contract/ExecutiveDashboardContractTest.py`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [US1] Redesign executive stat and summary panels in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
-- [ ] T014 [US1] Add top 5 capacity risk and recommendation table coverage in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
-- [ ] T015 [US1] Add forecast 30/60/90 and days-to-saturation decision panels in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
-- [ ] T016 [US1] Add used capacity versus headroom summary panels in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
-- [ ] T017 [US1] Ensure executive dashboard panel titles and descriptions distinguish missing data from OK state in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
-- [ ] T018 [US1] Validate executive dashboard with `Scripts/RunTests.sh` and document expected manual validation in `specs/004-grafana-dashboard-optimization/quickstart.md`
+- [X] T013 [US1] Redesign executive stat and summary panels in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
+- [X] T014 [US1] Add top 5 capacity risk and recommendation table coverage in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
+- [X] T015 [US1] Add forecast 30/60/90 and days-to-saturation decision panels in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
+- [X] T016 [US1] Add used capacity versus headroom summary panels in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
+- [X] T017 [US1] Ensure executive dashboard panel titles and descriptions distinguish missing data from OK state in `Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json`
+- [X] T018 [US1] Validate executive dashboard with `Scripts/RunTests.sh` and document expected manual validation in `specs/004-grafana-dashboard-optimization/quickstart.md`
 
 **Checkpoint**: User Story 1 is independently testable and provides the MVP.
 
@@ -74,18 +74,18 @@
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Add technical metric coverage tests for CPU, RAM, storage, IOPS, network, latency, throughput, errors, and saturation in `Tests/Contract/TechnicalDashboardContractTest.py`
-- [ ] T020 [P] [US2] Add technical integration expectations for warning and mixed verification data in `Tests/Integration/TechnicalPerformanceFlowTest.py`
-- [ ] T021 [P] [US2] Add top consumer and outlier panel assertions in `Tests/Contract/TechnicalDashboardContractTest.py`
+- [X] T019 [P] [US2] Add technical metric coverage tests for CPU, RAM, storage, IOPS, network, latency, throughput, errors, and saturation in `Tests/Contract/TechnicalDashboardContractTest.py`
+- [X] T020 [P] [US2] Add technical integration expectations for warning and mixed verification data in `Tests/Integration/TechnicalPerformanceFlowTest.py`
+- [X] T021 [P] [US2] Add top consumer and outlier panel assertions in `Tests/Contract/TechnicalDashboardContractTest.py`
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Redesign technical compute and memory panels in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
-- [ ] T023 [US2] Redesign storage, IOPS, and network panels in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
-- [ ] T024 [US2] Add latency, throughput, errors, and saturation diagnostic panels in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
-- [ ] T025 [US2] Add top consumer and outlier tables with service and resource context in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
-- [ ] T026 [US2] Ensure technical dashboard panel titles and legends expose resource, service, metric, and severity context in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
-- [ ] T027 [US2] Validate technical dashboard with `Scripts/RunTests.sh` and update expected validation in `specs/004-grafana-dashboard-optimization/quickstart.md`
+- [X] T022 [US2] Redesign technical compute and memory panels in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
+- [X] T023 [US2] Redesign storage, IOPS, and network panels in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
+- [X] T024 [US2] Add latency, throughput, errors, and saturation diagnostic panels in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
+- [X] T025 [US2] Add top consumer and outlier tables with service and resource context in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
+- [X] T026 [US2] Ensure technical dashboard panel titles and legends expose resource, service, metric, and severity context in `Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json`
+- [X] T027 [US2] Validate technical dashboard with `Scripts/RunTests.sh` and update expected validation in `specs/004-grafana-dashboard-optimization/quickstart.md`
 
 **Checkpoint**: User Story 2 is independently testable and does not require executive dashboard changes beyond shared data.
 
@@ -99,18 +99,18 @@
 
 ### Tests for User Story 3
 
-- [ ] T028 [P] [US3] Add planning dashboard contract tests for growth, headroom, baseline, forecast, and days-to-saturation in `Tests/Contract/CapacityPlanningDashboardContractTest.py`
-- [ ] T029 [P] [US3] Add application/service context contract tests for health, infrastructure, dependencies, and end-to-end performance in `Tests/Contract/ApplicationDashboardContractTest.py`
-- [ ] T030 [P] [US3] Add capacity planning integration expectations for mixed verification data in `Tests/Integration/CapacityPlanningFlowTest.py`
+- [X] T028 [P] [US3] Add planning dashboard contract tests for growth, headroom, baseline, forecast, and days-to-saturation in `Tests/Contract/CapacityPlanningDashboardContractTest.py`
+- [X] T029 [P] [US3] Add application/service context contract tests for health, infrastructure, dependencies, and end-to-end performance in `Tests/Contract/ApplicationDashboardContractTest.py`
+- [X] T030 [P] [US3] Add capacity planning integration expectations for mixed verification data in `Tests/Integration/CapacityPlanningFlowTest.py`
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Redesign capacity planning growth and headroom sections in `Config/Grafana/Dashboards/CapacityPlanningDashboard.json`
-- [ ] T032 [US3] Add overprovisioned and underprovisioned resource classification panels in `Config/Grafana/Dashboards/CapacityPlanningDashboard.json`
-- [ ] T033 [US3] Add baseline comparison and days-to-saturation planning panels in `Config/Grafana/Dashboards/CapacityPlanningDashboard.json`
-- [ ] T034 [US3] Redesign application health and associated infrastructure sections in `Config/Grafana/Dashboards/ApplicationDashboard.json`
-- [ ] T035 [US3] Add critical dependency and end-to-end performance context panels in `Config/Grafana/Dashboards/ApplicationDashboard.json`
-- [ ] T036 [US3] Validate planning and application dashboards with `Scripts/RunTests.sh` and update expected validation in `specs/004-grafana-dashboard-optimization/quickstart.md`
+- [X] T031 [US3] Redesign capacity planning growth and headroom sections in `Config/Grafana/Dashboards/CapacityPlanningDashboard.json`
+- [X] T032 [US3] Add overprovisioned and underprovisioned resource classification panels in `Config/Grafana/Dashboards/CapacityPlanningDashboard.json`
+- [X] T033 [US3] Add baseline comparison and days-to-saturation planning panels in `Config/Grafana/Dashboards/CapacityPlanningDashboard.json`
+- [X] T034 [US3] Redesign application health and associated infrastructure sections in `Config/Grafana/Dashboards/ApplicationDashboard.json`
+- [X] T035 [US3] Add critical dependency and end-to-end performance context panels in `Config/Grafana/Dashboards/ApplicationDashboard.json`
+- [X] T036 [US3] Validate planning and application dashboards with `Scripts/RunTests.sh` and update expected validation in `specs/004-grafana-dashboard-optimization/quickstart.md`
 
 **Checkpoint**: User Story 3 is independently testable and adds service-oriented planning value.
 
@@ -120,15 +120,15 @@
 
 **Purpose**: Validate end-to-end behavior, documentation, and constitutional constraints.
 
-- [ ] T037 [P] Update dashboard usage documentation in `README.md`
-- [ ] T038 [P] Update dashboard administration instructions in `docs/AdministracionDeImagenes.md`
-- [ ] T039 [P] Update synthetic data validation guidance in `docs/DatosDePruebaSinteticos.md`
-- [ ] T040 Run `Scripts/RunTests.sh` and fix any dashboard contract or integration failures
-- [ ] T041 Run `Scripts/ValidateStack.sh` and fix any provisioning validation failures
-- [ ] T042 Run `STACK_DRY_RUN=1 Scripts/StartStack.sh` and confirm Grafana mounts datasource, provider, and dashboard paths
+- [X] T037 [P] Update dashboard usage documentation in `README.md`
+- [X] T038 [P] Update dashboard administration instructions in `docs/AdministracionDeImagenes.md`
+- [X] T039 [P] Update synthetic data validation guidance in `docs/DatosDePruebaSinteticos.md`
+- [X] T040 Run `Scripts/RunTests.sh` and fix any dashboard contract or integration failures
+- [X] T041 Run `Scripts/ValidateStack.sh` and fix any provisioning validation failures
+- [X] T042 Run `STACK_DRY_RUN=1 Scripts/StartStack.sh` and confirm Grafana mounts datasource, provider, and dashboard paths
 - [ ] T043 Execute quickstart validation from `specs/004-grafana-dashboard-optimization/quickstart.md` on a real stack
-- [ ] T044 Verify no new external libraries, SDKs, packages, hosted services, or licensed products were introduced in `ContainerImages/`, `CapacityEngine/`, and `Scripts/`
-- [ ] T045 Verify project-defined symbols and artifacts keep PascalCase or documented external schema exceptions in `docs/PascalCaseExceptions.md`
+- [X] T044 Verify no new external libraries, SDKs, packages, hosted services, or licensed products were introduced in `ContainerImages/`, `CapacityEngine/`, and `Scripts/`
+- [X] T045 Verify project-defined symbols and artifacts keep PascalCase or documented external schema exceptions in `docs/PascalCaseExceptions.md`
 
 ---
 

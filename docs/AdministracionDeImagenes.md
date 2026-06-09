@@ -87,6 +87,13 @@ Generar lotes de verificacion para Grafana, VictoriaMetrics, PostgreSQL y Zabbix
 Scripts/GenerateVerificationBatches.sh DemoFull001
 ```
 
+Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
+
+- `Executive Capacity Dashboard`: decision ejecutiva y acciones priorizadas.
+- `Technical Performance Dashboard`: diagnostico operativo por recurso y metrica.
+- `Capacity Planning Dashboard`: crecimiento, headroom, baseline y sizing.
+- `Application Dashboard`: salud, infraestructura, dependencias y performance end-to-end.
+
 En Zabbix ingresar con `Admin` / `zabbix` y revisar `Monitoring > Latest data` filtrando por el
 grupo `Capacity Synthetic`.
 

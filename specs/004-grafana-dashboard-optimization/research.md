@@ -54,3 +54,25 @@
 
 - Build a custom empty-state service: rejected because it is unnecessary for the current dashboard provisioning scope.
 - Ignore empty states: rejected because users could mistake missing data for healthy conditions.
+
+## Dashboard Inventory And Gap Closure
+
+**Decision**: Treat the four existing dashboard files as the catalog and close gaps in place.
+
+**Rationale**: The current catalog already maps cleanly to the requested audiences:
+
+- `ExecutiveCapacityDashboard.json`: executive capacity decision view.
+- `TechnicalPerformanceDashboard.json`: technical performance diagnosis view.
+- `CapacityPlanningDashboard.json`: capacity planning and sizing view.
+- `ApplicationDashboard.json`: service and application context view.
+
+The initial gap was not the number of dashboards, but panel purpose and signal coverage. The
+optimized catalog closes these gaps with explicit top risk, top consumer, overprovisioned,
+underprovisioned, service risk, forecast, headroom, P95, baseline, and saturation coverage.
+
+**Alternatives considered**:
+
+- Create additional dashboard files: rejected because existing categories already cover the user
+  stories and adding more files would increase navigation cost.
+- Merge planning and application context into one dashboard: rejected because planning users and
+  service owners need different primary views.
