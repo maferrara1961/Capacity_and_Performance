@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import subprocess
 
 from CapacityEngine.Domain.SyntheticData import TestLoad
 
@@ -27,6 +28,8 @@ class SyntheticPostgreSqlAdapter:
         Store["Loads"][LoadId] = Dataset["Load"]
         Store["Datasets"][LoadId] = Dataset
         self.SaveStore(Store)
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            self.ExecuteSql(self.BuildLoadSql(Dataset))
 
     def ListLoads(self, Status: str | None = None) -> list[TestLoad]:
         Store = self.LoadStore()
@@ -44,6 +47,8 @@ class SyntheticPostgreSqlAdapter:
         if LoadId in Store["Loads"]:
             Store["Loads"][LoadId] = TestLoad.FromDict(Store["Loads"][LoadId]).WithStatus("Deleted").ToDict()
         self.SaveStore(Store)
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            self.ExecuteSql(self.BuildDeleteSql(LoadId))
         return self.CountRecords(Dataset)
 
     def DeleteAll(self) -> tuple[int, int]:
@@ -54,6 +59,9 @@ class SyntheticPostgreSqlAdapter:
             RecordCount += self.CountRecords(Store["Datasets"].pop(LoadId, None))
             Store["Loads"][LoadId] = TestLoad.FromDict(Store["Loads"][LoadId]).WithStatus("Deleted").ToDict()
         self.SaveStore(Store)
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            for LoadId in LoadIds:
+                self.ExecuteSql(self.BuildDeleteSql(LoadId))
         return len(LoadIds), RecordCount
 
     def CountRecords(self, Dataset: dict | None) -> int:
@@ -65,3 +73,110 @@ class SyntheticPostgreSqlAdapter:
         if LoadId:
             return self.GetDataset(LoadId) is not None
         return bool(self.ListLoads())
+
+    def ExecuteSql(self, Sql: str) -> None:
+        PodmanBin = os.environ.get("PODMAN_BIN", "podman")
+        Container = os.environ.get("POSTGRES_CONTAINER", "capacity-performance-postgresql")
+        Command = [PodmanBin, "exec", "-i", Container, "psql", "-U", "capacity", "-d", "capacity", "-v", "ON_ERROR_STOP=1"]
+        Result = subprocess.run(Command, input=Sql, text=True, capture_output=True)
+        if Result.returncode != 0:
+            raise RuntimeError(f"PostgreSQL rechazo la carga sintetica: {Result.stderr.strip()}")
+
+    def BuildLoadSql(self, Dataset: dict) -> str:
+        Lines = [
+            (Path("Sql/Schema/001_Catalog.sql")).read_text(encoding="utf-8"),
+            (Path("Sql/Schema/002_CapacityOutputs.sql")).read_text(encoding="utf-8"),
+            (Path("Sql/Schema/003_TestDataLoads.sql")).read_text(encoding="utf-8"),
+        ]
+        Load = Dataset["Load"]
+        Lines.append(
+            "insert into TestLoad (LoadId, ScenarioProfile, RequestedVolume, CreatedAt, FinishedAt, Status, "
+            "GeneratedServiceCount, GeneratedResourceCount, GeneratedMetricSampleCount, GeneratedKpiCount, "
+            "GeneratedForecastCount, GeneratedRiskCount, GeneratedRecommendationCount, ErrorMessage, IsTestData) "
+            f"values ({self.Q(Load['LoadId'])}, {self.Q(Load['ScenarioProfile'])}, {self.Q(Load['RequestedVolume'])}, "
+            f"{self.Q(Load['CreatedAt'])}, {self.Q(Load['FinishedAt'])}, {self.Q(Load['Status'])}, "
+            f"{Load['GeneratedServiceCount']}, {Load['GeneratedResourceCount']}, {Load['GeneratedMetricSampleCount']}, "
+            f"{Load['GeneratedKpiCount']}, {Load['GeneratedForecastCount']}, {Load['GeneratedRiskCount']}, "
+            f"{Load['GeneratedRecommendationCount']}, {self.Q(Load['ErrorMessage'])}, true) "
+            "on conflict (LoadId) do update set Status = excluded.Status;"
+        )
+        for Service in Dataset["Services"]:
+            Lines.append(
+                "insert into Service (ServiceId, Name, Owner, Criticality, Status) values "
+                f"({self.Q(Service['ServiceId'])}, {self.Q(Service['Name'])}, {self.Q(Service['Owner'])}, "
+                f"{self.Q(Service['Criticality'])}, {self.Q(Service['Status'])}) on conflict (ServiceId) do nothing;"
+            )
+        for Index, Service in enumerate(Dataset["Services"], start=1):
+            ApplicationId = f"{Load['LoadId']}-Application-{Index}"
+            Lines.append(
+                "insert into Application (ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus) values "
+                f"({self.Q(ApplicationId)}, {self.Q(Service['ServiceId'])}, {self.Q('Aplicacion Sintetica ' + str(Index))}, "
+                f"{self.Q('Demo')}, {self.Q(Service['Status'])}, {self.Q(Service['Status'])}) on conflict (ApplicationId) do nothing;"
+            )
+        for Resource in Dataset["Resources"]:
+            Lines.append(
+                "insert into MonitoredResource (ResourceId, ResourceType, Name, Platform, CapacityUnit, TotalCapacity, Status) values "
+                f"({self.Q(Resource['ResourceId'])}, {self.Q(Resource['ResourceType'])}, {self.Q(Resource['Name'])}, "
+                f"{self.Q(Resource['Platform'])}, {self.Q(Resource['CapacityUnit'])}, {Resource['TotalCapacity']}, {self.Q(Resource['Status'])}) "
+                "on conflict (ResourceId) do nothing;"
+            )
+        for Index, Resource in enumerate(Dataset["Resources"], start=1):
+            Service = Dataset["Services"][(Index - 1) % len(Dataset["Services"])]
+            Lines.append(
+                "insert into ServiceResourceMap (MapId, ServiceId, ResourceId, Role, ImpactWeight) values "
+                f"({self.Q(Load['LoadId'] + '-Map-' + str(Index))}, {self.Q(Service['ServiceId'])}, {self.Q(Resource['ResourceId'])}, "
+                f"{self.Q(Resource['ResourceType'])}, 50) on conflict (MapId) do nothing;"
+            )
+        for Kpi in Dataset["Kpis"]:
+            Lines.append(
+                "insert into CapacityKpi (CapacityKpiId, ResourceId, MetricName, CalculatedAt, WindowStart, WindowEnd, "
+                "AverageUtilization, PeakUtilization, P95Utilization, MonthlyGrowthRate, HeadroomAvailable, BaselineDelta) values "
+                f"({self.Q(Kpi['KpiId'])}, {self.Q(Kpi['ResourceId'])}, {self.Q(Kpi['MetricName'])}, {self.Q(Kpi['CalculatedAt'])}, "
+                f"{self.Q(Kpi['CalculatedAt'])}, {self.Q(Kpi['CalculatedAt'])}, {Kpi['AverageUtilization']}, {Kpi['PeakUtilization']}, "
+                f"{Kpi['P95Utilization']}, {Kpi['MonthlyGrowthRate']}, {Kpi['HeadroomAvailable']}, 0) on conflict (CapacityKpiId) do nothing;"
+            )
+        for Forecast in Dataset["Forecasts"]:
+            Lines.append(
+                "insert into ForecastResult (ForecastResultId, ResourceId, MetricName, CalculatedAt, Forecast30Days, Forecast60Days, "
+                "Forecast90Days, DaysToSaturation, Confidence) values "
+                f"({self.Q(Forecast['ForecastId'])}, {self.Q(Forecast['ResourceId'])}, {self.Q(Forecast['MetricName'])}, "
+                f"{self.Q(Forecast['CalculatedAt'])}, {Forecast['Forecast30Days']}, {Forecast['Forecast60Days']}, "
+                f"{Forecast['Forecast90Days']}, {Forecast['DaysToSaturation']}, {self.Q(Forecast['Confidence'])}) "
+                "on conflict (ForecastResultId) do nothing;"
+            )
+        for Risk in Dataset["Risks"]:
+            Lines.append(
+                "insert into RiskAssessment (RiskAssessmentId, ScopeType, ScopeId, OverallRisk, Reason, CalculatedAt) values "
+                f"({self.Q(Risk['RiskAssessmentId'])}, {self.Q(Risk['ScopeType'])}, {self.Q(Risk['ScopeId'])}, "
+                f"{self.Q(Risk['OverallRisk'])}, {self.Q(Risk['Reason'])}, {self.Q(Risk['CalculatedAt'])}) "
+                "on conflict (RiskAssessmentId) do nothing;"
+            )
+        for Recommendation in Dataset["Recommendations"]:
+            Lines.append(
+                "insert into Recommendation (RecommendationId, RiskAssessmentId, ScopeType, ScopeId, Priority, Action, Reason, Status) values "
+                f"({self.Q(Recommendation['RecommendationId'])}, {self.Q(Recommendation['RiskAssessmentId'])}, {self.Q('Resource')}, "
+                f"{self.Q(Recommendation['RiskAssessmentId'])}, {self.Q(Recommendation['Priority'])}, {self.Q(Recommendation['Action'])}, "
+                f"{self.Q(Recommendation['Reason'])}, {self.Q(Recommendation['Status'])}) on conflict (RecommendationId) do nothing;"
+            )
+        return "\n".join(Lines)
+
+    def BuildDeleteSql(self, LoadId: str) -> str:
+        Prefix = self.Q(f"{LoadId}%")
+        Exact = self.Q(LoadId)
+        return "\n".join(
+            [
+                f"delete from Recommendation where RecommendationId like {Prefix};",
+                f"delete from RiskAssessment where RiskAssessmentId like {Prefix};",
+                f"delete from ForecastResult where ForecastResultId like {Prefix};",
+                f"delete from CapacityKpi where CapacityKpiId like {Prefix};",
+                f"delete from ServiceResourceMap where MapId like {Prefix};",
+                f"delete from Application where ApplicationId like {Prefix};",
+                f"delete from MonitoredResource where ResourceId like {Prefix};",
+                f"delete from Service where ServiceId like {Prefix};",
+                f"delete from TestDataRecordMap where LoadId = {Exact};",
+                f"delete from TestLoad where LoadId = {Exact};",
+            ]
+        )
+
+    def Q(self, Value: str) -> str:
+        return "'" + str(Value).replace("'", "''") + "'"

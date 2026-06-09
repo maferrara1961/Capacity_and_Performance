@@ -1,17 +1,21 @@
 import json
 import os
 from pathlib import Path
+from urllib import request
 
 
 class SyntheticVictoriaMetricsAdapter:
-    def __init__(self, DataDir: str | None = None) -> None:
+    def __init__(self, DataDir: str | None = None, BaseUrl: str | None = None) -> None:
         self.DataDir = Path(DataDir or os.environ.get("SYNTHETIC_DATA_DIR", ".capacity-test-data"))
         self.DataPath = self.DataDir / "VictoriaMetricsSamples.json"
+        self.BaseUrl = (BaseUrl or os.environ.get("VICTORIAMETRICS_URL", "http://localhost:8428")).rstrip("/")
 
     def SaveSamples(self, LoadId: str, Samples: list[dict]) -> None:
         Store = self.LoadStore()
         Store[LoadId] = Samples
         self.SaveStore(Store)
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            self.ImportSamples(Samples)
 
     def DeleteSamples(self, LoadId: str) -> int:
         Store = self.LoadStore()
@@ -30,6 +34,30 @@ class SyntheticVictoriaMetricsAdapter:
         if LoadId:
             return bool(Store.get(LoadId))
         return any(Store.values())
+
+    def ImportSamples(self, Samples: list[dict]) -> None:
+        Lines = []
+        for Sample in Samples:
+            MetricName = self.NormalizeMetricName(Sample["MetricName"])
+            Labels = (
+                f'load_id="{Sample["LoadId"]}",'
+                f'resource_id="{Sample["ResourceId"]}",'
+                f'source="{Sample["Source"]}"'
+            )
+            Lines.append(f'{MetricName}{{{Labels}}} {Sample["Value"]}')
+        Body = ("\n".join(Lines) + "\n").encode("utf-8")
+        Request = request.Request(
+            f"{self.BaseUrl}/api/v1/import/prometheus",
+            data=Body,
+            method="POST",
+            headers={"Content-Type": "text/plain"},
+        )
+        with request.urlopen(Request, timeout=10) as Response:
+            if Response.status >= 300:
+                raise RuntimeError(f"VictoriaMetrics rechazo la carga: HTTP {Response.status}")
+
+    def NormalizeMetricName(self, MetricName: str) -> str:
+        return "synthetic_" + "".join(Character.lower() if Character.isalnum() else "_" for Character in MetricName)
 
     def LoadStore(self) -> dict:
         if not self.DataPath.exists():

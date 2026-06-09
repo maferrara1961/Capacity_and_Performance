@@ -4,6 +4,10 @@ El stack incluye un comando operativo para generar, listar, validar y borrar dat
 monitoreo, performance y capacity. El objetivo es validar dashboards y herramientas instaladas sin
 usar mediciones reales.
 
+Cuando el stack esta iniciado, la carga escribe datos en PostgreSQL para los paneles SQL de Grafana
+y publica series en VictoriaMetrics para los paneles tecnicos. En `STACK_DRY_RUN=1`, la carga queda
+limitada al almacenamiento local de prueba.
+
 ## Cargar Datos
 
 ```bash

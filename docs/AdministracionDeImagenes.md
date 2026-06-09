@@ -47,6 +47,13 @@ Usuario: admin
 Password: admin
 ```
 
+Credenciales por defecto para Zabbix Web:
+
+```text
+Usuario: Admin
+Password: zabbix
+```
+
 En servidores remotos, reemplazar `localhost` por la IP publica o nombre DNS del servidor. Tambien
 se deben habilitar los puertos en el firewall local y en las reglas de red del proveedor cloud.
 

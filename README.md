@@ -173,6 +173,13 @@ Usuario: admin
 Password: admin
 ```
 
+Credenciales por defecto para Zabbix Web:
+
+```text
+Usuario: Admin
+Password: zabbix
+```
+
 Para una instancia remota de Ubuntu, reemplazar `localhost` por la IP publica o nombre DNS del
 servidor, por ejemplo `http://IP_DEL_SERVIDOR:3000`. En Oracle Cloud, AWS, Azure u otro proveedor,
 abrir los puertos requeridos en el firewall del sistema operativo y en las reglas de red del
@@ -201,7 +208,8 @@ Grafana -> capacity-performance-postgresql:5432
 ZabbixWeb -> capacity-performance-zabbix-server:10051
 ZabbixWeb -> capacity-performance-postgresql:5432
 ZabbixServer -> capacity-performance-postgresql:5432
-CapacityEngine -> PostgreSQL y VictoriaMetrics (pendiente de integracion con datos reales)
+ManageTestData -> PostgreSQL y VictoriaMetrics
+CapacityEngine -> PostgreSQL y VictoriaMetrics
 ```
 
 Consultar estado:
@@ -248,7 +256,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 55 tests OK
+Scripts/RunTests.sh        -> 57 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```
