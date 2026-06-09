@@ -5,6 +5,22 @@
   "schemaVersion": 39,
   "version": 3,
   "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "LoadId",
+        "label": "Lote",
+        "type": "query",
+        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {"selected": true, "text": "All", "value": "$__all"}
+      }
+    ]
+  },
   "panels": [
     {
       "id": 100,
@@ -24,7 +40,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application order by Name"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application where ApplicationId ~ '^(${LoadId:regex})' order by Name"}]
     },
     {
       "id": 2,
@@ -33,7 +49,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ServiceId, ApplicationId, ResourceId, Role, ImpactWeight from ServiceResourceMap order by ServiceId, ResourceId"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ServiceId, ApplicationId, ResourceId, Role, ImpactWeight from ServiceResourceMap where MapId ~ '^(${LoadId:regex})' order by ServiceId, ResourceId"}]
     },
     {
       "id": 3,
@@ -42,7 +58,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeType, ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeType, ScopeId, OverallRisk, Reason from RiskAssessment where RiskAssessmentId ~ '^(${LoadId:regex})' and OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc"}]
     },
     {
       "id": 4,
@@ -52,9 +68,9 @@
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 9, "w": 16, "x": 0, "y": 12},
       "targets": [
-        {"refId": "A", "expr": "synthetic_latency", "legendFormat": "latency {{resource_id}} {{load_id}}"},
-        {"refId": "B", "expr": "synthetic_throughput", "legendFormat": "throughput {{resource_id}} {{load_id}}"},
-        {"refId": "C", "expr": "synthetic_errors", "legendFormat": "errors {{resource_id}} {{load_id}}"}
+        {"refId": "A", "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\"}", "legendFormat": "latency {{resource_id}} {{load_id}}"},
+        {"refId": "B", "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\"}", "legendFormat": "throughput {{resource_id}} {{load_id}}"},
+        {"refId": "C", "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\"}", "legendFormat": "errors {{resource_id}} {{load_id}}"}
       ]
     },
     {
@@ -64,7 +80,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 9, "w": 8, "x": 16, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId and m.MapId ~ '^(${LoadId:regex})' where r.RiskAssessmentId ~ '^(${LoadId:regex})' order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"}]
     }
   ]
 }

@@ -93,6 +93,10 @@ Generar historia diaria de 30, 60 y 90 dias para validar tendencias y forecast:
 Scripts/GenerateHistoricalVerificationBatches.sh HistoryFull001
 ```
 
+En Grafana usar el filtro `Lote`; `All` muestra todos los lotes cargados. En Zabbix revisar los
+hosts del grupo `Capacity Synthetic`, sus graficos `Capacity Synthetic - <host>` y los triggers
+Warning/Critical generados por metrica.
+
 Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
 
 - Cada dashboard comienza con `Como leer este dashboard`, que explica que muestra cada vista, como

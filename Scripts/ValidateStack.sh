@@ -75,6 +75,16 @@ if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards/*.json >/dev/null 2>&1;
   exit 1
 fi
 
+if ! grep -R '"name": "LoadId"' Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  echo "Dashboards no declaran filtro de lote LoadId" >&2
+  exit 1
+fi
+
+if ! grep -R 'load_id=~\\"${LoadId:regex}\\"' Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  echo "Dashboards no filtran series VictoriaMetrics por lote" >&2
+  exit 1
+fi
+
 for ExpectedText in "Top 5 Capacity Risks" "Top Consumers And Outliers" "Overprovisioned Resources" "Service Capacity Risk"; do
   if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
     echo "Falta panel optimizado requerido: $ExpectedText" >&2

@@ -110,6 +110,10 @@ Este script crea lotes como `HistoryFull001-30d-critical`, `HistoryFull001-60d-w
 Grafana y VictoriaMetrics tengan datos historicos suficientes en paneles de tendencia,
 percentil 95, forecast 30/60/90, saturacion y capacity planning.
 
+En Grafana, usar el filtro `Lote`: `All` muestra todos los lotes y un lote especifico filtra todos
+los cuadros SQL y series de VictoriaMetrics. En Zabbix se crean hosts sinteticos con items,
+graficos por host y triggers Warning/Critical para validar alertamientos.
+
 Para validar dashboards optimizados, usar un prefijo nuevo y revisar la carpeta `Capacity` en
 Grafana:
 

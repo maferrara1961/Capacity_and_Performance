@@ -5,6 +5,22 @@
   "schemaVersion": 39,
   "version": 3,
   "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "LoadId",
+        "label": "Lote",
+        "type": "query",
+        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {"selected": true, "text": "All", "value": "$__all"}
+      }
+    ]
+  },
   "panels": [
     {
       "id": 100,
@@ -24,7 +40,7 @@
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 7, "w": 8, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "expr": "synthetic_cpu", "legendFormat": "CPU {{resource_id}} {{load_id}}"}]
+      "targets": [{"refId": "A", "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\"}", "legendFormat": "CPU {{resource_id}} {{load_id}}"}]
     },
     {
       "id": 2,
@@ -33,7 +49,7 @@
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 7, "w": 8, "x": 8, "y": 4},
-      "targets": [{"refId": "A", "expr": "synthetic_ram", "legendFormat": "RAM {{resource_id}} {{load_id}}"}]
+      "targets": [{"refId": "A", "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\"}", "legendFormat": "RAM {{resource_id}} {{load_id}}"}]
     },
     {
       "id": 3,
@@ -42,7 +58,7 @@
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 7, "w": 8, "x": 16, "y": 4},
-      "targets": [{"refId": "A", "expr": "synthetic_storage", "legendFormat": "Storage {{resource_id}} {{load_id}}"}]
+      "targets": [{"refId": "A", "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Storage {{resource_id}} {{load_id}}"}]
     },
     {
       "id": 4,
@@ -52,8 +68,8 @@
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 11},
       "targets": [
-        {"refId": "A", "expr": "synthetic_iops", "legendFormat": "IOPS {{resource_id}} {{load_id}}"},
-        {"refId": "B", "expr": "synthetic_network", "legendFormat": "Network {{resource_id}} {{load_id}}"}
+        {"refId": "A", "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\"}", "legendFormat": "IOPS {{resource_id}} {{load_id}}"},
+        {"refId": "B", "expr": "synthetic_network{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Network {{resource_id}} {{load_id}}"}
       ]
     },
     {
@@ -64,9 +80,9 @@
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 8, "w": 12, "x": 12, "y": 11},
       "targets": [
-        {"refId": "A", "expr": "synthetic_latency", "legendFormat": "Latency {{resource_id}} {{load_id}}"},
-        {"refId": "B", "expr": "synthetic_throughput", "legendFormat": "Throughput {{resource_id}} {{load_id}}"},
-        {"refId": "C", "expr": "synthetic_errors", "legendFormat": "Errors {{resource_id}} {{load_id}}"}
+        {"refId": "A", "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Latency {{resource_id}} {{load_id}}"},
+        {"refId": "B", "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Throughput {{resource_id}} {{load_id}}"},
+        {"refId": "C", "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Errors {{resource_id}} {{load_id}}"}
       ]
     },
     {
@@ -76,7 +92,7 @@
       "type": "timeseries",
       "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
       "gridPos": {"h": 7, "w": 8, "x": 0, "y": 19},
-      "targets": [{"refId": "A", "expr": "synthetic_saturation", "legendFormat": "Saturation {{resource_id}} {{load_id}}"}]
+      "targets": [{"refId": "A", "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Saturation {{resource_id}} {{load_id}}"}]
     },
     {
       "id": 7,
@@ -85,7 +101,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 7, "w": 8, "x": 8, "y": 19},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, AverageUtilization, PeakUtilization, P95Utilization from CapacityKpi order by P95Utilization desc, CalculatedAt desc limit 50"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ResourceId, MetricName, AverageUtilization, PeakUtilization, P95Utilization from CapacityKpi where CapacityKpiId ~ '^(${LoadId:regex})' order by P95Utilization desc, CalculatedAt desc limit 50"}]
     },
     {
       "id": 8,
@@ -94,7 +110,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 7, "w": 8, "x": 16, "y": 19},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, k.ResourceId, k.MetricName, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId order by k.P95Utilization desc, k.PeakUtilization desc limit 20"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"}]
     },
     {
       "id": 9,
@@ -103,7 +119,7 @@
       "type": "table",
       "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
       "gridPos": {"h": 7, "w": 24, "x": 0, "y": 26},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeId, OverallRisk, Reason, CalculatedAt from RiskAssessment where OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc limit 50"}]
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeId, OverallRisk, Reason, CalculatedAt from RiskAssessment where RiskAssessmentId ~ '^(${LoadId:regex})' and OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc limit 50"}]
     }
   ]
 }

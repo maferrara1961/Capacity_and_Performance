@@ -35,6 +35,10 @@ Cada lote incluye muestras diarias aleatorias por recurso y metrica para validar
 percentil 95, forecast 30/60/90, saturacion, capacity planning y paneles tecnicos en Grafana y
 VictoriaMetrics.
 
+Los dashboards de Grafana incluyen el filtro `Lote`. Seleccionar `All` muestra todos los lotes
+cargados; seleccionar un lote como `HistoryFull001-90d-critical` filtra PostgreSQL y
+VictoriaMetrics con el mismo identificador.
+
 El script genera lotes `normal`, `warning`, `critical` y `mixed`. Para Zabbix usa la API web
 en `http://localhost:8080/api_jsonrpc.php` con `ZABBIX_USER=Admin` y `ZABBIX_PASSWORD=zabbix`
 por defecto.
@@ -50,8 +54,10 @@ En Grafana, cada dashboard incluye un cuadro informativo inicial `Como leer este
 cuadro explica que muestra la vista, como interpretar los resultados y que accion sugerida tomar.
 
 Antes de recrear cada lote, el script intenta borrar el lote con el mismo identificador para que la
-ejecucion sea repetible. Si Zabbix rechaza muestras historicas por permisos o cache de configuracion,
-la carga continua con hosts/items sinteticos creados para validar `Monitoring > Latest data`.
+ejecucion sea repetible. En Zabbix se crean hosts, items, graficos por host y triggers
+Warning/Critical para validar `Monitoring > Latest data`, `Monitoring > Hosts` y los alertamientos.
+Si Zabbix rechaza muestras historicas por permisos o cache de configuracion, la carga continua con
+hosts/items/graficos sinteticos creados.
 
 Perfiles permitidos:
 

@@ -70,9 +70,20 @@ class SyntheticPostgreSqlAdapter:
         return sum(len(Value) for Key, Value in Dataset.items() if Key != "Load" and isinstance(Value, list)) + 1
 
     def HasData(self, LoadId: str | None = None) -> bool:
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            return self.HasRemoteData(LoadId)
         if LoadId:
             return self.GetDataset(LoadId) is not None
         return bool(self.ListLoads())
+
+    def HasRemoteData(self, LoadId: str | None = None) -> bool:
+        Where = ""
+        if LoadId:
+            SafeLoadId = LoadId.replace("'", "''")
+            Where = f" where LoadId = '{SafeLoadId}'"
+        Sql = f"select exists(select 1 from TestLoad{Where});"
+        Result = self.ExecuteSqlQuery(Sql)
+        return Result.lower() in {"t", "true", "1"}
 
     def ExecuteSql(self, Sql: str) -> None:
         PodmanBin = os.environ.get("PODMAN_BIN", "podman")
@@ -81,6 +92,15 @@ class SyntheticPostgreSqlAdapter:
         Result = subprocess.run(Command, input=Sql, text=True, capture_output=True)
         if Result.returncode != 0:
             raise RuntimeError(f"PostgreSQL rechazo la carga sintetica: {Result.stderr.strip()}")
+
+    def ExecuteSqlQuery(self, Sql: str) -> str:
+        PodmanBin = os.environ.get("PODMAN_BIN", "podman")
+        Container = os.environ.get("POSTGRES_CONTAINER", "capacity-performance-postgresql")
+        Command = [PodmanBin, "exec", "-i", Container, "psql", "-U", "capacity", "-d", "capacity", "-tAc", Sql]
+        Result = subprocess.run(Command, text=True, capture_output=True)
+        if Result.returncode != 0:
+            raise RuntimeError(f"PostgreSQL rechazo la validacion sintetica: {Result.stderr.strip()}")
+        return Result.stdout.strip()
 
     def BuildLoadSql(self, Dataset: dict) -> str:
         Lines = [
@@ -121,11 +141,13 @@ class SyntheticPostgreSqlAdapter:
                 "on conflict (ResourceId) do nothing;"
             )
         for Index, Resource in enumerate(Dataset["Resources"], start=1):
-            Service = Dataset["Services"][(Index - 1) % len(Dataset["Services"])]
+            ServiceIndex = (Index - 1) % len(Dataset["Services"])
+            Service = Dataset["Services"][ServiceIndex]
+            ApplicationId = f"{Load['LoadId']}-Application-{ServiceIndex + 1}"
             Lines.append(
-                "insert into ServiceResourceMap (MapId, ServiceId, ResourceId, Role, ImpactWeight) values "
-                f"({self.Q(Load['LoadId'] + '-Map-' + str(Index))}, {self.Q(Service['ServiceId'])}, {self.Q(Resource['ResourceId'])}, "
-                f"{self.Q(Resource['ResourceType'])}, 50) on conflict (MapId) do nothing;"
+                "insert into ServiceResourceMap (MapId, ServiceId, ApplicationId, ResourceId, Role, ImpactWeight) values "
+                f"({self.Q(Load['LoadId'] + '-Map-' + str(Index))}, {self.Q(Service['ServiceId'])}, {self.Q(ApplicationId)}, "
+                f"{self.Q(Resource['ResourceId'])}, {self.Q(Resource['ResourceType'])}, 50) on conflict (MapId) do nothing;"
             )
         for Kpi in Dataset["Kpis"]:
             Lines.append(

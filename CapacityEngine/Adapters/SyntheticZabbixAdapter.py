@@ -59,8 +59,11 @@ class SyntheticZabbixAdapter:
         History = []
         for Resource in Dataset["Resources"]:
             HostId = self.EnsureHost(Token, GroupId, Resource)
+            ItemIds = []
             for Sample in LatestSamples.get(Resource["ResourceId"], {}).values():
-                self.EnsureItem(Token, HostId, Sample)
+                ItemId = self.EnsureItem(Token, HostId, Sample)
+                ItemIds.append(ItemId)
+                self.EnsureTriggers(Token, Resource["ResourceId"], Sample)
                 History.append(
                     {
                         "host": Resource["ResourceId"],
@@ -70,6 +73,7 @@ class SyntheticZabbixAdapter:
                         "ns": 0,
                     }
                 )
+            self.EnsureGraph(Token, HostId, Resource["Name"], ItemIds)
         for Chunk in self.Chunks(History, 100):
             Result = self.ApiCall(Token, "history.push", Chunk)
             Errors = [Item for Item in Result.get("data", []) if Item.get("error")]
@@ -142,6 +146,66 @@ class SyntheticZabbixAdapter:
             },
         )
         return Created["itemids"][0]
+
+    def EnsureGraph(self, Token: str, HostId: str, ResourceName: str, ItemIds: list[str]) -> str | None:
+        if not ItemIds:
+            return None
+        Name = f"Capacity Synthetic - {ResourceName}"
+        Existing = self.ApiCall(Token, "graph.get", {"output": ["graphid"], "hostids": HostId, "filter": {"name": [Name]}})
+        if Existing:
+            return Existing[0]["graphid"]
+        Colors = ["199C0D", "F2CC0C", "E24D42", "1F78C1", "BA43A9", "705DA0", "508642", "CCA300", "447EBC"]
+        Created = self.ApiCall(
+            Token,
+            "graph.create",
+            {
+                "name": Name,
+                "width": 900,
+                "height": 200,
+                "gitems": [
+                    {
+                        "itemid": ItemId,
+                        "color": Colors[Index % len(Colors)],
+                    }
+                    for Index, ItemId in enumerate(ItemIds)
+                ],
+            },
+        )
+        return Created["graphids"][0]
+
+    def EnsureTriggers(self, Token: str, HostName: str, Sample: dict) -> None:
+        Thresholds = self.TriggerThresholds(Sample["MetricName"])
+        if not Thresholds:
+            return
+        Key = self.ItemKey(Sample["MetricName"])
+        for SeverityName, Priority, Value in Thresholds:
+            Description = f"Capacity Synthetic {SeverityName} {Sample['MetricName']} - {HostName}"
+            Existing = self.ApiCall(Token, "trigger.get", {"output": ["triggerid"], "filter": {"description": [Description]}})
+            if Existing:
+                continue
+            self.ApiCall(
+                Token,
+                "trigger.create",
+                {
+                    "description": Description,
+                    "expression": f"last(/{HostName}/{Key})>{Value}",
+                    "priority": Priority,
+                    "comments": f"Alerta sintetica de capacity para validar dashboards y graficas por host. Umbral {SeverityName}: {Value}.",
+                },
+            )
+
+    def TriggerThresholds(self, MetricName: str) -> list[tuple[str, int, int]]:
+        Thresholds = {
+            "CPU": [("Warning", 2, 75), ("Critical", 4, 90)],
+            "RAM": [("Warning", 2, 75), ("Critical", 4, 90)],
+            "Storage": [("Warning", 2, 75), ("Critical", 4, 90)],
+            "IOPS": [("Warning", 2, 75), ("Critical", 4, 90)],
+            "Network": [("Warning", 2, 75), ("Critical", 4, 90)],
+            "Saturation": [("Warning", 2, 70), ("Critical", 4, 85)],
+            "Latency": [("Warning", 2, 70), ("Critical", 4, 90)],
+            "Errors": [("Warning", 2, 5), ("Critical", 4, 10)],
+        }
+        return Thresholds.get(MetricName, [])
 
     def ApiCall(self, Token: str | None, Method: str, Params) -> object:
         Payload = {"jsonrpc": "2.0", "method": Method, "params": Params, "id": 1}

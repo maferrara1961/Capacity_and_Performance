@@ -88,6 +88,33 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
             self.assertIn("Como interpretarlo", Content)
             self.assertIn("Accion sugerida", Content)
 
+    def test_dashboards_tienen_filtro_de_lote_con_all(self):
+        for DashboardPath in DashboardDirectory.glob("*.json"):
+            Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
+            Variables = Dashboard.get("templating", {}).get("list", [])
+            LoadVariables = [Variable for Variable in Variables if Variable.get("name") == "LoadId"]
+            self.assertTrue(LoadVariables, DashboardPath.name)
+            Variable = LoadVariables[0]
+            self.assertTrue(Variable.get("includeAll"), DashboardPath.name)
+            self.assertEqual(Variable.get("allValue"), ".*", DashboardPath.name)
+            self.assertIn("TestLoad", Variable.get("query", ""), DashboardPath.name)
+
+    def test_paneles_filtran_por_lote(self):
+        for DashboardPath in DashboardDirectory.glob("*.json"):
+            Text = DashboardText(DashboardPath.name)
+            self.assertIn("LoadId", Text, DashboardPath.name)
+            if "TechnicalPerformance" in DashboardPath.name or "Application" in DashboardPath.name or "CapacityPlanning" in DashboardPath.name:
+                self.assertIn('load_id=~\\"${LoadId:regex}\\"', Text, DashboardPath.name)
+            self.assertIn("${LoadId:regex}", Text, DashboardPath.name)
+
+    def test_dashboard_tecnico_expone_average_y_top_consumers(self):
+        Dashboard = LoadDashboard("TechnicalPerformanceDashboard.json")
+        AveragePanel = PanelByTitle(Dashboard, "Average Peak P95")
+        TopPanel = PanelByTitle(Dashboard, "Top Consumers And Outliers")
+        self.assertIn("AverageUtilization", AveragePanel["targets"][0]["rawSql"])
+        self.assertIn("AverageUtilization", TopPanel["targets"][0]["rawSql"])
+        self.assertIn("P95Utilization", TopPanel["targets"][0]["rawSql"])
+
 
 if __name__ == "__main__":
     unittest.main()

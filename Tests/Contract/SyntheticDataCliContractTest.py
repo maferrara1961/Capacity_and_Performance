@@ -79,6 +79,8 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         Adapter = SyntheticZabbixAdapter()
         self.assertEqual(Adapter.ItemKey("CPU"), "capacity.synthetic[cpu]")
         self.assertEqual(Adapter.ItemKey("Network IOPS"), "capacity.synthetic[network_iops]")
+        self.assertTrue(Adapter.TriggerThresholds("CPU"))
+        self.assertTrue(Adapter.TriggerThresholds("Saturation"))
 
     def test_zabbix_latest_samples_por_recurso_y_metrica(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxDemo001", "mixed", "small", 30, 1)
@@ -86,6 +88,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         ResourceId = Dataset["Resources"][0]["ResourceId"]
         self.assertIn("CPU", Latest[ResourceId])
         self.assertEqual(Latest[ResourceId]["CPU"]["LoadId"], "ZbxDemo001")
+
+    def test_zabbix_adapter_expone_graficos_y_alertas_por_host(self):
+        Adapter = SyntheticZabbixAdapter()
+        self.assertTrue(hasattr(Adapter, "EnsureGraph"))
+        self.assertTrue(hasattr(Adapter, "EnsureTriggers"))
+        CpuThresholds = Adapter.TriggerThresholds("CPU")
+        self.assertIn(("Warning", 2, 75), CpuThresholds)
+        self.assertIn(("Critical", 4, 90), CpuThresholds)
 
     def test_script_de_lotes_de_verificacion_existe(self):
         Script = ROOT / "Scripts" / "GenerateVerificationBatches.sh"
