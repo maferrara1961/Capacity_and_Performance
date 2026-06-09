@@ -8,6 +8,7 @@ VOLUME="${VERIFY_VOLUME:-small}"
 RunLoad() {
   Profile="$1"
   LoadId="${PREFIX}-${Profile}"
+  "$SCRIPT_DIR/ManageTestData.sh" delete --load-id "$LoadId" >/dev/null 2>&1 || true
   "$SCRIPT_DIR/ManageTestData.sh" load --profile "$Profile" --volume "$VOLUME" --load-id "$LoadId"
   "$SCRIPT_DIR/ManageTestData.sh" validate --load-id "$LoadId"
 }

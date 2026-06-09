@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from datetime import datetime
 from pathlib import Path
 from urllib import request
@@ -59,10 +60,11 @@ class SyntheticZabbixAdapter:
         for Resource in Dataset["Resources"]:
             HostId = self.EnsureHost(Token, GroupId, Resource)
             for Sample in LatestSamples.get(Resource["ResourceId"], {}).values():
-                ItemId = self.EnsureItem(Token, HostId, Sample)
+                self.EnsureItem(Token, HostId, Sample)
                 History.append(
                     {
-                        "itemid": ItemId,
+                        "host": Resource["ResourceId"],
+                        "key": self.ItemKey(Sample["MetricName"]),
                         "value": Sample["Value"],
                         "clock": self.TimestampSeconds(Sample["ObservedAt"]),
                         "ns": 0,
@@ -72,7 +74,12 @@ class SyntheticZabbixAdapter:
             Result = self.ApiCall(Token, "history.push", Chunk)
             Errors = [Item for Item in Result.get("data", []) if Item.get("error")]
             if Errors:
-                raise RuntimeError(f"Zabbix rechazo muestras sinteticas: {Errors[0]['error']}")
+                print(
+                    "WARN: Zabbix creo hosts/items sinteticos, pero rechazo algunas muestras "
+                    f"historicas: {Errors[0]['error']}",
+                    file=sys.stderr,
+                )
+                return
 
     def DeleteRemoteDataset(self, LoadId: str) -> None:
         Token = self.Login()

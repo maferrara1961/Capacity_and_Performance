@@ -82,6 +82,8 @@ Scripts/GenerateVerificationBatches.sh DemoFull001
 
 El generador crea lotes `normal`, `warning`, `critical` y `mixed`. La carga escribe KPIs en
 PostgreSQL para Grafana, series en VictoriaMetrics y hosts/items sinteticos en Zabbix.
+El script borra primero cada lote con el mismo identificador para que pueda repetirse con el mismo
+prefijo.
 
 Validar una serie sintetica en VictoriaMetrics:
 

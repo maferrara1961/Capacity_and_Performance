@@ -26,6 +26,10 @@ El script genera lotes `normal`, `warning`, `critical` y `mixed`. Para Zabbix us
 en `http://localhost:8080/api_jsonrpc.php` con `ZABBIX_USER=Admin` y `ZABBIX_PASSWORD=zabbix`
 por defecto.
 
+Antes de recrear cada lote, el script intenta borrar el lote con el mismo identificador para que la
+ejecucion sea repetible. Si Zabbix rechaza muestras historicas por permisos o cache de configuracion,
+la carga continua con hosts/items sinteticos creados para validar `Monitoring > Latest data`.
+
 Perfiles permitidos:
 
 ```text

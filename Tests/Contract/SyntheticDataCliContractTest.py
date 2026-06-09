@@ -80,10 +80,18 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertEqual(Adapter.ItemKey("CPU"), "capacity.synthetic[cpu]")
         self.assertEqual(Adapter.ItemKey("Network IOPS"), "capacity.synthetic[network_iops]")
 
+    def test_zabbix_latest_samples_por_recurso_y_metrica(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxDemo001", "mixed", "small", 30, 1)
+        Latest = SyntheticZabbixAdapter().LatestSamplesByResourceAndMetric(Dataset["Samples"])
+        ResourceId = Dataset["Resources"][0]["ResourceId"]
+        self.assertIn("CPU", Latest[ResourceId])
+        self.assertEqual(Latest[ResourceId]["CPU"]["LoadId"], "ZbxDemo001")
+
     def test_script_de_lotes_de_verificacion_existe(self):
         Script = ROOT / "Scripts" / "GenerateVerificationBatches.sh"
         self.assertTrue(Script.exists())
         self.assertIn("RunLoad critical", Script.read_text())
+        self.assertIn("delete --load-id", Script.read_text())
 
 
 if __name__ == "__main__":
