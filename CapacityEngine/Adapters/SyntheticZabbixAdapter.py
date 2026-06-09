@@ -116,6 +116,57 @@ class SyntheticZabbixAdapter:
         Hosts = self.ApiCall(Token, "host.get", Params)
         return bool(Hosts)
 
+    def ListInventoryHosts(self) -> list[dict]:
+        if os.environ.get("STACK_DRY_RUN", "0") == "1":
+            return self.ListStoredInventoryHosts()
+        Token = self.Login()
+        Hosts = self.ApiCall(
+            Token,
+            "host.get",
+            {
+                "output": ["hostid", "host", "name", "status"],
+                "selectInventory": ["asset_tag", "alias", "type", "os", "location", "notes"],
+                "search": {"host": "SRV-"},
+            },
+        )
+        return [self.NormalizeInventoryHost(Host) for Host in Hosts]
+
+    def ListStoredInventoryHosts(self) -> list[dict]:
+        Store = self.LoadStore()
+        Hosts = []
+        for LoadId, Record in Store.items():
+            for Index, HostName in enumerate(Record.get("Hosts", []), start=1):
+                Hosts.append(
+                    {
+                        "HostId": f"dryrun-{LoadId}-{Index}",
+                        "HostName": HostName,
+                        "VisibleName": HostName,
+                        "Status": "OK",
+                        "AssetTag": f"{LoadId}-{Index}",
+                        "Type": "Server",
+                        "Os": "Linux",
+                        "Location": "CapacityLab",
+                        "Notes": "Host sintetico en modo simulacion",
+                    }
+                )
+        return Hosts
+
+    def NormalizeInventoryHost(self, Host: dict) -> dict:
+        Inventory = Host.get("inventory") or {}
+        Status = "Disabled" if str(Host.get("status", "0")) == "1" else "OK"
+        HostName = Host.get("host") or Host.get("name")
+        return {
+            "HostId": Host.get("hostid", ""),
+            "HostName": HostName,
+            "VisibleName": Host.get("name") or HostName,
+            "Status": Status,
+            "AssetTag": Inventory.get("asset_tag") or HostName,
+            "Type": Inventory.get("type") or "Server",
+            "Os": Inventory.get("os") or "Unknown",
+            "Location": Inventory.get("location") or "Unknown",
+            "Notes": Inventory.get("notes") or "",
+        }
+
     def Login(self) -> str:
         Result = self.ApiCall(None, "user.login", {"username": self.User, "password": self.Password})
         if not isinstance(Result, str) or not Result:

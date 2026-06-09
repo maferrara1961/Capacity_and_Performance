@@ -43,6 +43,15 @@ La identidad del host es congruente entre herramientas: Zabbix usa `SRV-#####` c
 PostgreSQL lo guarda en `MonitoredResource.Name`, VictoriaMetrics lo publica como etiqueta
 `host_name` y Grafana lo muestra como `HostName` en tablas y leyendas.
 
+Para inventario operativo, Zabbix es la fuente. Luego de alta, baja o modificacion manual de hosts
+en Zabbix, ejecutar:
+
+```bash
+Scripts/SyncZabbixInventory.sh
+```
+
+Ese comando sincroniza `MonitoredResource` en PostgreSQL con el inventario actual de Zabbix.
+
 Los dashboards de Grafana incluyen el filtro `Lote`. Seleccionar `All` muestra todos los lotes
 cargados; seleccionar un lote como `HistoryFull001-90d-critical` filtra PostgreSQL y
 VictoriaMetrics con el mismo identificador.

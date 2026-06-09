@@ -47,6 +47,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("PostgreSQL", Result.stdout)
         self.assertIn("Zabbix hosts/items sinteticos", Result.stdout)
 
+    def test_sync_zabbix_inventory_imprime_resumen(self):
+        RunManage("load", "--profile", "mixed", "--volume", "small", "--load-id", "SyncInventory001")
+        Result = RunManage("sync-zabbix-inventory")
+        self.assertEqual(Result.returncode, 0, Result.stderr)
+        self.assertIn("sincronizacion de inventario Zabbix completada", Result.stdout)
+        self.assertIn("fuente: Zabbix", Result.stdout)
+        self.assertIn("destino: PostgreSQL", Result.stdout)
+
     def test_postgresql_sql_incluye_tablas_de_dashboard(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("SqlDemo001", "mixed", "small", 30, 1)
         Sql = SyntheticPostgreSqlAdapter().BuildLoadSql(Dataset)
@@ -56,6 +64,25 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("insert into Recommendation", Sql)
         self.assertIn("insert into Service", Sql)
         self.assertIn("Servicio Sintetico SqlDemo001 1", Sql)
+
+    def test_postgresql_sincroniza_inventario_desde_zabbix(self):
+        Hosts = [
+            {
+                "HostName": "SRV-12345",
+                "VisibleName": "SRV-12345",
+                "Status": "OK",
+                "AssetTag": "Manual-1",
+                "Type": "Server",
+                "Os": "Linux",
+                "Location": "Datacenter",
+                "Notes": "Alta manual en Zabbix",
+            }
+        ]
+        Sql = SyntheticPostgreSqlAdapter().BuildZabbixInventorySyncSql(Hosts)
+        self.assertIn("Platform = excluded.Platform", Sql)
+        self.assertIn("'ZabbixInventory'", Sql)
+        self.assertIn("'SRV-12345'", Sql)
+        self.assertIn("delete from MonitoredResource where Platform = 'ZabbixInventory'", Sql)
 
     def test_nombres_sinteticos_son_unicos_por_lote(self):
         First = SyntheticDataService().BuildSyntheticDataset("NameDemo001", "mixed", "small", 30, 1)
@@ -143,6 +170,11 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertTrue(Script.exists())
         self.assertIn("RunLoad critical", Script.read_text())
         self.assertIn("delete --load-id", Script.read_text())
+
+    def test_script_de_sincronizacion_zabbix_existe(self):
+        Script = ROOT / "Scripts" / "SyncZabbixInventory.sh"
+        self.assertTrue(Script.exists())
+        self.assertIn("sync-zabbix-inventory", Script.read_text())
 
     def test_script_de_lotes_historicos_genera_30_60_y_90_dias(self):
         Script = ROOT / "Scripts" / "GenerateHistoricalVerificationBatches.sh"

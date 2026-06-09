@@ -85,6 +85,52 @@ class SyntheticPostgreSqlAdapter:
         Result = self.ExecuteSqlQuery(Sql)
         return Result.lower() in {"t", "true", "1"}
 
+    def SyncZabbixInventory(self, Hosts: list[dict]) -> tuple[int, int]:
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            self.ExecuteSql(self.BuildZabbixInventorySyncSql(Hosts))
+        return len(Hosts), 0
+
+    def BuildZabbixInventorySyncSql(self, Hosts: list[dict]) -> str:
+        Lines = [
+            (Path("Sql/Schema/001_Catalog.sql")).read_text(encoding="utf-8"),
+            "begin;",
+        ]
+        HostNames = []
+        for Host in Hosts:
+            HostName = Host["HostName"]
+            HostNames.append(HostName)
+            Status = Host.get("Status", "OK")
+            ResourceType = Host.get("Type", "Server") or "Server"
+            Notes = Host.get("Notes", "")
+            Lines.append(
+                "insert into MonitoredResource (ResourceId, ResourceType, Name, Platform, CapacityUnit, TotalCapacity, Status) values "
+                f"({self.Q(HostName)}, {self.Q(ResourceType)}, {self.Q(HostName)}, {self.Q('ZabbixInventory')}, "
+                f"{self.Q('Percent')}, 100, {self.Q(Status)}) "
+                "on conflict (ResourceId) do update set "
+                "ResourceType = excluded.ResourceType, "
+                "Name = excluded.Name, "
+                "Platform = excluded.Platform, "
+                "CapacityUnit = excluded.CapacityUnit, "
+                "TotalCapacity = excluded.TotalCapacity, "
+                "Status = excluded.Status;"
+            )
+            Lines.append(
+                "insert into Baseline (BaselineId, ResourceId, MetricName, PeriodStart, PeriodEnd, AverageValue, P95Value, PeakValue) values "
+                f"({self.Q('ZabbixInventory-' + HostName)}, {self.Q(HostName)}, {self.Q('Inventory')}, now(), now(), 0, 0, 0) "
+                "on conflict (BaselineId) do update set PeriodEnd = now(), AverageValue = 0, P95Value = 0, PeakValue = 0;"
+            )
+            if Notes:
+                Lines.append(f"-- inventory notes {self.Q(HostName)}: {self.Q(Notes)}")
+        if HostNames:
+            Values = ", ".join(self.Q(HostName) for HostName in HostNames)
+            Lines.append(f"delete from Baseline where BaselineId like 'ZabbixInventory-%' and ResourceId not in ({Values});")
+            Lines.append(f"delete from MonitoredResource where Platform = 'ZabbixInventory' and ResourceId not in ({Values});")
+        else:
+            Lines.append("delete from Baseline where BaselineId like 'ZabbixInventory-%';")
+            Lines.append("delete from MonitoredResource where Platform = 'ZabbixInventory';")
+        Lines.append("commit;")
+        return "\n".join(Lines)
+
     def ExecuteSql(self, Sql: str) -> None:
         PodmanBin = os.environ.get("PODMAN_BIN", "podman")
         Container = os.environ.get("POSTGRES_CONTAINER", "capacity-performance-postgresql")

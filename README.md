@@ -150,6 +150,18 @@ ManageTestData -> PostgreSQL, VictoriaMetrics y Zabbix
 CapacityEngine -> PostgreSQL y VictoriaMetrics
 ```
 
+Zabbix es la fuente del inventario de hosts. Cuando se da de alta, baja o modifica un equipo en
+Zabbix, sincronizar el catalogo PostgreSQL para que Grafana y las consultas SQL reflejen el mismo
+estado:
+
+```bash
+Scripts/SyncZabbixInventory.sh
+```
+
+La sincronizacion toma hosts `SRV-#####` desde Zabbix, actualiza `MonitoredResource` con
+`Platform = ZabbixInventory` y elimina del catalogo los hosts de inventario que ya no existan en
+Zabbix.
+
 Ejecutar el motor diario de capacidad:
 
 ```bash
@@ -242,6 +254,10 @@ La misma identidad de host queda disponible en todas las herramientas:
 - PostgreSQL: `MonitoredResource.Name` como `SRV-#####`.
 - VictoriaMetrics: etiqueta `host_name="SRV-#####"`.
 - Grafana: columnas `HostName` y leyendas basadas en `{{host_name}}`.
+
+Para inventario operativo, Zabbix gobierna altas, bajas y modificaciones. Ejecutar
+`Scripts/SyncZabbixInventory.sh` despues de cambiar hosts en Zabbix para reflejar el cambio en
+PostgreSQL y Grafana.
 
 En Zabbix se crean hosts sinteticos con items, inventario, graficos por host y triggers
 Warning/Critical para validar alertamientos. Revisar:

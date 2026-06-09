@@ -60,6 +60,8 @@ capacity-performance-net
 | ManageTestData | PostgreSQL | `podman exec` + `psql` | Carga y borrado de catalogo, KPIs y forecasts sinteticos. |
 | ManageTestData | VictoriaMetrics | HTTP API | Importacion y borrado de series temporales sinteticas. |
 | ManageTestData | ZabbixWeb | HTTP JSON-RPC | Creacion de hosts, inventario, items, graficos y triggers sinteticos. |
+| SyncZabbixInventory | ZabbixWeb | HTTP JSON-RPC | Lectura de inventario de hosts administrado por Zabbix. |
+| SyncZabbixInventory | PostgreSQL | `podman exec` + `psql` | Alta, baja y modificacion de `MonitoredResource` segun inventario Zabbix. |
 | CapacityEngine | PostgreSQL | TCP `5432` | Escritura/lectura prevista de resultados de capacidad. |
 | CapacityEngine | VictoriaMetrics | HTTP `8428` | Lectura prevista de metricas de series temporales. |
 
@@ -125,10 +127,14 @@ Tablas principales:
 Responsabilidades:
 
 - Mapear servicios, aplicaciones, recursos e infraestructura.
+- Reflejar el inventario operativo gobernado por Zabbix.
 - Guardar KPIs de capacidad.
 - Guardar forecast 30/60/90 dias.
 - Guardar riesgos y recomendaciones.
 - Registrar lotes sinteticos de prueba.
+
+Zabbix gobierna altas, bajas y modificaciones de hosts. PostgreSQL mantiene una copia sincronizada
+en `MonitoredResource` para que Grafana pueda consultar el inventario junto con KPIs y forecasts.
 
 ### Dashboards
 
@@ -192,6 +198,25 @@ Responsabilidades:
 | `HostName` / `host_name` | PostgreSQL, VictoriaMetrics, Grafana | Nombre operativo comun `SRV-#####`. |
 | `host` | Zabbix | Host tecnico y visible `SRV-#####`. |
 | `asset_tag` | Zabbix inventory | Relacionar host con lote y permitir limpieza por `LoadId`. |
+
+## Flujo de Sincronizacion de Inventario
+
+```text
+Alta / baja / modificacion de host en Zabbix
+  -> Scripts/SyncZabbixInventory.sh
+      -> Zabbix API host.get + inventory
+      -> PostgreSQL MonitoredResource
+          -> upsert de hosts existentes
+          -> delete de hosts Platform=ZabbixInventory que ya no existen en Zabbix
+      -> Grafana
+          -> dashboards SQL consultan inventario sincronizado
+```
+
+Regla de consistencia:
+
+```text
+Zabbix host SRV-##### == PostgreSQL MonitoredResource.Name == Grafana HostName
+```
 
 ## Flujo de Carga Sintetica
 

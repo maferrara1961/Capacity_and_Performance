@@ -26,6 +26,8 @@ def BuildParser() -> argparse.ArgumentParser:
     Validate = Subparsers.add_parser("validate")
     Validate.add_argument("--load-id")
 
+    Subparsers.add_parser("sync-zabbix-inventory")
+
     Delete = Subparsers.add_parser("delete")
     Delete.add_argument("--load-id")
     Delete.add_argument("--all", action="store_true")
@@ -46,6 +48,8 @@ def Main(Argv: list[str] | None = None) -> int:
             return ListLoads(Args, PostgreSql)
         if Args.Action == "validate":
             return Validate(Args, Service, PostgreSql, Victoria, Zabbix)
+        if Args.Action == "sync-zabbix-inventory":
+            return SyncZabbixInventory(PostgreSql, Zabbix)
         if Args.Action == "delete":
             return Delete(Args, PostgreSql, Victoria, Zabbix)
     except ValidationError as Error:
@@ -98,6 +102,17 @@ def Validate(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql
     print(f"  PostgreSQL datos sinteticos: {'OK' if PostgreSql.HasData(LoadId) else 'Sin datos'}")
     print(f"  VictoriaMetrics muestras sinteticas: {'OK' if Victoria.HasRemoteSamples(LoadId) else 'Sin datos'}")
     print(f"  Zabbix hosts/items sinteticos: {'OK' if Zabbix.HasData(LoadId) else 'Sin datos'}")
+    return 0
+
+
+def SyncZabbixInventory(PostgreSql: SyntheticPostgreSqlAdapter, Zabbix: SyntheticZabbixAdapter) -> int:
+    Hosts = Zabbix.ListInventoryHosts()
+    SyncedCount, DeletedCount = PostgreSql.SyncZabbixInventory(Hosts)
+    print("INFO: sincronizacion de inventario Zabbix completada")
+    print("  fuente: Zabbix")
+    print("  destino: PostgreSQL")
+    print(f"  hosts sincronizados: {SyncedCount}")
+    print(f"  hosts dados de baja: {DeletedCount}")
     return 0
 
 

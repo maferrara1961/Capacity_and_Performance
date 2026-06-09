@@ -20,6 +20,7 @@ Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ManageTestData.sh
+Scripts/SyncZabbixInventory.sh
 Scripts/GenerateVerificationBatches.sh
 Scripts/GenerateHistoricalVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
