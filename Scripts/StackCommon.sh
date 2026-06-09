@@ -126,7 +126,7 @@ VolumeArgsFor() {
     VictoriaMetrics) echo "-v ${PROJECT_NAME}-victoriametrics-data:/victoria-metrics-data" ;;
     ZabbixServer) echo "-v ${PROJECT_NAME}-zabbix-server-data:/var/lib/zabbix" ;;
     Zabbix|ZabbixWeb) echo "" ;;
-    Grafana) echo "-v ${PROJECT_NAME}-grafana-data:/var/lib/grafana" ;;
+    Grafana) echo "-v ${PROJECT_NAME}-grafana-data:/var/lib/grafana -v ${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z -v ${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/provisioning/dashboards:ro,Z" ;;
     CapacityEngine) echo "" ;;
   esac
 }

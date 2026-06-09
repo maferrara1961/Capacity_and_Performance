@@ -31,6 +31,11 @@ class StackInterconnectionContractTest(unittest.TestCase):
         self.assertIn("ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server", Common)
         self.assertIn("DB_SERVER_HOST=${PROJECT_NAME}-postgresql", Common)
 
+    def test_grafana_monta_provisioning_desde_el_repositorio(self):
+        Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")
+        self.assertIn("${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z", Common)
+        self.assertIn("${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/provisioning/dashboards:ro,Z", Common)
+
 
 if __name__ == "__main__":
     unittest.main()

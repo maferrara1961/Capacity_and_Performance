@@ -28,6 +28,10 @@ detiene antes de crear contenedores y solicita ejecutar `Scripts/BuildImages.sh`
 comun del stack e inicia servicios en orden compatible con dependencias: PostgreSQL,
 VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
 
+Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Despues de un
+`git pull`, ejecutar `Scripts/StopStack.sh` y `Scripts/StartStack.sh` reprovisiona dashboards y
+datasources sin reconstruir la imagen.
+
 ## Modo de uso
 
 URLs locales luego de iniciar el stack:
