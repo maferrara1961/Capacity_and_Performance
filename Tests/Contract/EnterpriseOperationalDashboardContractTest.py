@@ -19,6 +19,9 @@ class EnterpriseOperationalDashboardContractTest(unittest.TestCase):
         self.assertIn("${MetricName:regex}", Text)
         self.assertIn("CapacityKpi", Text)
         self.assertIn("ForecastResult", Text)
+        self.assertIn("LoadIdCalculado", Text)
+        self.assertIn("c.LoadId = k.LoadIdCalculado", Text)
+        self.assertIn("k.LoadIdCalculado ~", Text)
         self.assertIn('load_id=~\\"${LoadId:regex}\\"', Text)
 
 
