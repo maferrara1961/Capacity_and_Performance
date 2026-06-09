@@ -33,6 +33,8 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
         self.assertIn("deleteDatasources:", Text)
         self.assertIn("prune: true", Text)
         self.assertIn("orgId: 1", Text)
+        self.assertIn("database: capacity", Text)
+        self.assertIn("postgresVersion: 1600", Text)
         self.assertIn("sslmode: disable", Text)
 
     def test_paneles_sql_usan_postgresql_explicito(self):

@@ -65,6 +65,11 @@ if ! grep -q "uid: CapacityPostgreSQL" Config/Grafana/Datasources/Datasources.ym
   exit 1
 fi
 
+if ! grep -A8 "uid: CapacityPostgreSQL" Config/Grafana/Datasources/Datasources.yml | grep -q "database: capacity"; then
+  echo "Datasource PostgreSQL no declara base por defecto capacity" >&2
+  exit 1
+fi
+
 if ! grep -R "CapacityPostgreSQL" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
   echo "Dashboards no declaran datasource PostgreSQL explicito" >&2
   exit 1

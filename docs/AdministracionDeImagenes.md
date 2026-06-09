@@ -106,6 +106,15 @@ Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
 - `Capacity Planning Dashboard`: crecimiento, headroom, baseline y sizing.
 - `Application Dashboard`: salud, infraestructura, dependencias y performance end-to-end.
 
+Si Grafana muestra que PostgreSQL no tiene base por defecto configurada, actualizar el repositorio y
+reiniciar el stack para reprovisionar `CapacityPostgreSQL` con `jsonData.database=capacity`:
+
+```bash
+git pull
+Scripts/StopStack.sh
+Scripts/StartStack.sh
+```
+
 En Zabbix ingresar con `Admin` / `zabbix` y revisar `Monitoring > Latest data` filtrando por el
 grupo `Capacity Synthetic`.
 

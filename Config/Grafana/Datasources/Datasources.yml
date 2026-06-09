@@ -24,8 +24,11 @@ datasources:
     database: capacity
     user: capacity
     jsonData:
+      database: capacity
       sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
     secureJsonData:
       password: capacity
-    version: 2
+    version: 3
     editable: false
