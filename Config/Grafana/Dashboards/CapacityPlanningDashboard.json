@@ -1,6 +1,9 @@
 {
   "title": "Capacity Planning Dashboard",
-  "tags": ["capacity", "planning"],
+  "tags": [
+    "capacity",
+    "planning"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 3,
@@ -11,13 +14,20 @@
         "name": "LoadId",
         "label": "Lote",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
         "multi": false,
-        "current": {"selected": true, "text": "All", "value": "$__all"}
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -27,7 +37,12 @@
       "title": "Como leer este dashboard",
       "description": "Guia visible para interpretar los cuadros de planificacion de capacidad.",
       "type": "text",
-      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "options": {
         "mode": "markdown",
         "content": "### Que muestra\nEste tablero ayuda a planificar capacidad: crecimiento mensual, fecha estimada de agotamiento, headroom, baseline, sobredimensionamiento y subdimensionamiento.\n\n### Como interpretarlo\nMonthlyGrowthRate alto acelera la demanda; DaysToSaturation bajo indica urgencia; HeadroomAvailable alto con baja utilizacion sugiere sobredimensionamiento; HeadroomAvailable bajo sugiere subdimensionamiento.\n\n### Accion sugerida\nRevisar primero Underprovisioned Resources para evitar saturacion y luego Overprovisioned Resources para optimizar costos/capacidad."
@@ -38,54 +53,234 @@
       "title": "Monthly Growth",
       "description": "MonthlyGrowthRate by resource for planning trend analysis.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.MonthlyGrowthRate from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 30"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.MonthlyGrowthRate from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 30"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 2,
       "title": "Exhaustion Date Estimate",
       "description": "Forecast30Days, Forecast60Days, Forecast90Days, and DaysToSaturation for planning decisions.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.ResourceId, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 30"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.ResourceId, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 30"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 3,
       "title": "Headroom And Baseline",
       "description": "HeadroomAvailable and BaselineDelta for sizing and baseline comparison.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.HeadroomAvailable, k.BaselineDelta, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 30"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.HeadroomAvailable, k.BaselineDelta, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 30"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 4,
       "title": "Overprovisioned Resources",
       "description": "Resources with high available headroom and low average utilization.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.HeadroomAvailable, k.BaselineDelta from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and k.HeadroomAvailable >= 70 order by k.HeadroomAvailable desc limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.HeadroomAvailable, k.BaselineDelta from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and k.HeadroomAvailable >= 70 order by k.HeadroomAvailable desc limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 5,
       "title": "Underprovisioned Resources",
       "description": "Resources with limited headroom or short days-to-saturation.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.HeadroomAvailable, f.DaysToSaturation, f.Forecast90Days from CapacityKpi k left join ForecastResult f on f.ResourceId = k.ResourceId and f.ForecastResultId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and (k.HeadroomAvailable <= 25 or f.DaysToSaturation <= 90) order by k.HeadroomAvailable asc, f.DaysToSaturation asc limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.HeadroomAvailable, f.DaysToSaturation, f.Forecast90Days from CapacityKpi k left join ForecastResult f on f.ResourceId = k.ResourceId and f.ForecastResultId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and (k.HeadroomAvailable <= 25 or f.DaysToSaturation <= 90) order by k.HeadroomAvailable asc, f.DaysToSaturation asc limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 6,
       "title": "Saturation Trend",
       "description": "Saturation time series by resource and verification scenario. Missing data means no saturation samples are available.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 9, "w": 24, "x": 0, "y": 20},
-      "targets": [{"refId": "A", "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\"}", "legendFormat": "{{host_name}} {{load_id}}"}]
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\"}",
+          "legendFormat": "{{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     }
   ]
 }

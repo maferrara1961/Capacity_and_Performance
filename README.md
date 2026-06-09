@@ -213,6 +213,9 @@ Uso recomendado:
 - Cada dashboard incluye un cuadro visible `Como leer este dashboard` con `Que muestra`,
   `Como interpretarlo` y `Accion sugerida`.
 - Cada dashboard incluye filtro `Lote`; `All` muestra todos los lotes cargados.
+- Cada panel no textual incluye enlaces de drill-down. Al hacer click sobre un host, servicio o
+  serie, usar `Ver graficos del equipo` para abrir `Technical Performance Dashboard` filtrado por
+  `LoadId`, `HostName` y `ServiceId`.
 - **Executive Capacity Dashboard**: decision ejecutiva con estado general, top 5 riesgos,
   forecast 30/60/90, headroom y recomendaciones priorizadas.
 - **Technical Performance Dashboard**: mejora operativa con CPU, RAM, storage, IOPS, red,

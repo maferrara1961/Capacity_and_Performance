@@ -1,6 +1,10 @@
 {
   "title": "Application Dashboard",
-  "tags": ["capacity", "application", "service"],
+  "tags": [
+    "capacity",
+    "application",
+    "service"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 3,
@@ -11,13 +15,20 @@
         "name": "LoadId",
         "label": "Lote",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
         "multi": false,
-        "current": {"selected": true, "text": "All", "value": "$__all"}
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -27,7 +38,12 @@
       "title": "Como leer este dashboard",
       "description": "Guia visible para interpretar los cuadros de aplicacion y servicio.",
       "type": "text",
-      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "options": {
         "mode": "markdown",
         "content": "### Que muestra\nEste tablero conecta aplicaciones con infraestructura: salud, recursos asociados, dependencias criticas, performance end-to-end y riesgo de capacidad por servicio.\n\n### Como interpretarlo\nApplication Health muestra el estado funcional; Associated Infrastructure muestra que recursos soportan el servicio; Critical Dependencies muestra riesgos que pueden impactar la aplicacion; End To End Performance muestra latencia, throughput y errores.\n\n### Accion sugerida\nSi un servicio esta en Warning o Critical, revisar primero Service Capacity Risk, despues Critical Dependencies y finalmente la metrica tecnica que explica la degradacion."
@@ -38,49 +54,205 @@
       "title": "Application Health",
       "description": "ApplicationId, health, and end-to-end status for service owners.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application where ApplicationId ~ '^(${LoadId:regex})' order by Name"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application where ApplicationId ~ '^(${LoadId:regex})' order by Name"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 2,
       "title": "Associated Infrastructure",
       "description": "ServiceId, ResourceId, role, and ImpactWeight mapping for each service.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, m.ApplicationId, coalesce(mr.Name, m.ResourceId) as HostName, m.ResourceId, m.Role, m.ImpactWeight from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId where m.MapId ~ '^(${LoadId:regex})' order by m.ServiceId, HostName"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select m.ServiceId, m.ApplicationId, coalesce(mr.Name, m.ResourceId) as HostName, m.ResourceId, m.Role, m.ImpactWeight from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId where m.MapId ~ '^(${LoadId:regex})' order by m.ServiceId, HostName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 3,
       "title": "Critical Dependencies",
       "description": "Warning and Critical dependency risks with service or resource scope.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select r.ScopeType, coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select r.ScopeType, coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 4,
       "title": "End To End Performance",
       "description": "Latency, throughput, and error signals for application-level performance.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 9, "w": 16, "x": 0, "y": 12},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 16,
+        "x": 0,
+        "y": 12
+      },
       "targets": [
-        {"refId": "A", "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\"}", "legendFormat": "latency {{host_name}} {{load_id}}"},
-        {"refId": "B", "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\"}", "legendFormat": "throughput {{host_name}} {{load_id}}"},
-        {"refId": "C", "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\"}", "legendFormat": "errors {{host_name}} {{load_id}}"}
-      ]
+        {
+          "refId": "A",
+          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\"}",
+          "legendFormat": "latency {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\"}",
+          "legendFormat": "throughput {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "C",
+          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\"}",
+          "legendFormat": "errors {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 5,
       "title": "Service Capacity Risk",
       "description": "Service and resource risk context for service-oriented capacity decisions. Missing data means no mapped risk exists.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 9, "w": 8, "x": 16, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId and m.MapId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select m.ServiceId, coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId and m.MapId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     }
   ]
 }

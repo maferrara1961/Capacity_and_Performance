@@ -1,6 +1,10 @@
 {
   "title": "Technical Performance Dashboard",
-  "tags": ["capacity", "technical", "performance"],
+  "tags": [
+    "capacity",
+    "technical",
+    "performance"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 3,
@@ -11,13 +15,58 @@
         "name": "LoadId",
         "label": "Lote",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
         "multi": false,
-        "current": {"selected": true, "text": "All", "value": "$__all"}
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "HostName",
+        "label": "Equipo",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
+        "query": "select distinct Name as HostName from MonitoredResource union select distinct ComponentName as HostName from EnterpriseTechnologyComponent order by HostName",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "ServiceId",
+        "label": "Servicio/Subsistema",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
+        "query": "select distinct ServiceId from ServiceResourceMap union select distinct BusinessServiceId as ServiceId from EnterpriseTechnologyComponent where BusinessServiceId is not null order by ServiceId",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -27,7 +76,12 @@
       "title": "Como leer este dashboard",
       "description": "Guia visible para interpretar los cuadros tecnicos de performance.",
       "type": "text",
-      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "options": {
         "mode": "markdown",
         "content": "### Que muestra\nEste tablero separa performance tecnica por CPU, RAM, storage, IOPS, red, latencia, throughput, errores y saturacion.\n\n### Como interpretarlo\nPicos altos y P95 alto indican consumo sostenido; errores y latencia altos indican degradacion de servicio; saturacion alta indica riesgo operativo. Si no hay datos, falta carga o rango para esa metrica.\n\n### Accion sugerida\nEmpezar por Top Consumers And Outliers, confirmar la metrica afectada y revisar Threshold Breaches para priorizar remediacion."
@@ -38,88 +92,367 @@
       "title": "CPU Utilization",
       "description": "CPU performance by resource and load identifier. Missing data means no CPU samples are available for the selected range.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\"}", "legendFormat": "CPU {{host_name}} {{load_id}}"}]
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "CPU {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 2,
       "title": "RAM Utilization",
       "description": "Memory performance by resource and load identifier.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 4},
-      "targets": [{"refId": "A", "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\"}", "legendFormat": "RAM {{host_name}} {{load_id}}"}]
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "RAM {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 3,
       "title": "Storage Utilization",
       "description": "Storage performance by resource and load identifier.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 4},
-      "targets": [{"refId": "A", "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Storage {{host_name}} {{load_id}}"}]
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Storage {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 4,
       "title": "IOPS And Network",
       "description": "IOPS and network indicators for operational bottleneck diagnosis.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 11},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
       "targets": [
-        {"refId": "A", "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\"}", "legendFormat": "IOPS {{host_name}} {{load_id}}"},
-        {"refId": "B", "expr": "synthetic_network{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Network {{host_name}} {{load_id}}"}
-      ]
+        {
+          "refId": "A",
+          "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "IOPS {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Network {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 5,
       "title": "Latency Throughput Errors",
       "description": "Application-style performance signals for end-to-end diagnosis.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 11},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 11
+      },
       "targets": [
-        {"refId": "A", "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Latency {{host_name}} {{load_id}}"},
-        {"refId": "B", "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Throughput {{host_name}} {{load_id}}"},
-        {"refId": "C", "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Errors {{host_name}} {{load_id}}"}
-      ]
+        {
+          "refId": "A",
+          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Latency {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "B",
+          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Throughput {{host_name}} {{load_id}}"
+        },
+        {
+          "refId": "C",
+          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Errors {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 6,
       "title": "Saturation",
       "description": "Saturation signal by resource and scenario.",
       "type": "timeseries",
-      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
-      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 19},
-      "targets": [{"refId": "A", "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\"}", "legendFormat": "Saturation {{host_name}} {{load_id}}"}]
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 19
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Saturation {{host_name}} {{load_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 7,
       "title": "Average Peak P95",
       "description": "Operational KPI table with average, peak, and P95 utilization.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 19},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.P95Utilization desc, k.CalculatedAt desc limit 50"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 19
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and coalesce(mr.Name, k.ResourceId) ~ '^(${HostName:regex})' order by k.P95Utilization desc, k.CalculatedAt desc limit 50"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 8,
       "title": "Top Consumers And Outliers",
       "description": "Highest consumers with ServiceId and ResourceId context for prioritizing operations work.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 19},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 19
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select m.ServiceId, coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and coalesce(mr.Name, k.ResourceId) ~ '^(${HostName:regex})' and coalesce(m.ServiceId, '') ~ '^(${ServiceId:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 9,
       "title": "Threshold Breaches",
       "description": "Warning and Critical conditions with resource/service severity context.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 26},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 50"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(mr.Name, r.ScopeId) ~ '^(${HostName:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 50"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     }
-  ]
+  ],
+  "uid": "technical-performance"
 }

@@ -2,13 +2,20 @@
   "uid": "enterprise-software-backlevel",
   "title": "Enterprise Software Backlevel Dashboard",
   "schemaVersion": 39,
-  "tags": ["Enterprise", "Lifecycle", "Backlevel"],
+  "tags": [
+    "Enterprise",
+    "Lifecycle",
+    "Backlevel"
+  ],
   "templating": {
     "list": [
       {
         "name": "LoadId",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select distinct LoadId from TestLoad order by LoadId desc",
         "allValue": ".*",
         "includeAll": true,
@@ -23,35 +30,133 @@
       "title": "Como leer este dashboard",
       "type": "text",
       "description": "Guia para interpretar software backlevel, ciclo de vida y soporte.",
-      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
-      "options": {"content": "Que muestra: hosts y componentes con software backlevel, fin de soporte o fin de vida. Como interpretarlo: Backlevel, EndOfSupport y EndOfLife elevan riesgo aun cuando la capacidad este OK. Accion sugerida: priorizar upgrades por severidad, servicio afectado y fecha de soporte.", "mode": "markdown"}
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "content": "Que muestra: hosts y componentes con software backlevel, fin de soporte o fin de vida. Como interpretarlo: Backlevel, EndOfSupport y EndOfLife elevan riesgo aun cuando la capacidad este OK. Accion sugerida: priorizar upgrades por severidad, servicio afectado y fecha de soporte.",
+        "mode": "markdown"
+      }
     },
     {
       "id": 2,
       "title": "Resumen Backlevel",
       "type": "table",
       "description": "Conteo de componentes por estado de backlevel, lifecycle y soporte.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 10, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select BacklevelStatus, LifecycleStatus, SupportStatus, count(*) as HostCount from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' group by BacklevelStatus, LifecycleStatus, SupportStatus order by case BacklevelStatus when 'Backlevel' then 1 when 'Current' then 2 else 3 end, LifecycleStatus"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select BacklevelStatus, LifecycleStatus, SupportStatus, count(*) as HostCount from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' group by BacklevelStatus, LifecycleStatus, SupportStatus order by case BacklevelStatus when 'Backlevel' then 1 when 'Current' then 2 else 3 end, LifecycleStatus"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 3,
       "title": "Software Backlevel por Host",
       "type": "table",
       "description": "Detalle de hosts con version, vendor, fin de soporte y servicio afectado para planificar upgrades.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 14, "x": 10, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select ComponentName as HostName, TechnologyType, Version, Vendor, DomainName, BusinessServiceId, BacklevelStatus, LifecycleStatus, SupportStatus, EndOfSupportDate from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and (BacklevelStatus = 'Backlevel' or LifecycleStatus in ('EndOfSupport','EndOfLife')) order by EndOfSupportDate nulls last, ComponentName"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 14,
+        "x": 10,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select ComponentName as HostName, TechnologyType, Version, Vendor, DomainName, BusinessServiceId, BacklevelStatus, LifecycleStatus, SupportStatus, EndOfSupportDate from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and (BacklevelStatus = 'Backlevel' or LifecycleStatus in ('EndOfSupport','EndOfLife')) order by EndOfSupportDate nulls last, ComponentName"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 4,
       "title": "Riesgos y Acciones Backlevel",
       "type": "table",
       "description": "Riesgos lifecycle asociados a software backlevel con impacto y accion recomendada.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 11},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select r.Severity, c.ComponentName as HostName, c.BacklevelStatus, c.LifecycleStatus, c.EndOfSupportDate, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Lifecycle' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.EndOfSupportDate nulls last"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select r.Severity, c.ComponentName as HostName, c.BacklevelStatus, c.LifecycleStatus, c.EndOfSupportDate, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Lifecycle' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.EndOfSupportDate nulls last"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     }
   ]
 }

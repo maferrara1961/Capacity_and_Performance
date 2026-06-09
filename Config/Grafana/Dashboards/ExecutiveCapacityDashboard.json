@@ -1,6 +1,10 @@
 {
   "title": "Executive Capacity Dashboard",
-  "tags": ["capacity", "executive", "decision"],
+  "tags": [
+    "capacity",
+    "executive",
+    "decision"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 3,
@@ -11,13 +15,20 @@
         "name": "LoadId",
         "label": "Lote",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
         "multi": false,
-        "current": {"selected": true, "text": "All", "value": "$__all"}
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -27,7 +38,12 @@
       "title": "Como leer este dashboard",
       "description": "Guia visible para interpretar los cuadros ejecutivos de capacidad.",
       "type": "text",
-      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "options": {
         "mode": "markdown",
         "content": "### Que muestra\nEste tablero resume capacidad para toma de decision: estado general, top 5 riesgos, forecast 30/60/90, headroom y recomendaciones.\n\n### Como interpretarlo\nCritical requiere accion inmediata; Warning requiere plan preventivo; OK indica que no hay riesgo relevante en los datos cargados. Si un cuadro no muestra datos, significa que falta informacion para el rango o lote seleccionado, no que el estado sea OK.\n\n### Accion sugerida\nPriorizar primero los recursos con menor headroom, menor DaysToSaturation y recomendaciones High."
@@ -38,54 +54,234 @@
       "title": "Overall Capacity State",
       "description": "Resumen ejecutivo de decision calculado desde riesgos de capacidad del lote seleccionado. SIN DATOS significa que el filtro no encontro evidencia.",
       "type": "stat",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select case when count(*) = 0 then 'SIN DATOS' when sum(case when OverallRisk = 'Critical' then 1 else 0 end) > 0 then 'CRITICAL' when sum(case when OverallRisk = 'Warning' then 1 else 0 end) > 0 then 'WARNING' else 'OK' end as State from RiskAssessment where RiskAssessmentId ~ '^(${LoadId:regex})'"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select case when count(*) = 0 then 'SIN DATOS' when sum(case when OverallRisk = 'Critical' then 1 else 0 end) > 0 then 'CRITICAL' when sum(case when OverallRisk = 'Warning' then 1 else 0 end) > 0 then 'WARNING' else 'OK' end as State from RiskAssessment where RiskAssessmentId ~ '^(${LoadId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 2,
       "title": "Top 5 Capacity Risks",
       "description": "Top 5 services or resources that need executive prioritization.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 6, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 5"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 6,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 5"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 3,
       "title": "Capacity Used Vs Headroom",
       "description": "Decision view of used capacity and remaining headroom. Missing data means no KPI evidence for the selected range.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.MetricName, k.AverageUtilization as UsedPercent, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable as AvailablePercent from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 10"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.MetricName, k.AverageUtilization as UsedPercent, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable as AvailablePercent from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.HeadroomAvailable asc, k.CalculatedAt desc limit 10"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 4,
       "title": "Forecast 30/60/90 Days",
       "description": "Forecast windows and days-to-saturation for investment and remediation decisions.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 14, "x": 0, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation, f.Confidence from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 14,
+        "x": 0,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, f.ResourceId) as HostName, f.MetricName, f.Forecast30Days, f.Forecast60Days, f.Forecast90Days, f.DaysToSaturation, f.Confidence from ForecastResult f left join MonitoredResource mr on mr.ResourceId = f.ResourceId where f.ForecastResultId ~ '^(${LoadId:regex})' order by f.DaysToSaturation asc, f.CalculatedAt desc limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 5,
       "title": "Recommendations",
       "description": "Acciones priorizadas por host. SIN DATOS significa que no hay recomendaciones abiertas para el lote seleccionado.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 10, "x": 14, "y": 12},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, rec.ScopeId) as HostName, rec.Priority, rec.Action, rec.Reason, rec.Status from Recommendation rec left join MonitoredResource mr on mr.ResourceId = rec.ScopeId where rec.RecommendationId ~ '^(${LoadId:regex})' and rec.Status = 'Open' order by case rec.Priority when 'High' then 3 when 'Medium' then 2 when 'Low' then 1 else 0 end desc, HostName limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 14,
+        "y": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, rec.ScopeId) as HostName, rec.Priority, rec.Action, rec.Reason, rec.Status from Recommendation rec left join MonitoredResource mr on mr.ResourceId = rec.ScopeId where rec.RecommendationId ~ '^(${LoadId:regex})' and rec.Status = 'Open' order by case rec.Priority when 'High' then 3 when 'Medium' then 2 when 'Low' then 1 else 0 end desc, HostName limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 6,
       "title": "Monthly Growth And Baseline",
       "description": "Executive trend context for growth and deviation from baseline.",
       "type": "table",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 20},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.MetricName, k.MonthlyGrowthRate, k.BaselineDelta, k.HeadroomAvailable from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.MetricName, k.MonthlyGrowthRate, k.BaselineDelta, k.HeadroomAvailable from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' order by k.MonthlyGrowthRate desc, k.CalculatedAt desc limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     }
   ]
 }

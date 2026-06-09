@@ -2,13 +2,20 @@
   "uid": "enterprise-executive",
   "title": "Enterprise Executive Dashboard",
   "schemaVersion": 39,
-  "tags": ["Capacity", "Enterprise", "Governance"],
+  "tags": [
+    "Capacity",
+    "Enterprise",
+    "Governance"
+  ],
   "templating": {
     "list": [
       {
         "name": "AssessmentRunId",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select distinct AssessmentRunId from EnterpriseScoreAssessment order by AssessmentRunId desc",
         "allValue": ".*",
         "includeAll": true,
@@ -18,7 +25,10 @@
       {
         "name": "LoadId",
         "type": "query",
-        "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
         "query": "select distinct LoadId from TestLoad order by LoadId desc",
         "allValue": ".*",
         "includeAll": true,
@@ -33,71 +43,289 @@
       "title": "Como leer este dashboard",
       "type": "text",
       "description": "Explica como leer los indicadores enterprise y como tratar evidencia faltante.",
-      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
-      "options": {"content": "Que muestra: salud tecnologica enterprise, scores, evidencia y riesgos. Como interpretarlo: SIN EVIDENCIA no es OK. Accion sugerida: priorizar riesgos criticos y evidencia faltante.", "mode": "markdown"}
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "content": "Que muestra: salud tecnologica enterprise, scores, evidencia y riesgos. Como interpretarlo: SIN EVIDENCIA no es OK. Accion sugerida: priorizar riesgos criticos y evidencia faltante.",
+        "mode": "markdown"
+      }
     },
     {
       "id": 2,
       "title": "Technology Health Score",
       "type": "stat",
       "description": "Score consolidado 0-100 de salud tecnologica; combina capacidad, performance, disponibilidad, ciclo de vida, compliance y confianza de monitoreo.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(round(avg(ScoreValue),2),0) as TechnologyHealthScore from EnterpriseScoreAssessment where ScoreType = 'TechnologyHealth' and AssessmentRunId ~ '^(${AssessmentRunId:regex})'"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(round(avg(ScoreValue),2),0) as TechnologyHealthScore from EnterpriseScoreAssessment where ScoreType = 'TechnologyHealth' and AssessmentRunId ~ '^(${AssessmentRunId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 3,
       "title": "Capacity Score",
       "type": "stat",
       "description": "Score promedio de capacidad para el alcance seleccionado; valores bajos indican riesgo de saturacion o headroom insuficiente.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(round(avg(ScoreValue),2),0) as CapacityScore from EnterpriseScoreAssessment where ScoreType = 'Capacity' and AssessmentRunId ~ '^(${AssessmentRunId:regex})'"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(round(avg(ScoreValue),2),0) as CapacityScore from EnterpriseScoreAssessment where ScoreType = 'Capacity' and AssessmentRunId ~ '^(${AssessmentRunId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 4,
       "title": "Monitoring Confidence",
       "type": "stat",
       "description": "Nivel de confianza de monitoreo segun frescura, completitud y verificacion de evidencia.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select coalesce(round(avg(ScoreValue),2),0) as MonitoringConfidence from EnterpriseScoreAssessment where ScoreType = 'MonitoringConfidence' and AssessmentRunId ~ '^(${AssessmentRunId:regex})'"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select coalesce(round(avg(ScoreValue),2),0) as MonitoringConfidence from EnterpriseScoreAssessment where ScoreType = 'MonitoringConfidence' and AssessmentRunId ~ '^(${AssessmentRunId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 5,
       "title": "SIN EVIDENCIA",
       "type": "stat",
       "description": "Cantidad de evidencias faltantes, desconocidas, incompletas o no verificadas; no deben interpretarse como estado saludable.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 4},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select count(*) as SinEvidencia from EnterpriseEvidenceRecord where EvidenceState in ('Missing','Unknown','Incomplete','Unverified') and LoadId ~ '^(${LoadId:regex})'"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select count(*) as SinEvidencia from EnterpriseEvidenceRecord where EvidenceState in ('Missing','Unknown','Incomplete','Unverified') and LoadId ~ '^(${LoadId:regex})'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 6,
       "title": "Risk Heat Map",
       "type": "table",
       "description": "Distribucion de riesgos por dominio tecnologico y severidad para priorizacion ejecutiva.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 9},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select c.DomainName, r.Severity, count(*) as RiskCount from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' group by c.DomainName, r.Severity order by c.DomainName, r.Severity"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select c.DomainName, r.Severity, count(*) as RiskCount from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' group by c.DomainName, r.Severity order by c.DomainName, r.Severity"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 7,
       "title": "Top 10 Riesgos",
       "type": "table",
       "description": "Principales riesgos con tecnologia afectada, servicio, impacto, accion recomendada y estado de evidencia.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 9},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select r.Severity, c.ComponentName as TecnologiaAfectada, s.Name as ServicioAfectado, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r left join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join Service s on s.ServiceId = r.AffectedServiceId where r.LoadId ~ '^(${LoadId:regex})' order by case r.Severity when 'Critical' then 4 when 'High' then 3 when 'Medium' then 2 else 1 end desc limit 10"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select r.Severity, c.ComponentName as TecnologiaAfectada, s.Name as ServicioAfectado, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r left join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join Service s on s.ServiceId = r.AffectedServiceId where r.LoadId ~ '^(${LoadId:regex})' order by case r.Severity when 'Critical' then 4 when 'High' then 3 when 'Medium' then 2 else 1 end desc limit 10"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     },
     {
       "id": 8,
       "title": "Executive Decision Summary",
       "type": "table",
       "description": "Resumen de decisiones recomendadas, racional y responsable sugerido para seguimiento ejecutivo.",
-      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
-      "gridPos": {"h": 7, "w": 24, "x": 0, "y": 17},
-      "targets": [{"refId": "A", "format": "table", "rawSql": "select rec.Priority, rec.Action, rec.Rationale, rec.DecisionOwner, r.EvidenceState from EnterpriseRecommendation rec join EnterpriseRiskRegistryEntry r on r.RiskId = rec.RiskId where rec.LoadId ~ '^(${LoadId:regex})' order by case rec.Priority when 'Critical' then 4 when 'High' then 3 when 'Medium' then 2 else 1 end desc limit 20"}]
+      "datasource": {
+        "type": "postgres",
+        "uid": "CapacityPostgreSQL"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "select rec.Priority, rec.Action, rec.Rationale, rec.DecisionOwner, r.EvidenceState from EnterpriseRecommendation rec join EnterpriseRiskRegistryEntry r on r.RiskId = rec.RiskId where rec.LoadId ~ '^(${LoadId:regex})' order by case rec.Priority when 'Critical' then 4 when 'High' then 3 when 'Medium' then 2 else 1 end desc limit 20"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Ver graficos del equipo",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}${__field.labels.host_name}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}",
+              "targetBlank": false
+            },
+            {
+              "title": "Ver subsistema o servicio",
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*",
+              "targetBlank": false
+            }
+          ]
+        }
+      }
     }
   ]
 }
