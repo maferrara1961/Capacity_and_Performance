@@ -17,6 +17,7 @@ Scripts/StopStack.sh
 Scripts/StackLogs.sh
 Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
+Scripts/ValidateLocalAccess.sh
 Config/Grafana/Datasources/Datasources.yml
 Config/Grafana/Dashboards/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json

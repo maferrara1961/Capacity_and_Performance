@@ -53,6 +53,13 @@ se deben habilitar los puertos en el firewall local y en las reglas de red del p
 PostgreSQL y Zabbix Server no son servicios HTTP. Un `curl` contra `localhost:5432` puede devolver
 respuesta vacia, y eso no indica una falla de PostgreSQL.
 
+Validar acceso local con HTTP para interfaces web y TCP para servicios no HTTP:
+
+```bash
+Scripts/ValidateLocalAccess.sh
+Scripts/ValidateLocalAccess.sh IP_DEL_SERVIDOR
+```
+
 ## Stop
 
 ```bash

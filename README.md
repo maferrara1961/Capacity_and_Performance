@@ -170,6 +170,18 @@ proveedor antes de acceder desde otra maquina.
 PostgreSQL y Zabbix Server no son endpoints HTTP. No se validan con `curl`; se acceden con clientes
 especificos o desde otros contenedores del stack.
 
+Validar acceso local con los protocolos correctos:
+
+```bash
+Scripts/ValidateLocalAccess.sh
+```
+
+Para validar desde otro host o usando una IP/DNS:
+
+```bash
+Scripts/ValidateLocalAccess.sh IP_DEL_SERVIDOR
+```
+
 Interconexion interna del stack:
 
 ```text
@@ -215,6 +227,7 @@ STACK_DRY_RUN=1 Scripts/BuildImages.sh Grafana v1.0.0
 STACK_DRY_RUN=1 Scripts/StartStack.sh
 STACK_DRY_RUN=1 Scripts/StackStatus.sh
 STACK_DRY_RUN=1 Scripts/StackLogs.sh Grafana 50
+STACK_DRY_RUN=1 Scripts/ValidateLocalAccess.sh
 STACK_DRY_RUN=1 Scripts/StopStack.sh
 STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 ```
@@ -224,7 +237,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 43 tests OK
+Scripts/RunTests.sh        -> 44 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```
