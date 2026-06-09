@@ -19,8 +19,9 @@ Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ManageTestData.sh
+Scripts/GenerateVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
-Config/Grafana/Dashboards/Provisioning.yml
+Config/Grafana/DashboardProviders/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
 Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json
 Config/Grafana/Dashboards/CapacityPlanningDashboard.json
@@ -48,10 +49,44 @@ if ! grep -q "http://capacity-performance-victoriametrics:8428" Config/Grafana/D
   exit 1
 fi
 
+if ! grep -q "uid: VictoriaMetrics" Config/Grafana/Datasources/Datasources.yml; then
+  echo "Datasource VictoriaMetrics no declara UID estable" >&2
+  exit 1
+fi
+
 if ! grep -q "capacity-performance-postgresql:5432" Config/Grafana/Datasources/Datasources.yml; then
   echo "Datasource PostgreSQL no apunta al contenedor esperado" >&2
   exit 1
 fi
+
+if ! grep -q "uid: CapacityPostgreSQL" Config/Grafana/Datasources/Datasources.yml; then
+  echo "Datasource PostgreSQL no declara UID estable" >&2
+  exit 1
+fi
+
+if ! grep -R "CapacityPostgreSQL" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  echo "Dashboards no declaran datasource PostgreSQL explicito" >&2
+  exit 1
+fi
+
+if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  echo "Dashboards no declaran datasource VictoriaMetrics explicito" >&2
+  exit 1
+fi
+
+for ExpectedText in "Top 5 Capacity Risks" "Top Consumers And Outliers" "Overprovisioned Resources" "Service Capacity Risk"; do
+  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+    echo "Falta panel optimizado requerido: $ExpectedText" >&2
+    exit 1
+  fi
+done
+
+for ExpectedSignal in "Forecast30Days" "Forecast60Days" "Forecast90Days" "P95Utilization" "synthetic_saturation"; do
+  if ! grep -R "$ExpectedSignal" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+    echo "Falta senal requerida en dashboards: $ExpectedSignal" >&2
+    exit 1
+  fi
+done
 
 if ! grep -q "ZBX_SERVER_HOST=.*zabbix-server" Scripts/StackCommon.sh; then
   echo "Zabbix Web no declara conexion con Zabbix Server" >&2

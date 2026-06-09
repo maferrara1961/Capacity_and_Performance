@@ -1,15 +1,28 @@
-import json
 import unittest
-from pathlib import Path
+
+from Tests.Contract.GrafanaDatasourceContractTest import DashboardText, LoadDashboard, PanelTitles
 
 
 class ApplicationDashboardContractTest(unittest.TestCase):
     def test_dashboard_contains_health_infrastructure_and_dependencies(self):
-        Data = json.loads(Path("Config/Grafana/Dashboards/ApplicationDashboard.json").read_text())
-        Titles = {Panel["title"] for Panel in Data["panels"]}
-        self.assertIn("Application Health", Titles)
-        self.assertIn("Associated Infrastructure", Titles)
-        self.assertIn("Critical Dependencies", Titles)
+        Dashboard = LoadDashboard("ApplicationDashboard.json")
+        Titles = PanelTitles(Dashboard)
+        Expected = {
+            "Application Health",
+            "Associated Infrastructure",
+            "Critical Dependencies",
+            "End To End Performance",
+            "Service Capacity Risk",
+        }
+        self.assertTrue(Expected.issubset(Titles))
+
+    def test_dashboard_expone_contexto_de_servicio(self):
+        Text = DashboardText("ApplicationDashboard.json")
+        self.assertIn("ServiceId", Text)
+        self.assertIn("ApplicationId", Text)
+        self.assertIn("ResourceId", Text)
+        self.assertIn("ImpactWeight", Text)
+        self.assertIn("OverallRisk", Text)
 
 
 if __name__ == "__main__":

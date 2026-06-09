@@ -28,6 +28,11 @@ detiene antes de crear contenedores y solicita ejecutar `Scripts/BuildImages.sh`
 comun del stack e inicia servicios en orden compatible con dependencias: PostgreSQL,
 VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
 
+Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Los providers
+de dashboard y los JSON de dashboard se montan en rutas separadas para evitar que Grafana lea el
+provider como dashboard. Despues de un `git pull`, ejecutar `Scripts/StopStack.sh` y
+`Scripts/StartStack.sh` reprovisiona dashboards y datasources sin reconstruir la imagen.
+
 ## Modo de uso
 
 URLs locales luego de iniciar el stack:
@@ -45,6 +50,13 @@ Credenciales por defecto para Grafana:
 ```text
 Usuario: admin
 Password: admin
+```
+
+Credenciales por defecto para Zabbix Web:
+
+```text
+Usuario: Admin
+Password: zabbix
 ```
 
 En servidores remotos, reemplazar `localhost` por la IP publica o nombre DNS del servidor. Tambien
@@ -68,6 +80,24 @@ Scripts/ManageTestData.sh list
 Scripts/ManageTestData.sh validate
 Scripts/ManageTestData.sh delete --all --confirmar
 ```
+
+Generar lotes de verificacion para Grafana, VictoriaMetrics, PostgreSQL y Zabbix:
+
+```bash
+Scripts/GenerateVerificationBatches.sh DemoFull001
+```
+
+Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
+
+- Cada dashboard comienza con `Como leer este dashboard`, que explica que muestra cada vista, como
+  interpretar los cuadros y que accion tomar.
+- `Executive Capacity Dashboard`: decision ejecutiva y acciones priorizadas.
+- `Technical Performance Dashboard`: diagnostico operativo por recurso y metrica.
+- `Capacity Planning Dashboard`: crecimiento, headroom, baseline y sizing.
+- `Application Dashboard`: salud, infraestructura, dependencias y performance end-to-end.
+
+En Zabbix ingresar con `Admin` / `zabbix` y revisar `Monitoring > Latest data` filtrando por el
+grupo `Capacity Synthetic`.
 
 ## Stop
 

@@ -29,6 +29,19 @@ La provision de Grafana incluye vistas para:
 Los dashboards cubren estado OK/Warning/Critical, forecast 30/60/90 dias, utilizacion promedio,
 pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias y recomendaciones.
 
+Uso recomendado de dashboards:
+
+- Cada dashboard incluye un cuadro visible `Como leer este dashboard` con tres partes:
+  `Que muestra`, `Como interpretarlo` y `Accion sugerida`.
+- **Executive Capacity Dashboard**: decision ejecutiva con estado general, top 5 riesgos,
+  forecast 30/60/90, headroom y recomendaciones priorizadas.
+- **Technical Performance Dashboard**: mejora operativa con CPU, RAM, storage, IOPS, red,
+  latencia, throughput, errores, saturacion, percentil 95, top consumidores y outliers.
+- **Capacity Planning Dashboard**: planificacion con crecimiento mensual, headroom, baseline,
+  dias a saturacion, recursos sobredimensionados y subdimensionados.
+- **Application Dashboard**: contexto de aplicacion con salud, infraestructura asociada,
+  dependencias criticas y performance end-to-end.
+
 ## Estructura
 
 ```text
@@ -71,6 +84,32 @@ Scripts/ManageTestData.sh list
 Scripts/ManageTestData.sh validate
 Scripts/ManageTestData.sh delete --load-id DemoCritical001
 Scripts/ManageTestData.sh delete --all --confirmar
+```
+
+Generar lotes de verificacion para todas las herramientas:
+
+```bash
+Scripts/GenerateVerificationBatches.sh
+Scripts/GenerateVerificationBatches.sh DemoFull001
+```
+
+El generador crea lotes `normal`, `warning`, `critical` y `mixed`. La carga escribe KPIs en
+PostgreSQL para Grafana, series en VictoriaMetrics y hosts/items sinteticos en Zabbix.
+El script borra primero cada lote con el mismo identificador para que pueda repetirse con el mismo
+prefijo.
+
+Para validar dashboards optimizados, usar un prefijo nuevo y revisar la carpeta `Capacity` en
+Grafana:
+
+```bash
+Scripts/GenerateVerificationBatches.sh DashboardOpt001
+Scripts/ManageTestData.sh validate --load-id DashboardOpt001-critical
+```
+
+Validar una serie sintetica en VictoriaMetrics:
+
+```bash
+curl "http://localhost:8428/api/v1/query?query=count_over_time%28synthetic_cpu%7Bload_id%3D%22DemoCritical001%22%7D%5B400d%5D%29"
 ```
 
 ## Uso de CapacityEngine
@@ -153,6 +192,9 @@ Scripts/StartStack.sh
 
 `StartStack.sh` valida primero que existan todas las imagenes locales. Si falta alguna, ejecutar
 `Scripts/BuildImages.sh` antes de iniciar.
+Grafana monta `Config/Grafana/Datasources`, `Config/Grafana/DashboardProviders` y
+`Config/Grafana/Dashboards` desde el repositorio. Despues de un `git pull`, reiniciar el stack
+alcanza para reprovisionar dashboards sin reconstruir la imagen.
 
 ## Modo de uso
 
@@ -171,6 +213,13 @@ Credenciales por defecto para Grafana:
 ```text
 Usuario: admin
 Password: admin
+```
+
+Credenciales por defecto para Zabbix Web:
+
+```text
+Usuario: Admin
+Password: zabbix
 ```
 
 Para una instancia remota de Ubuntu, reemplazar `localhost` por la IP publica o nombre DNS del
@@ -201,7 +250,8 @@ Grafana -> capacity-performance-postgresql:5432
 ZabbixWeb -> capacity-performance-zabbix-server:10051
 ZabbixWeb -> capacity-performance-postgresql:5432
 ZabbixServer -> capacity-performance-postgresql:5432
-CapacityEngine -> PostgreSQL y VictoriaMetrics (pendiente de integracion con datos reales)
+ManageTestData -> PostgreSQL y VictoriaMetrics
+CapacityEngine -> PostgreSQL y VictoriaMetrics
 ```
 
 Consultar estado:
@@ -248,7 +298,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 55 tests OK
+Scripts/RunTests.sh        -> 79 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```

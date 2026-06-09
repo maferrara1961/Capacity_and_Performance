@@ -1,10 +1,70 @@
 {
   "title": "Application Dashboard",
-  "tags": ["capacity", "application"],
+  "tags": ["capacity", "application", "service"],
   "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "30s",
   "panels": [
-    {"title": "Application Health", "type": "stat", "targets": [{"rawSql": "select Name, HealthStatus from Application"}]},
-    {"title": "Associated Infrastructure", "type": "table", "targets": [{"rawSql": "select ServiceId, ResourceId, Role, ImpactWeight from ServiceResourceMap"}]},
-    {"title": "Critical Dependencies", "type": "table", "targets": [{"rawSql": "select ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical')"}]}
+    {
+      "id": 100,
+      "title": "Como leer este dashboard",
+      "description": "Guia visible para interpretar los cuadros de aplicacion y servicio.",
+      "type": "text",
+      "gridPos": {"h": 4, "w": 24, "x": 0, "y": 0},
+      "options": {
+        "mode": "markdown",
+        "content": "### Que muestra\nEste tablero conecta aplicaciones con infraestructura: salud, recursos asociados, dependencias criticas, performance end-to-end y riesgo de capacidad por servicio.\n\n### Como interpretarlo\nApplication Health muestra el estado funcional; Associated Infrastructure muestra que recursos soportan el servicio; Critical Dependencies muestra riesgos que pueden impactar la aplicacion; End To End Performance muestra latencia, throughput y errores.\n\n### Accion sugerida\nSi un servicio esta en Warning o Critical, revisar primero Service Capacity Risk, despues Critical Dependencies y finalmente la metrica tecnica que explica la degradacion."
+      }
+    },
+    {
+      "id": 1,
+      "title": "Application Health",
+      "description": "ApplicationId, health, and end-to-end status for service owners.",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application order by Name"}]
+    },
+    {
+      "id": 2,
+      "title": "Associated Infrastructure",
+      "description": "ServiceId, ResourceId, role, and ImpactWeight mapping for each service.",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ServiceId, ApplicationId, ResourceId, Role, ImpactWeight from ServiceResourceMap order by ServiceId, ResourceId"}]
+    },
+    {
+      "id": 3,
+      "title": "Critical Dependencies",
+      "description": "Warning and Critical dependency risks with service or resource scope.",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 4},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select ScopeType, ScopeId, OverallRisk, Reason from RiskAssessment where OverallRisk in ('Warning','Critical') order by case OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, CalculatedAt desc"}]
+    },
+    {
+      "id": 4,
+      "title": "End To End Performance",
+      "description": "Latency, throughput, and error signals for application-level performance.",
+      "type": "timeseries",
+      "datasource": {"type": "prometheus", "uid": "VictoriaMetrics"},
+      "gridPos": {"h": 9, "w": 16, "x": 0, "y": 12},
+      "targets": [
+        {"refId": "A", "expr": "synthetic_latency", "legendFormat": "latency {{resource_id}} {{load_id}}"},
+        {"refId": "B", "expr": "synthetic_throughput", "legendFormat": "throughput {{resource_id}} {{load_id}}"},
+        {"refId": "C", "expr": "synthetic_errors", "legendFormat": "errors {{resource_id}} {{load_id}}"}
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Service Capacity Risk",
+      "description": "Service and resource risk context for service-oriented capacity decisions. Missing data means no mapped risk exists.",
+      "type": "table",
+      "datasource": {"type": "postgres", "uid": "CapacityPostgreSQL"},
+      "gridPos": {"h": 9, "w": 8, "x": 16, "y": 12},
+      "targets": [{"refId": "A", "format": "table", "rawSql": "select m.ServiceId, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"}]
+    }
   ]
 }

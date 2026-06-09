@@ -45,7 +45,7 @@ class SyntheticDataService:
             {
                 "ServiceId": f"{LoadId}-Service-{Index}",
                 "LoadId": LoadId,
-                "Name": f"Servicio Sintetico {Index}",
+                "Name": f"Servicio Sintetico {LoadId} {Index}",
                 "Owner": "CapacityLab",
                 "Criticality": Criticalities[Index % len(Criticalities)],
                 "Status": self.StatusFor(Profile),
@@ -61,7 +61,7 @@ class SyntheticDataService:
                 "ResourceId": f"{LoadId}-Resource-{Index}",
                 "LoadId": LoadId,
                 "ResourceType": Types[(Index - 1) % len(Types)],
-                "Name": f"Recurso Sintetico {Index}",
+                "Name": f"Recurso Sintetico {LoadId} {Index}",
                 "Platform": "PodmanLab",
                 "CapacityUnit": "Percent",
                 "TotalCapacity": 100.0,
