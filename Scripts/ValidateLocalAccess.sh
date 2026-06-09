@@ -29,15 +29,15 @@ ValidateHttp() {
   Match="$3"
   Info "validando HTTP $Name en $Url"
   if [ "$STACK_DRY_RUN" = "1" ]; then
-    echo "SIMULACION: curl -fsS --max-time 5 $Url"
+    echo "SIMULACION: curl -fsSL --max-time 5 $Url"
     return 0
   fi
-  Body="$(curl -fsS --max-time 5 "$Url")"
+  Body="$(curl -fsSL --max-time 5 "$Url")"
   if printf '%s' "$Body" | grep -qi "$Match"; then
     Info "$Name disponible"
     return 0
   fi
-  Error "$Name respondio HTTP pero no contiene la marca esperada: $Match"
+  Error "$Name respondio HTTP despues de seguir redirecciones, pero no contiene la marca esperada: $Match"
   return 1
 }
 

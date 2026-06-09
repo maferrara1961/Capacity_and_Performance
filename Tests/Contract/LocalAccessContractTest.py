@@ -20,6 +20,7 @@ class LocalAccessContractTest(unittest.TestCase):
         )
         self.assertEqual(Result.returncode, 0, Result.stderr)
         self.assertIn("validando HTTP Grafana", Result.stdout)
+        self.assertIn("curl -fsSL --max-time 5 http://127.0.0.1:3000", Result.stdout)
         self.assertIn("validando HTTP Zabbix Web", Result.stdout)
         self.assertIn("validando HTTP VictoriaMetrics", Result.stdout)
         self.assertIn("validando TCP PostgreSQL", Result.stdout)
