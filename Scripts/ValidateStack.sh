@@ -18,6 +18,7 @@ Scripts/StackLogs.sh
 Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
+Scripts/ManageTestData.sh
 Config/Grafana/Datasources/Datasources.yml
 Config/Grafana/Dashboards/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
@@ -26,6 +27,7 @@ Config/Grafana/Dashboards/CapacityPlanningDashboard.json
 Config/Grafana/Dashboards/ApplicationDashboard.json
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
+Sql/Schema/003_TestDataLoads.sql
 Sql/Seed/SampleCatalog.sql
 "
 

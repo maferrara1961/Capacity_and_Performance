@@ -14,3 +14,4 @@ venv/
 dist/
 *.egg-info/
 coverage/
+.capacity-test-data/

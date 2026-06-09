@@ -12,12 +12,12 @@
 
 **Purpose**: Prepare shared files and command entry points for the synthetic data feature.
 
-- [ ] T001 Create placeholder command wrapper in Scripts/ManageTestData.sh
-- [ ] T002 [P] Create Python command module placeholder in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T003 [P] Create synthetic domain module placeholder in CapacityEngine/Domain/SyntheticData.py
-- [ ] T004 [P] Create synthetic application service placeholder in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T005 [P] Create PostgreSQL adapter placeholder in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
-- [ ] T006 [P] Create VictoriaMetrics adapter placeholder in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
+- [X] T001 Create placeholder command wrapper in Scripts/ManageTestData.sh
+- [X] T002 [P] Create Python command module placeholder in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T003 [P] Create synthetic domain module placeholder in CapacityEngine/Domain/SyntheticData.py
+- [X] T004 [P] Create synthetic application service placeholder in CapacityEngine/Application/SyntheticDataService.py
+- [X] T005 [P] Create PostgreSQL adapter placeholder in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
+- [X] T006 [P] Create VictoriaMetrics adapter placeholder in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
 
 ---
 
@@ -27,16 +27,16 @@
 
 **CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T007 [P] Add contract tests for CLI actions and exit codes in Tests/Contract/SyntheticDataCliContractTest.py
-- [ ] T008 [P] Add unit tests for LoadId, profile, volume, days, seed, and delete confirmation validation in Tests/Unit/SyntheticDataValidationTest.py
-- [ ] T009 [P] Add unit tests for TestLoad state transitions and deletion rules in Tests/Unit/SyntheticDataValidationTest.py
-- [ ] T010 Add synthetic load tracking schema in Sql/Schema/003_TestDataLoads.sql
-- [ ] T011 Add test-data marker fields or companion mapping strategy in Sql/Schema/003_TestDataLoads.sql
-- [ ] T012 Implement core entities TestLoad, ToolValidationResult, and validation helpers in CapacityEngine/Domain/SyntheticData.py
-- [ ] T013 Implement CLI argument parsing and deterministic Spanish error handling in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T014 Implement shell wrapper validation and Python invocation in Scripts/ManageTestData.sh
-- [ ] T015 Add Scripts/ManageTestData.sh to Scripts/ValidateStack.sh required file validation
-- [ ] T016 Add docs command references for ManageTestData in README.md
+- [X] T007 [P] Add contract tests for CLI actions and exit codes in Tests/Contract/SyntheticDataCliContractTest.py
+- [X] T008 [P] Add unit tests for LoadId, profile, volume, days, seed, and delete confirmation validation in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T009 [P] Add unit tests for TestLoad state transitions and deletion rules in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T010 Add synthetic load tracking schema in Sql/Schema/003_TestDataLoads.sql
+- [X] T011 Add test-data marker fields or companion mapping strategy in Sql/Schema/003_TestDataLoads.sql
+- [X] T012 Implement core entities TestLoad, ToolValidationResult, and validation helpers in CapacityEngine/Domain/SyntheticData.py
+- [X] T013 Implement CLI argument parsing and deterministic Spanish error handling in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T014 Implement shell wrapper validation and Python invocation in Scripts/ManageTestData.sh
+- [X] T015 Add Scripts/ManageTestData.sh to Scripts/ValidateStack.sh required file validation
+- [X] T016 Add docs command references for ManageTestData in README.md
 
 **Checkpoint**: Foundation ready. CLI rejects invalid inputs, exposes actions, and schema support exists.
 
@@ -50,21 +50,21 @@
 
 ### Tests for User Story 1
 
-- [ ] T017 [P] [US1] Add unit tests for scenario-based service/resource generation in Tests/Unit/SyntheticDataValidationTest.py
-- [ ] T018 [P] [US1] Add unit tests for metric sample ranges and trend shapes in Tests/Unit/SyntheticDataValidationTest.py
-- [ ] T019 [P] [US1] Add contract test for `Scripts/ManageTestData.sh load --profile mixed --volume small` summary in Tests/Contract/SyntheticDataCliContractTest.py
-- [ ] T020 [P] [US1] Add integration test for one successful synthetic load in Tests/Integration/SyntheticDataFlowTest.py
+- [X] T017 [P] [US1] Add unit tests for scenario-based service/resource generation in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T018 [P] [US1] Add unit tests for metric sample ranges and trend shapes in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T019 [P] [US1] Add contract test for `Scripts/ManageTestData.sh load --profile mixed --volume small` summary in Tests/Contract/SyntheticDataCliContractTest.py
+- [X] T020 [P] [US1] Add integration test for one successful synthetic load in Tests/Integration/SyntheticDataFlowTest.py
 
 ### Implementation for User Story 1
 
-- [ ] T021 [P] [US1] Implement SyntheticService, SyntheticApplication, SyntheticResource, SyntheticMetricSample, SyntheticCapacityKpi, SyntheticForecast, SyntheticRisk, and SyntheticRecommendation entities in CapacityEngine/Domain/SyntheticData.py
-- [ ] T022 [US1] Implement scenario profile generation for normal, warning, critical, overprovisioned, underprovisioned, and mixed in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T023 [US1] Implement deterministic random generation with optional seed in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T024 [US1] Implement KPI, forecast, risk, and recommendation synthetic output creation in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T025 [US1] Implement PostgreSQL write operations for catalog and capacity outputs in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
-- [ ] T026 [US1] Implement VictoriaMetrics import/write operation boundary for synthetic metric samples in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
-- [ ] T027 [US1] Wire `load` action orchestration in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T028 [US1] Print Spanish load summary with counts in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T021 [P] [US1] Implement SyntheticService, SyntheticApplication, SyntheticResource, SyntheticMetricSample, SyntheticCapacityKpi, SyntheticForecast, SyntheticRisk, and SyntheticRecommendation entities in CapacityEngine/Domain/SyntheticData.py
+- [X] T022 [US1] Implement scenario profile generation for normal, warning, critical, overprovisioned, underprovisioned, and mixed in CapacityEngine/Application/SyntheticDataService.py
+- [X] T023 [US1] Implement deterministic random generation with optional seed in CapacityEngine/Application/SyntheticDataService.py
+- [X] T024 [US1] Implement KPI, forecast, risk, and recommendation synthetic output creation in CapacityEngine/Application/SyntheticDataService.py
+- [X] T025 [US1] Implement PostgreSQL write operations for catalog and capacity outputs in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
+- [X] T026 [US1] Implement VictoriaMetrics import/write operation boundary for synthetic metric samples in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
+- [X] T027 [US1] Wire `load` action orchestration in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T028 [US1] Print Spanish load summary with counts in CapacityEngine/Scheduler/SyntheticDataCommand.py
 
 **Checkpoint**: User Story 1 is independently functional and demonstrable as the MVP.
 
@@ -78,17 +78,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T029 [P] [US2] Add contract tests for explicit and generated load ids in Tests/Contract/SyntheticDataCliContractTest.py
-- [ ] T030 [P] [US2] Add unit tests for duplicate LoadId rejection or safe unique generation in Tests/Unit/SyntheticDataValidationTest.py
-- [ ] T031 [P] [US2] Add integration test for two independent loads and list output in Tests/Integration/SyntheticDataFlowTest.py
+- [X] T029 [P] [US2] Add contract tests for explicit and generated load ids in Tests/Contract/SyntheticDataCliContractTest.py
+- [X] T030 [P] [US2] Add unit tests for duplicate LoadId rejection or safe unique generation in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T031 [P] [US2] Add integration test for two independent loads and list output in Tests/Integration/SyntheticDataFlowTest.py
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] Implement TestLoad persistence, uniqueness checks, and status updates in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
-- [ ] T033 [US2] Implement generated LoadId behavior and duplicate handling in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T034 [US2] Implement `list` action with status filtering in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T035 [US2] Ensure generated records carry LoadId and IsTestData marker in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T036 [US2] Add multiple-load usage examples to README.md
+- [X] T032 [US2] Implement TestLoad persistence, uniqueness checks, and status updates in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
+- [X] T033 [US2] Implement generated LoadId behavior and duplicate handling in CapacityEngine/Application/SyntheticDataService.py
+- [X] T034 [US2] Implement `list` action with status filtering in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T035 [US2] Ensure generated records carry LoadId and IsTestData marker in CapacityEngine/Application/SyntheticDataService.py
+- [X] T036 [US2] Add multiple-load usage examples to README.md
 
 **Checkpoint**: User Stories 1 and 2 work independently and together.
 
@@ -102,17 +102,17 @@
 
 ### Tests for User Story 3
 
-- [ ] T037 [P] [US3] Add contract tests for delete by load id and delete all confirmation in Tests/Contract/SyntheticDataCliContractTest.py
-- [ ] T038 [P] [US3] Add unit tests for cleanup safety preserving non-test records in Tests/Unit/SyntheticDataValidationTest.py
-- [ ] T039 [P] [US3] Add integration test for selective cleanup and delete-all cleanup in Tests/Integration/SyntheticDataFlowTest.py
+- [X] T037 [P] [US3] Add contract tests for delete by load id and delete all confirmation in Tests/Contract/SyntheticDataCliContractTest.py
+- [X] T038 [P] [US3] Add unit tests for cleanup safety preserving non-test records in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T039 [P] [US3] Add integration test for selective cleanup and delete-all cleanup in Tests/Integration/SyntheticDataFlowTest.py
 
 ### Implementation for User Story 3
 
-- [ ] T040 [US3] Implement delete by LoadId in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
-- [ ] T041 [US3] Implement synthetic metric deletion by LoadId in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
-- [ ] T042 [US3] Implement delete-all guarded by `--confirmar` in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T043 [US3] Implement Spanish cleanup summary with deleted load and record counts in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T044 [US3] Add cleanup examples and safety warnings to README.md
+- [X] T040 [US3] Implement delete by LoadId in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
+- [X] T041 [US3] Implement synthetic metric deletion by LoadId in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
+- [X] T042 [US3] Implement delete-all guarded by `--confirmar` in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T043 [US3] Implement Spanish cleanup summary with deleted load and record counts in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T044 [US3] Add cleanup examples and safety warnings to README.md
 
 **Checkpoint**: Synthetic data can be cleaned safely by load or all-test scope.
 
@@ -126,17 +126,17 @@
 
 ### Tests for User Story 4
 
-- [ ] T045 [P] [US4] Add contract tests for `validate` action output per tool in Tests/Contract/SyntheticDataCliContractTest.py
-- [ ] T046 [P] [US4] Add integration test for validate after a synthetic load in Tests/Integration/SyntheticDataFlowTest.py
-- [ ] T047 [P] [US4] Add unit tests for ToolValidationResult statuses in Tests/Unit/SyntheticDataValidationTest.py
+- [X] T045 [P] [US4] Add contract tests for `validate` action output per tool in Tests/Contract/SyntheticDataCliContractTest.py
+- [X] T046 [P] [US4] Add integration test for validate after a synthetic load in Tests/Integration/SyntheticDataFlowTest.py
+- [X] T047 [P] [US4] Add unit tests for ToolValidationResult statuses in Tests/Unit/SyntheticDataValidationTest.py
 
 ### Implementation for User Story 4
 
-- [ ] T048 [US4] Implement tool validation use case in CapacityEngine/Application/SyntheticDataService.py
-- [ ] T049 [US4] Implement PostgreSQL data presence validation in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
-- [ ] T050 [US4] Implement VictoriaMetrics data presence validation in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
-- [ ] T051 [US4] Wire `validate` action in CapacityEngine/Scheduler/SyntheticDataCommand.py
-- [ ] T052 [US4] Add validation examples to README.md and docs/AdministracionDeImagenes.md
+- [X] T048 [US4] Implement tool validation use case in CapacityEngine/Application/SyntheticDataService.py
+- [X] T049 [US4] Implement PostgreSQL data presence validation in CapacityEngine/Adapters/SyntheticPostgreSqlAdapter.py
+- [X] T050 [US4] Implement VictoriaMetrics data presence validation in CapacityEngine/Adapters/SyntheticVictoriaMetricsAdapter.py
+- [X] T051 [US4] Wire `validate` action in CapacityEngine/Scheduler/SyntheticDataCommand.py
+- [X] T052 [US4] Add validation examples to README.md and docs/AdministracionDeImagenes.md
 
 **Checkpoint**: All user stories are independently functional.
 
@@ -146,14 +146,14 @@
 
 **Purpose**: Final validation, documentation, and constitutional checks.
 
-- [ ] T053 [P] Update specs/003-test-data-loader/quickstart.md if implementation command behavior differs from contract
-- [ ] T054 [P] Add final operational documentation in docs/DatosDePruebaSinteticos.md
-- [ ] T055 Run Scripts/RunTests.sh and record updated test count in README.md
-- [ ] T056 Run Scripts/ValidateStack.sh and ensure no new dependency violations
-- [ ] T057 Run STACK_DRY_RUN=1 Scripts/ManageTestData.sh load --profile mixed --volume small
-- [ ] T058 Run STACK_DRY_RUN=1 Scripts/ManageTestData.sh delete --all --confirmar
-- [ ] T059 Verify no new external libraries, SDKs, packages, requirements files, or hosted services were introduced
-- [ ] T060 Verify project-defined Python symbols use PascalCase where runtime conventions allow it
+- [X] T053 [P] Update specs/003-test-data-loader/quickstart.md if implementation command behavior differs from contract
+- [X] T054 [P] Add final operational documentation in docs/DatosDePruebaSinteticos.md
+- [X] T055 Run Scripts/RunTests.sh and record updated test count in README.md
+- [X] T056 Run Scripts/ValidateStack.sh and ensure no new dependency violations
+- [X] T057 Run STACK_DRY_RUN=1 Scripts/ManageTestData.sh load --profile mixed --volume small
+- [X] T058 Run STACK_DRY_RUN=1 Scripts/ManageTestData.sh delete --all --confirmar
+- [X] T059 Verify no new external libraries, SDKs, packages, requirements files, or hosted services were introduced
+- [X] T060 Verify project-defined Python symbols use PascalCase where runtime conventions allow it
 
 ---
 

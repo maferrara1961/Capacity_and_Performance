@@ -60,6 +60,15 @@ Scripts/ValidateLocalAccess.sh
 Scripts/ValidateLocalAccess.sh IP_DEL_SERVIDOR
 ```
 
+Generar y validar datos sinteticos para dashboards:
+
+```bash
+Scripts/ManageTestData.sh load --profile mixed --volume small
+Scripts/ManageTestData.sh list
+Scripts/ManageTestData.sh validate
+Scripts/ManageTestData.sh delete --all --confirmar
+```
+
 ## Stop
 
 ```bash

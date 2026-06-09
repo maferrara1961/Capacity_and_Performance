@@ -62,6 +62,17 @@ Ejecutar el motor diario de capacidad:
 Scripts/RunCapacityDaily.sh
 ```
 
+Gestionar datos sinteticos de prueba:
+
+```bash
+Scripts/ManageTestData.sh load --profile mixed --volume small
+Scripts/ManageTestData.sh load --profile critical --volume small --load-id DemoCritical001
+Scripts/ManageTestData.sh list
+Scripts/ManageTestData.sh validate
+Scripts/ManageTestData.sh delete --load-id DemoCritical001
+Scripts/ManageTestData.sh delete --all --confirmar
+```
+
 ## Uso de CapacityEngine
 
 `CapacityEngine` es el motor Python que calcula KPIs de capacidad, forecast 30/60/90 dias, riesgo
@@ -237,7 +248,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 44 tests OK
+Scripts/RunTests.sh        -> 55 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```

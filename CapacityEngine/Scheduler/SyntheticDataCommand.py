@@ -1,0 +1,115 @@
+import argparse
+import sys
+
+from CapacityEngine.Adapters.SyntheticPostgreSqlAdapter import SyntheticPostgreSqlAdapter
+from CapacityEngine.Adapters.SyntheticVictoriaMetricsAdapter import SyntheticVictoriaMetricsAdapter
+from CapacityEngine.Application.SyntheticDataService import SyntheticDataService
+from CapacityEngine.Domain.Exceptions import ValidationError
+from CapacityEngine.Domain.SyntheticData import ValidateDays, ValidateLoadId, ValidateProfile, ValidateSeed, ValidateStatus, ValidateVolume
+
+
+def BuildParser() -> argparse.ArgumentParser:
+    Parser = argparse.ArgumentParser(prog="ManageTestData", description="Administra datos sinteticos de capacity")
+    Subparsers = Parser.add_subparsers(dest="Action", required=True)
+
+    Load = Subparsers.add_parser("load")
+    Load.add_argument("--load-id")
+    Load.add_argument("--profile", default="mixed")
+    Load.add_argument("--volume", default="small")
+    Load.add_argument("--days", default="90")
+    Load.add_argument("--seed")
+
+    List = Subparsers.add_parser("list")
+    List.add_argument("--status")
+
+    Validate = Subparsers.add_parser("validate")
+    Validate.add_argument("--load-id")
+
+    Delete = Subparsers.add_parser("delete")
+    Delete.add_argument("--load-id")
+    Delete.add_argument("--all", action="store_true")
+    Delete.add_argument("--confirmar", action="store_true")
+    return Parser
+
+
+def Main(Argv: list[str] | None = None) -> int:
+    try:
+        Args = BuildParser().parse_args(Argv)
+        Service = SyntheticDataService()
+        PostgreSql = SyntheticPostgreSqlAdapter()
+        Victoria = SyntheticVictoriaMetricsAdapter()
+        if Args.Action == "load":
+            return Load(Args, Service, PostgreSql, Victoria)
+        if Args.Action == "list":
+            return ListLoads(Args, PostgreSql)
+        if Args.Action == "validate":
+            return Validate(Args, Service, PostgreSql, Victoria)
+        if Args.Action == "delete":
+            return Delete(Args, PostgreSql, Victoria)
+    except ValidationError as Error:
+        print(f"ERROR: {Error}", file=sys.stderr)
+        return 1
+    except ValueError as Error:
+        print(f"ERROR: {Error}", file=sys.stderr)
+        return 1
+    return 1
+
+
+def Load(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter) -> int:
+    Dataset = Service.BuildSyntheticDataset(Args.load_id, ValidateProfile(Args.profile), ValidateVolume(Args.volume), ValidateDays(Args.days), ValidateSeed(Args.seed))
+    PostgreSql.SaveDataset(Dataset)
+    Victoria.SaveSamples(Dataset["Load"]["LoadId"], Dataset["Samples"])
+    LoadValue = Dataset["Load"]
+    print("INFO: carga sintetica completada")
+    print(f"  lote: {LoadValue['LoadId']}")
+    print(f"  perfil: {LoadValue['ScenarioProfile']}")
+    print(f"  servicios: {LoadValue['GeneratedServiceCount']}")
+    print(f"  recursos: {LoadValue['GeneratedResourceCount']}")
+    print(f"  muestras: {LoadValue['GeneratedMetricSampleCount']}")
+    print(f"  kpis: {LoadValue['GeneratedKpiCount']}")
+    print(f"  forecasts: {LoadValue['GeneratedForecastCount']}")
+    print(f"  riesgos: {LoadValue['GeneratedRiskCount']}")
+    print(f"  recomendaciones: {LoadValue['GeneratedRecommendationCount']}")
+    return 0
+
+
+def ListLoads(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter) -> int:
+    Status = ValidateStatus(Args.status) if Args.status else None
+    Loads = PostgreSql.ListLoads(Status)
+    if not Loads:
+        print("INFO: sin cargas sinteticas")
+        return 0
+    for LoadValue in Loads:
+        print(f"{LoadValue.LoadId} {LoadValue.Status} perfil={LoadValue.ScenarioProfile} servicios={LoadValue.GeneratedServiceCount} recursos={LoadValue.GeneratedResourceCount}")
+    return 0
+
+
+def Validate(Args: argparse.Namespace, Service: SyntheticDataService, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter) -> int:
+    LoadId = ValidateLoadId(Args.load_id) if Args.load_id else None
+    print("INFO: validacion sintetica completada")
+    for Result in Service.ValidateTools(LoadId):
+        print(f"  {Result.ToolName}: {Result.Status} ({Result.Protocol}) {Result.Message}")
+    print(f"  PostgreSQL datos sinteticos: {'OK' if PostgreSql.HasData(LoadId) else 'Sin datos'}")
+    print(f"  VictoriaMetrics muestras sinteticas: {'OK' if Victoria.HasSamples(LoadId) else 'Sin datos'}")
+    return 0
+
+
+def Delete(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter, Victoria: SyntheticVictoriaMetricsAdapter) -> int:
+    if Args.all:
+        if not Args.confirmar:
+            raise ValidationError("delete --all requiere --confirmar")
+        LoadCount, RecordCount = PostgreSql.DeleteAll()
+        MetricCount = Victoria.DeleteAll()
+    else:
+        LoadId = ValidateLoadId(Args.load_id)
+        RecordCount = PostgreSql.DeleteLoad(LoadId)
+        MetricCount = Victoria.DeleteSamples(LoadId)
+        LoadCount = 1 if RecordCount or MetricCount else 0
+    print("INFO: limpieza sintetica completada")
+    print(f"  lotes eliminados: {LoadCount}")
+    print(f"  registros eliminados: {RecordCount + MetricCount}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(Main())

@@ -19,6 +19,15 @@ Scripts/ValidateStack.sh
 
 Expected result: all tests pass and stack validation reports OK.
 
+Current validation command:
+
+```bash
+Scripts/RunTests.sh
+Scripts/ValidateStack.sh
+STACK_DRY_RUN=1 Scripts/ManageTestData.sh load --profile mixed --volume small
+STACK_DRY_RUN=1 Scripts/ManageTestData.sh delete --all --confirmar
+```
+
 ## Standard Load
 
 ```bash
