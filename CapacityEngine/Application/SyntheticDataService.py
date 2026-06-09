@@ -16,12 +16,12 @@ class SyntheticDataService:
         Days = ValidateDays(Days)
         Seed = ValidateSeed(Seed)
         LoadId = ValidateLoadId(LoadId or self.GenerateLoadId())
-        Random = random.Random(Seed if Seed is not None else LoadId)
+        Random = random.Random(f"{Seed}-{LoadId}" if Seed is not None else LoadId)
         ResourceCount = self.VolumeScale[Volume]
         ServiceCount = max(1, ResourceCount // 2)
         Load = TestLoad.Create(LoadId, Profile, Volume).WithStatus("Running")
         Services = self.BuildServices(LoadId, ServiceCount, Profile)
-        Resources = self.BuildResources(LoadId, ResourceCount, Profile)
+        Resources = self.BuildResources(LoadId, ResourceCount, Profile, Random)
         Samples = self.BuildSamples(LoadId, Resources, Profile, Days, Random)
         Kpis = self.BuildKpis(LoadId, Resources, Profile, Random)
         Forecasts = self.BuildForecasts(LoadId, Resources, Profile, Random)
@@ -54,22 +54,46 @@ class SyntheticDataService:
             for Index in range(1, Count + 1)
         ]
 
-    def BuildResources(self, LoadId: str, Count: int, Profile: str) -> list[dict]:
+    def BuildResources(self, LoadId: str, Count: int, Profile: str, Random: random.Random) -> list[dict]:
         Types = ["Server", "Database", "Storage", "Network", "Dependency"]
-        return [
-            {
-                "ResourceId": f"{LoadId}-Resource-{Index}",
-                "LoadId": LoadId,
-                "ResourceType": Types[(Index - 1) % len(Types)],
-                "Name": f"Recurso Sintetico {LoadId} {Index}",
-                "Platform": "PodmanLab",
-                "CapacityUnit": "Percent",
-                "TotalCapacity": 100.0,
-                "Status": self.StatusFor(Profile),
-                "IsTestData": True,
-            }
-            for Index in range(1, Count + 1)
-        ]
+        UsedHostNumbers = set()
+        Resources = []
+        for Index in range(1, Count + 1):
+            HostNumber = self.RandomHostNumber(Random, UsedHostNumbers)
+            HostName = f"SRV-{HostNumber}"
+            ResourceType = Types[(Index - 1) % len(Types)]
+            Resources.append(
+                {
+                    "ResourceId": f"{LoadId}-Resource-{Index}",
+                    "LoadId": LoadId,
+                    "ResourceType": ResourceType,
+                    "Name": HostName,
+                    "Platform": "PodmanLab",
+                    "CapacityUnit": "Percent",
+                    "TotalCapacity": 100.0,
+                    "Status": self.StatusFor(Profile),
+                    "Inventory": self.BuildInventory(LoadId, HostName, ResourceType, Index),
+                    "IsTestData": True,
+                }
+            )
+        return Resources
+
+    def RandomHostNumber(self, Random: random.Random, UsedHostNumbers: set[int]) -> int:
+        while True:
+            HostNumber = Random.randint(10000, 99999)
+            if HostNumber not in UsedHostNumbers:
+                UsedHostNumbers.add(HostNumber)
+                return HostNumber
+
+    def BuildInventory(self, LoadId: str, HostName: str, ResourceType: str, Index: int) -> dict:
+        return {
+            "AssetTag": f"{LoadId}-{Index}",
+            "Alias": HostName,
+            "Type": ResourceType,
+            "Os": "Linux",
+            "Location": "CapacityLab",
+            "Notes": f"Host sintetico {HostName} generado para pruebas de capacity y performance",
+        }
 
     def BuildSamples(self, LoadId: str, Resources: list[dict], Profile: str, Days: int, Random: random.Random) -> list[dict]:
         Metrics = ["CPU", "RAM", "Storage", "IOPS", "Network", "Latency", "Throughput", "Errors", "Saturation"]

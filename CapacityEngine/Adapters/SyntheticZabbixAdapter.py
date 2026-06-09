@@ -64,7 +64,7 @@ class SyntheticZabbixAdapter:
                 ItemId = self.EnsureItem(Token, HostId, Sample)
                 ItemIds.append(ItemId)
                 ItemIdsByResourceMetric[(Resource["ResourceId"], Sample["MetricName"])] = ItemId
-                self.EnsureTriggers(Token, Resource["ResourceId"], Sample)
+                self.EnsureTriggers(Token, Resource["ResourceId"], Resource["Name"], Sample)
             self.EnsureGraph(Token, HostId, Resource["Name"], ItemIds)
         History = self.BuildHistoryPushPayload(Dataset["Samples"], ItemIdsByResourceMetric)
         for Chunk in self.Chunks(History, 100):
@@ -122,6 +122,7 @@ class SyntheticZabbixAdapter:
     def EnsureHost(self, Token: str, GroupId: str, Resource: dict) -> str:
         Existing = self.ApiCall(Token, "host.get", {"output": ["hostid"], "filter": {"host": [Resource["ResourceId"]]}})
         if Existing:
+            self.UpdateHostInventory(Token, Existing[0]["hostid"], Resource)
             return Existing[0]["hostid"]
         Created = self.ApiCall(
             Token,
@@ -130,9 +131,35 @@ class SyntheticZabbixAdapter:
                 "host": Resource["ResourceId"],
                 "name": Resource["Name"],
                 "groups": [{"groupid": GroupId}],
+                "inventory_mode": 0,
+                "inventory": self.BuildZabbixInventory(Resource),
             },
         )
         return Created["hostids"][0]
+
+    def UpdateHostInventory(self, Token: str, HostId: str, Resource: dict) -> None:
+        self.ApiCall(
+            Token,
+            "host.update",
+            {
+                "hostid": HostId,
+                "name": Resource["Name"],
+                "inventory_mode": 0,
+                "inventory": self.BuildZabbixInventory(Resource),
+            },
+        )
+
+    def BuildZabbixInventory(self, Resource: dict) -> dict:
+        Inventory = Resource.get("Inventory", {})
+        return {
+            "name": Resource["Name"],
+            "alias": Inventory.get("Alias", Resource["Name"]),
+            "asset_tag": Inventory.get("AssetTag", Resource["ResourceId"]),
+            "type": Inventory.get("Type", Resource.get("ResourceType", "Server")),
+            "os": Inventory.get("Os", "Linux"),
+            "location": Inventory.get("Location", "CapacityLab"),
+            "notes": Inventory.get("Notes", "Host sintetico de capacity"),
+        }
 
     def EnsureItem(self, Token: str, HostId: str, Sample: dict) -> str:
         Key = self.ItemKey(Sample["MetricName"])
@@ -181,7 +208,7 @@ class SyntheticZabbixAdapter:
         )
         return Created["graphids"][0]
 
-    def EnsureTriggers(self, Token: str, HostName: str, Sample: dict) -> None:
+    def EnsureTriggers(self, Token: str, HostKey: str, HostName: str, Sample: dict) -> None:
         Thresholds = self.TriggerThresholds(Sample["MetricName"])
         if not Thresholds:
             return
@@ -196,7 +223,7 @@ class SyntheticZabbixAdapter:
                 "trigger.create",
                 {
                     "description": Description,
-                    "expression": f"last(/{HostName}/{Key})>{Value}",
+                    "expression": f"last(/{HostKey}/{Key})>{Value}",
                     "priority": Priority,
                     "comments": f"Alerta sintetica de capacity para validar dashboards y graficas por host. Umbral {SeverityName}: {Value}.",
                 },

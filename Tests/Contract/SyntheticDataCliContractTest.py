@@ -63,6 +63,15 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertNotEqual(First["Services"][0]["Name"], Second["Services"][0]["Name"])
         self.assertNotEqual(First["Resources"][0]["Name"], Second["Resources"][0]["Name"])
 
+    def test_recursos_usan_hosts_srv_aleatorios_con_inventario(self):
+        Dataset = SyntheticDataService().BuildSyntheticDataset("SrvDemo001", "mixed", "small", 30, 1)
+        HostNames = [Resource["Name"] for Resource in Dataset["Resources"]]
+        self.assertEqual(len(HostNames), len(set(HostNames)))
+        for Resource in Dataset["Resources"]:
+            self.assertRegex(Resource["Name"], r"^SRV-[0-9]{5}$")
+            self.assertEqual(Resource["Inventory"]["Alias"], Resource["Name"])
+            self.assertEqual(Resource["Inventory"]["AssetTag"], f"SrvDemo001-{Dataset['Resources'].index(Resource) + 1}")
+
     def test_victoriametrics_import_usa_formato_prometheus(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("VmDemo001", "mixed", "small", 30, 1)
         Adapter = SyntheticVictoriaMetricsAdapter()
@@ -81,6 +90,16 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertEqual(Adapter.ItemKey("Network IOPS"), "capacity.synthetic[network_iops]")
         self.assertTrue(Adapter.TriggerThresholds("CPU"))
         self.assertTrue(Adapter.TriggerThresholds("Saturation"))
+        Inventory = Adapter.BuildZabbixInventory(
+            {
+                "ResourceId": "SrvDemo001-Resource-1",
+                "ResourceType": "Server",
+                "Name": "SRV-12345",
+                "Inventory": {"AssetTag": "SrvDemo001-1", "Alias": "SRV-12345", "Type": "Server"},
+            }
+        )
+        self.assertEqual(Inventory["name"], "SRV-12345")
+        self.assertEqual(Inventory["asset_tag"], "SrvDemo001-1")
 
     def test_zabbix_latest_samples_por_recurso_y_metrica(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxDemo001", "mixed", "small", 30, 1)
