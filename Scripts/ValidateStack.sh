@@ -21,7 +21,7 @@ Scripts/ValidateLocalAccess.sh
 Scripts/ManageTestData.sh
 Scripts/GenerateVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
-Config/Grafana/Dashboards/Provisioning.yml
+Config/Grafana/DashboardProviders/Provisioning.yml
 Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
 Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json
 Config/Grafana/Dashboards/CapacityPlanningDashboard.json

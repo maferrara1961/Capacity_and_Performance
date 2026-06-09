@@ -12,8 +12,6 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
 
     def test_paneles_sql_usan_postgresql_explicito(self):
         for DashboardPath in Path("Config/Grafana/Dashboards").glob("*.json"):
-            if DashboardPath.name == "Provisioning.yml":
-                continue
             Dashboard = json.loads(DashboardPath.read_text())
             for Panel in Dashboard.get("panels", []):
                 Targets = Panel.get("targets", [])
@@ -27,6 +25,10 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
         self.assertTrue(PrometheusPanels)
         for Panel in PrometheusPanels:
             self.assertEqual(Panel["datasource"]["uid"], "VictoriaMetrics")
+
+    def test_provider_apunta_a_directorio_de_json_separado(self):
+        Provider = Path("Config/Grafana/DashboardProviders/Provisioning.yml").read_text()
+        self.assertIn("path: /etc/grafana/dashboards", Provider)
 
 
 if __name__ == "__main__":

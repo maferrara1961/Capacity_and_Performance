@@ -171,8 +171,9 @@ Scripts/StartStack.sh
 
 `StartStack.sh` valida primero que existan todas las imagenes locales. Si falta alguna, ejecutar
 `Scripts/BuildImages.sh` antes de iniciar.
-Grafana monta `Config/Grafana/Datasources` y `Config/Grafana/Dashboards` desde el repositorio; despues
-de un `git pull`, reiniciar el stack alcanza para reprovisionar dashboards sin reconstruir la imagen.
+Grafana monta `Config/Grafana/Datasources`, `Config/Grafana/DashboardProviders` y
+`Config/Grafana/Dashboards` desde el repositorio. Despues de un `git pull`, reiniciar el stack
+alcanza para reprovisionar dashboards sin reconstruir la imagen.
 
 ## Modo de uso
 

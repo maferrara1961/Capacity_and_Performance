@@ -34,7 +34,8 @@ class StackInterconnectionContractTest(unittest.TestCase):
     def test_grafana_monta_provisioning_desde_el_repositorio(self):
         Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")
         self.assertIn("${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z", Common)
-        self.assertIn("${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/provisioning/dashboards:ro,Z", Common)
+        self.assertIn("${REPO_ROOT}/Config/Grafana/DashboardProviders:/etc/grafana/provisioning/dashboards:ro,Z", Common)
+        self.assertIn("${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/dashboards:ro,Z", Common)
 
 
 if __name__ == "__main__":
