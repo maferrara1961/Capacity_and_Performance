@@ -29,6 +29,19 @@ La provision de Grafana incluye vistas para:
 Los dashboards cubren estado OK/Warning/Critical, forecast 30/60/90 dias, utilizacion promedio,
 pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias y recomendaciones.
 
+Uso recomendado de dashboards:
+
+- Cada dashboard incluye un cuadro visible `Como leer este dashboard` con tres partes:
+  `Que muestra`, `Como interpretarlo` y `Accion sugerida`.
+- **Executive Capacity Dashboard**: decision ejecutiva con estado general, top 5 riesgos,
+  forecast 30/60/90, headroom y recomendaciones priorizadas.
+- **Technical Performance Dashboard**: mejora operativa con CPU, RAM, storage, IOPS, red,
+  latencia, throughput, errores, saturacion, percentil 95, top consumidores y outliers.
+- **Capacity Planning Dashboard**: planificacion con crecimiento mensual, headroom, baseline,
+  dias a saturacion, recursos sobredimensionados y subdimensionados.
+- **Application Dashboard**: contexto de aplicacion con salud, infraestructura asociada,
+  dependencias criticas y performance end-to-end.
+
 ## Estructura
 
 ```text
@@ -84,6 +97,14 @@ El generador crea lotes `normal`, `warning`, `critical` y `mixed`. La carga escr
 PostgreSQL para Grafana, series en VictoriaMetrics y hosts/items sinteticos en Zabbix.
 El script borra primero cada lote con el mismo identificador para que pueda repetirse con el mismo
 prefijo.
+
+Para validar dashboards optimizados, usar un prefijo nuevo y revisar la carpeta `Capacity` en
+Grafana:
+
+```bash
+Scripts/GenerateVerificationBatches.sh DashboardOpt001
+Scripts/ManageTestData.sh validate --load-id DashboardOpt001-critical
+```
 
 Validar una serie sintetica en VictoriaMetrics:
 
@@ -277,7 +298,7 @@ STACK_DRY_RUN=1 Scripts/CleanupStack.sh --confirmar
 La implementacion fue validada con:
 
 ```text
-Scripts/RunTests.sh        -> 57 tests OK
+Scripts/RunTests.sh        -> 79 tests OK
 Scripts/ValidateStack.sh   -> OK
 STACK_DRY_RUN=1 build/start/status/logs/stop/cleanup -> OK
 ```

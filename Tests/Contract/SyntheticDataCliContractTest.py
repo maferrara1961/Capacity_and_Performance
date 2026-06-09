@@ -93,6 +93,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("RunLoad critical", Script.read_text())
         self.assertIn("delete --load-id", Script.read_text())
 
+    def test_perfiles_de_verificacion_requeridos_generan_datos(self):
+        Service = SyntheticDataService()
+        for Profile in ["normal", "warning", "critical", "mixed"]:
+            Dataset = Service.BuildSyntheticDataset(f"Profile{Profile}001", Profile, "small", 30, 1)
+            self.assertEqual(Dataset["Load"]["ScenarioProfile"], Profile)
+            self.assertGreater(Dataset["Load"]["GeneratedMetricSampleCount"], 0)
+            self.assertGreater(Dataset["Load"]["GeneratedKpiCount"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

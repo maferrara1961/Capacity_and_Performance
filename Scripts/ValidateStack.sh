@@ -74,6 +74,20 @@ if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards/*.json >/dev/null 2>&1;
   exit 1
 fi
 
+for ExpectedText in "Top 5 Capacity Risks" "Top Consumers And Outliers" "Overprovisioned Resources" "Service Capacity Risk"; do
+  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+    echo "Falta panel optimizado requerido: $ExpectedText" >&2
+    exit 1
+  fi
+done
+
+for ExpectedSignal in "Forecast30Days" "Forecast60Days" "Forecast90Days" "P95Utilization" "synthetic_saturation"; do
+  if ! grep -R "$ExpectedSignal" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+    echo "Falta senal requerida en dashboards: $ExpectedSignal" >&2
+    exit 1
+  fi
+done
+
 if ! grep -q "ZBX_SERVER_HOST=.*zabbix-server" Scripts/StackCommon.sh; then
   echo "Zabbix Web no declara conexion con Zabbix Server" >&2
   exit 1
