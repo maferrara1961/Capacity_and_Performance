@@ -37,6 +37,15 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
         self.assertIn("postgresVersion: 1600", Text)
         self.assertIn("sslmode: disable", Text)
 
+    def test_grafana_usa_postgresql_como_base_operacional(self):
+        Common = Path("Scripts/StackCommon.sh").read_text(encoding="utf-8")
+        self.assertIn("GF_DATABASE_TYPE=postgres", Common)
+        self.assertIn("GF_DATABASE_HOST=${PROJECT_NAME}-postgresql:5432", Common)
+        self.assertIn("GF_DATABASE_NAME=grafana", Common)
+        self.assertIn("GF_DATABASE_USER=capacity", Common)
+        self.assertIn("GF_DATABASE_SSL_MODE=disable", Common)
+        self.assertNotIn("capacity-performance-grafana-data:/var/lib/grafana", Common)
+
     def test_paneles_sql_usan_postgresql_explicito(self):
         for DashboardPath in DashboardDirectory.glob("*.json"):
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))

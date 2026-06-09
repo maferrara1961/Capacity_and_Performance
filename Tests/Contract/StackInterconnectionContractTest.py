@@ -31,6 +31,14 @@ class StackInterconnectionContractTest(unittest.TestCase):
         Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")
         self.assertIn("ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server", Common)
         self.assertIn("DB_SERVER_HOST=${PROJECT_NAME}-postgresql", Common)
+        self.assertIn("POSTGRES_DB=capacity", Common)
+
+    def test_postgresql_inicializa_base_grafana_y_validador_de_consistencia(self):
+        InitSql = (ROOT / "Sql/Init/001_CreateGrafanaDatabase.sql").read_text(encoding="utf-8")
+        Validator = (ROOT / "Scripts/ValidateDatabaseConsistency.sh").read_text(encoding="utf-8")
+        self.assertIn("create database grafana", InitSql)
+        self.assertIn("database:grafana", Validator)
+        self.assertIn("EnterpriseTechnologyComponent", Validator)
 
     def test_zabbix_agent_levanta_licencias_y_backlevel(self):
         Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")

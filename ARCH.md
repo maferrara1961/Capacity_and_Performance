@@ -49,7 +49,7 @@ capacity-performance-net
 | ZabbixServer | `capacity-performance-zabbix-server` | `10051` | Motor de monitoreo Zabbix, items, triggers y procesamiento de datos. |
 | ZabbixWeb | `capacity-performance-zabbix-web` | `8080` | Consola web/API JSON-RPC de Zabbix. |
 | ZabbixAgent | `capacity-performance-zabbix-agent` | interno `10050` | Checks custom de licencia, compliance, software backlevel, lifecycle y fin de soporte. |
-| Grafana | `capacity-performance-grafana` | `3000` | Capa principal de dashboards ejecutivos, tecnicos, capacity planning y aplicacion. |
+| Grafana | `capacity-performance-grafana` | `3000` | Capa principal de dashboards; metadata persistida en PostgreSQL. |
 | CapacityEngine | `capacity-performance-capacity-engine` | sin puerto | Tarea batch Python para calculo de capacidad. |
 
 ## Comunicacion Interna
@@ -58,6 +58,7 @@ capacity-performance-net
 |---|---|---|---|
 | Grafana | VictoriaMetrics | HTTP `8428` | Consultas PromQL sobre metricas sinteticas. |
 | Grafana | PostgreSQL | TCP `5432` | Consultas SQL para KPIs, forecast, riesgos, recomendaciones y catalogo. |
+| Grafana | PostgreSQL | TCP `5432` | Persistencia operacional Grafana en base `grafana`; no usa SQLite. |
 | ZabbixWeb | ZabbixServer | TCP `10051` | Consola web conectada al motor Zabbix. |
 | ZabbixWeb | PostgreSQL | TCP `5432` | Persistencia de configuracion y datos de Zabbix. |
 | ZabbixServer | PostgreSQL | TCP `5432` | Persistencia operativa de Zabbix. |
@@ -233,8 +234,24 @@ Responsabilidades:
 | VictoriaMetrics | TSDB interna | `capacity-performance-victoriametrics-data` | Series temporales sinteticas por metrica, lote y host. |
 | ZabbixServer/ZabbixWeb | PostgreSQL `capacity` | `capacity-performance-postgresql-data` y `capacity-performance-zabbix-server-data` | Configuracion Zabbix, hosts, items, triggers, graficos y datos operativos. |
 | ZabbixAgent | Archivo TSV montado | `.capacity-test-data/ZabbixAgent` | Facts enterprise que el agente expone como UserParameters. |
-| Grafana | SQLite interna | `capacity-performance-grafana-data` | Estado de Grafana; dashboards y datasources se reprovisionan desde `Config/Grafana`. |
+| Grafana | PostgreSQL `grafana` | `capacity-performance-postgresql-data` | Metadata operacional de Grafana; dashboards y datasources se reprovisionan desde `Config/Grafana`. |
 | CapacityEngine | Sin persistencia propia | sin volumen dedicado | Tarea batch; resultados previstos en PostgreSQL. |
+
+## Motor PostgreSQL Comun
+
+PostgreSQL es el motor persistente comun del stack:
+
+- Base `capacity`: Zabbix, catalogo, KPIs, forecasts, riesgos, recomendaciones, datos sinteticos y datasets enterprise.
+- Base `grafana`: metadata operacional de Grafana.
+
+Grafana no usa SQLite persistente. `Scripts/StartStack.sh` garantiza la existencia de la base
+`grafana` incluso cuando el volumen de PostgreSQL ya existia antes de la actualizacion.
+
+Validacion:
+
+```bash
+Scripts/ValidateDatabaseConsistency.sh
+```
 
 ## Identificadores de Datos
 

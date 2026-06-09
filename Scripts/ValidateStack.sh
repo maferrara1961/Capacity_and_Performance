@@ -20,6 +20,7 @@ Scripts/StackLogs.sh
 Scripts/StackStatus.sh
 Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
+Scripts/ValidateDatabaseConsistency.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh
@@ -43,6 +44,7 @@ Config/ZabbixAgent/ReadEnterpriseFact.sh
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
+Sql/Init/001_CreateGrafanaDatabase.sql
 Sql/Seed/SampleCatalog.sql
 "
 
@@ -80,6 +82,21 @@ fi
 
 if ! grep -A8 "uid: CapacityPostgreSQL" Config/Grafana/Datasources/Datasources.yml | grep -q "database: capacity"; then
   echo "Datasource PostgreSQL no declara base por defecto capacity" >&2
+  exit 1
+fi
+
+if ! grep -q "GF_DATABASE_TYPE=postgres" Scripts/StackCommon.sh; then
+  echo "Grafana no usa PostgreSQL como base operacional" >&2
+  exit 1
+fi
+
+if ! grep -q "GF_DATABASE_NAME=grafana" Scripts/StackCommon.sh; then
+  echo "Grafana no declara base grafana en PostgreSQL" >&2
+  exit 1
+fi
+
+if grep -q "capacity-performance-grafana-data:/var/lib/grafana" Scripts/StackCommon.sh; then
+  echo "Grafana conserva volumen persistente local; debe usar PostgreSQL" >&2
   exit 1
 fi
 

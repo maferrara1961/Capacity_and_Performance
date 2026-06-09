@@ -130,7 +130,7 @@ VolumeArgsFor() {
     ZabbixServer) echo "-v ${PROJECT_NAME}-zabbix-server-data:/var/lib/zabbix" ;;
     Zabbix|ZabbixWeb) echo "" ;;
     ZabbixAgent) echo "-v ${REPO_ROOT}/.capacity-test-data/ZabbixAgent:/var/lib/zabbix/capacity-agent:ro,Z" ;;
-    Grafana) echo "-v ${PROJECT_NAME}-grafana-data:/var/lib/grafana -v ${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z -v ${REPO_ROOT}/Config/Grafana/DashboardProviders:/etc/grafana/provisioning/dashboards:ro,Z -v ${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/dashboards:ro,Z" ;;
+    Grafana) echo "-v ${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z -v ${REPO_ROOT}/Config/Grafana/DashboardProviders:/etc/grafana/provisioning/dashboards:ro,Z -v ${REPO_ROOT}/Config/Grafana/Dashboards:/etc/grafana/dashboards:ro,Z" ;;
     CapacityEngine) echo "" ;;
   esac
 }
@@ -142,7 +142,7 @@ EnvironmentArgsFor() {
     ZabbixServer) echo "-e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
     Zabbix|ZabbixWeb) echo "-e ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server -e DB_SERVER_HOST=${PROJECT_NAME}-postgresql -e POSTGRES_DB=capacity -e POSTGRES_USER=capacity -e POSTGRES_PASSWORD=capacity" ;;
     ZabbixAgent) echo "-e ZBX_SERVER_HOST=${PROJECT_NAME}-zabbix-server -e ZBX_HOSTNAME=${PROJECT_NAME}-zabbix-agent" ;;
-    Grafana) echo "-e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin" ;;
+    Grafana) echo "-e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=admin -e GF_DATABASE_TYPE=postgres -e GF_DATABASE_HOST=${PROJECT_NAME}-postgresql:5432 -e GF_DATABASE_NAME=grafana -e GF_DATABASE_USER=capacity -e GF_DATABASE_PASSWORD=capacity -e GF_DATABASE_SSL_MODE=disable" ;;
     VictoriaMetrics|CapacityEngine) echo "" ;;
   esac
 }

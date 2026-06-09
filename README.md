@@ -97,8 +97,9 @@ Componentes:
 - **ZabbixAgent**: agente con checks custom para levantar licencias, compliance, backlevel,
   lifecycle y fecha de fin de soporte por host.
 - **VictoriaMetrics**: almacenamiento de metricas de series temporales.
-- **Grafana**: capa principal de dashboards.
-- **PostgreSQL**: catalogo de servicios, umbrales, baselines, KPIs, forecasts y recomendaciones.
+- **Grafana**: capa principal de dashboards con metadata persistida en PostgreSQL.
+- **PostgreSQL**: motor de base de datos comun para Zabbix, Grafana, catalogo, KPIs, forecasts,
+  riesgos, recomendaciones y consistencia de datos.
 - **CapacityEngine**: motor Python diario para calculo de capacidad.
 - **Scripts**: administracion de build, start, stop, logs, status, cleanup y validacion.
 
@@ -140,11 +141,21 @@ Scripts/ValidateLocalAccess.sh
 Scripts/ValidateLocalAccess.sh IP_DEL_SERVIDOR
 ```
 
+Validar consistencia del motor PostgreSQL:
+
+```bash
+Scripts/ValidateDatabaseConsistency.sh
+```
+
+La validacion confirma que Grafana usa PostgreSQL como base operacional (`grafana`) y que Zabbix,
+catalogo, datos sinteticos y CapacityEngine usan el mismo motor PostgreSQL (`capacity`).
+
 Interconexion interna del stack:
 
 ```text
 Grafana -> capacity-performance-victoriametrics:8428
 Grafana -> capacity-performance-postgresql:5432
+Grafana metadata -> capacity-performance-postgresql:5432/grafana
 ZabbixWeb -> capacity-performance-zabbix-server:10051
 ZabbixWeb -> capacity-performance-postgresql:5432
 ZabbixServer -> capacity-performance-postgresql:5432

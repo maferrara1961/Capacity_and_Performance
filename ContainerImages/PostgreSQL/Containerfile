@@ -1,3 +1,4 @@
 FROM postgres:16
 LABEL org.opencontainers.image.title="Capacity PostgreSQL"
 LABEL org.opencontainers.image.description="Self-hosted PostgreSQL persistence for capacity observability"
+COPY Sql/Init /docker-entrypoint-initdb.d

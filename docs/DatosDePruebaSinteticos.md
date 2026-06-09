@@ -148,6 +148,12 @@ Scripts/ManageTestData.sh validate --load-id DemoCritical001
 La validacion informa estado de Grafana, Zabbix Web, VictoriaMetrics, PostgreSQL y Zabbix Server,
 ademas de presencia de datos sinteticos en PostgreSQL, VictoriaMetrics y Zabbix.
 
+Validar que PostgreSQL sea el motor de base de datos comun para Grafana, Zabbix y datasets:
+
+```bash
+Scripts/ValidateDatabaseConsistency.sh
+```
+
 Validar una serie publicada en VictoriaMetrics:
 
 ```bash
