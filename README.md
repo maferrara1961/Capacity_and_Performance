@@ -320,9 +320,25 @@ Los servicios con puerto exponen checks TCP `net.tcp.service[...]`. `CapacityEng
 publica puerto; por eso se valida con el UserParameter `capacity.platform.status[...]`, alimentado
 por `Scripts/UpdatePlatformZabbixStatus.sh` durante `StartStack` y `StopStack`.
 
+Las metricas operativas por contenedor se exponen en Zabbix con
+`capacity.platform.metric[HostName,MetricName]`. Incluyen `CpuPercent`, `MemoryUsedBytes`,
+`MemoryPercent`, `NetworkInputBytes`, `NetworkOutputBytes`, `BlockInputBytes` y
+`BlockOutputBytes`. Para historico continuo, programar:
+
+```bash
+* * * * * cd /home/opc/Capacity_and_Performance && Scripts/UpdatePlatformZabbixStatus.sh >/dev/null 2>&1
+```
+
 En Zabbix, esos datos se ven por host en `Monitoring > Latest data` como items de agente:
 
 ```text
+Platform CPU percent
+Platform RAM used bytes
+Platform RAM percent
+Platform network input bytes
+Platform network output bytes
+Platform block input bytes
+Platform block output bytes
 Enterprise Licencia - Estado
 Enterprise Compliance - Estado
 Enterprise Software Backlevel - Estado

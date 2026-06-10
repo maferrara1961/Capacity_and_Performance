@@ -46,6 +46,7 @@ Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseSoftwareBacklevelDashboard
 Config/ZabbixAgent/UserParameters.conf
 Config/ZabbixAgent/ReadEnterpriseFact.sh
 Config/ZabbixAgent/ReadPlatformStatus.sh
+Config/ZabbixAgent/ReadPlatformMetric.sh
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
@@ -171,10 +172,27 @@ if ! grep -q "capacity.platform.status" Config/ZabbixAgent/UserParameters.conf; 
   exit 1
 fi
 
+if ! grep -q "capacity.platform.metric" Config/ZabbixAgent/UserParameters.conf; then
+  echo "ZabbixAgent no declara UserParameter para metricas de plataforma" >&2
+  exit 1
+fi
+
 if ! grep -q "UpdatePlatformZabbixStatus.sh" Scripts/StartStack.sh Scripts/StopStack.sh; then
   echo "Start/Stop no actualizan estado de plataforma para Zabbix" >&2
   exit 1
 fi
+
+if ! grep -q "stats --no-stream" Scripts/UpdatePlatformZabbixStatus.sh; then
+  echo "No se actualizan metricas de CPU/RAM/red/disco desde Podman" >&2
+  exit 1
+fi
+
+for ExpectedMetric in CpuPercent MemoryUsedBytes MemoryPercent NetworkInputBytes NetworkOutputBytes BlockInputBytes BlockOutputBytes; do
+  if ! grep -q "$ExpectedMetric" CapacityEngine/Adapters/SyntheticZabbixAdapter.py Config/ZabbixAgent/ReadPlatformMetric.sh; then
+    echo "Falta metrica de plataforma para Zabbix: $ExpectedMetric" >&2
+    exit 1
+  fi
+done
 
 if ! grep -q "register-platform-hosts" CapacityEngine/Scheduler/SyntheticDataCommand.py Scripts/RegisterPlatformHosts.sh; then
   echo "Falta comando para registrar hosts productivos de la plataforma en Zabbix" >&2

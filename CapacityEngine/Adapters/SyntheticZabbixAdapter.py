@@ -37,7 +37,9 @@ class SyntheticZabbixAdapter:
             Resource = self.PlatformResource(Service)
             HostId = self.EnsureHost(Token, GroupId, Resource)
             InterfaceId = self.EnsureAgentInterface(Token, HostId)
-            self.EnsurePlatformItem(Token, HostId, InterfaceId, Service)
+            PlatformItemIds = [self.EnsurePlatformItem(Token, HostId, InterfaceId, Service)]
+            PlatformItemIds.extend(self.EnsurePlatformMetricItems(Token, HostId, InterfaceId, Service))
+            self.EnsurePlatformGraph(Token, HostId, Service["Name"], PlatformItemIds)
         return len(self.PlatformServiceDefinitions())
 
     def PlatformResource(self, Service: dict) -> dict:
@@ -484,6 +486,74 @@ class SyntheticZabbixAdapter:
         Created = self.ApiCall(Token, "item.create", Payload)
         self.EnsurePlatformTrigger(Token, ServiceName, Key)
         return Created["itemids"][0]
+
+    def EnsurePlatformMetricItems(self, Token: str, HostId: str, InterfaceId: str, Service: dict) -> list[str]:
+        ServiceName = Service["Name"]
+        Metrics = [
+            ("CpuPercent", "Platform CPU percent", "%", 0),
+            ("MemoryUsedBytes", "Platform RAM used bytes", "B", 0),
+            ("MemoryPercent", "Platform RAM percent", "%", 0),
+            ("NetworkInputBytes", "Platform network input bytes", "B", 0),
+            ("NetworkOutputBytes", "Platform network output bytes", "B", 0),
+            ("BlockInputBytes", "Platform block input bytes", "B", 0),
+            ("BlockOutputBytes", "Platform block output bytes", "B", 0),
+        ]
+        ItemIds = []
+        for MetricName, ItemName, Units, ValueType in Metrics:
+            Key = f"capacity.platform.metric[{ServiceName},{MetricName}]"
+            Existing = self.ApiCall(Token, "item.get", {"output": ["itemid"], "hostids": HostId, "filter": {"key_": [Key]}})
+            Payload = {
+                "interfaceid": InterfaceId,
+                "type": 0,
+                "value_type": ValueType,
+                "delay": "1m",
+                "history": "90d",
+                "trends": "365d",
+                "units": Units,
+                "description": f"Metrica operativa del contenedor {ServiceName} calculada desde podman stats y expuesta por ZabbixAgent.",
+            }
+            if Existing:
+                self.ApiCall(Token, "item.update", {"itemid": Existing[0]["itemid"], **Payload})
+                ItemIds.append(Existing[0]["itemid"])
+                continue
+            Created = self.ApiCall(
+                Token,
+                "item.create",
+                {
+                    "hostid": HostId,
+                    "name": f"{ItemName} - {ServiceName}",
+                    "key_": Key,
+                    **Payload,
+                },
+            )
+            ItemIds.append(Created["itemids"][0])
+        return ItemIds
+
+    def EnsurePlatformGraph(self, Token: str, HostId: str, ServiceName: str, ItemIds: list[str]) -> str | None:
+        if not ItemIds:
+            return None
+        Name = f"Platform runtime metrics - {ServiceName}"
+        Existing = self.ApiCall(Token, "graph.get", {"output": ["graphid"], "hostids": HostId, "filter": {"name": [Name]}})
+        if Existing:
+            return Existing[0]["graphid"]
+        Colors = ["199C0D", "1F78C1", "F2CC0C", "E24D42", "705DA0", "508642", "CCA300", "447EBC"]
+        Created = self.ApiCall(
+            Token,
+            "graph.create",
+            {
+                "name": Name,
+                "width": 900,
+                "height": 240,
+                "gitems": [
+                    {
+                        "itemid": ItemId,
+                        "color": Colors[Index % len(Colors)],
+                    }
+                    for Index, ItemId in enumerate(ItemIds)
+                ],
+            },
+        )
+        return Created["graphids"][0]
 
     def EnsurePlatformTrigger(self, Token: str, HostName: str, Key: str) -> None:
         Description = f"Capacity Platform unavailable - {HostName}"

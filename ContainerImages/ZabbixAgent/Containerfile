@@ -4,3 +4,4 @@ LABEL org.opencontainers.image.description="Zabbix agent2 with enterprise licens
 COPY Config/ZabbixAgent/UserParameters.conf /etc/zabbix/zabbix_agent2.d/capacity_enterprise.conf
 COPY Config/ZabbixAgent/ReadEnterpriseFact.sh /usr/local/bin/ReadEnterpriseFact.sh
 COPY Config/ZabbixAgent/ReadPlatformStatus.sh /usr/local/bin/ReadPlatformStatus.sh
+COPY Config/ZabbixAgent/ReadPlatformMetric.sh /usr/local/bin/ReadPlatformMetric.sh

@@ -49,7 +49,9 @@ class StackInterconnectionContractTest(unittest.TestCase):
         self.assertIn("${PROJECT_NAME}-zabbix-agent", Common)
         self.assertIn("capacity.enterprise.fact[*]", UserParameters)
         self.assertIn("capacity.platform.status[*]", UserParameters)
+        self.assertIn("capacity.platform.metric[*]", UserParameters)
         self.assertIn("ReadPlatformStatus.sh", Containerfile)
+        self.assertIn("ReadPlatformMetric.sh", Containerfile)
         self.assertIn("LicenseStatus", Adapter)
         self.assertIn("BacklevelStatus", Adapter)
         self.assertIn('"type": 0', Adapter)
@@ -60,15 +62,33 @@ class StackInterconnectionContractTest(unittest.TestCase):
         Stop = (ROOT / "Scripts/StopStack.sh").read_text(encoding="utf-8")
         StatusScript = (ROOT / "Scripts/UpdatePlatformZabbixStatus.sh").read_text(encoding="utf-8")
         Reader = (ROOT / "Config/ZabbixAgent/ReadPlatformStatus.sh").read_text(encoding="utf-8")
+        MetricReader = (ROOT / "Config/ZabbixAgent/ReadPlatformMetric.sh").read_text(encoding="utf-8")
 
         self.assertIn("capacity.platform.status[{ServiceName}]", Adapter)
+        self.assertIn("capacity.platform.metric[{ServiceName},{MetricName}]", Adapter)
+        self.assertIn("EnsurePlatformMetricItems", Adapter)
+        self.assertIn("EnsurePlatformGraph", Adapter)
         self.assertIn('"type": ItemType', Adapter)
         self.assertIn("ItemType = 0", Adapter)
         self.assertIn("UpdatePlatformZabbixStatus.sh", Start)
         self.assertIn("UpdatePlatformZabbixStatus.sh", Stop)
         self.assertIn("PlatformStatus.tsv", StatusScript)
+        self.assertIn("PlatformMetrics.tsv", StatusScript)
+        self.assertIn("stats --no-stream", StatusScript)
         self.assertIn("IsBatchService", StatusScript)
         self.assertIn("PlatformStatus.tsv", Reader)
+        self.assertIn("PlatformMetrics.tsv", MetricReader)
+        for MetricName in [
+            "CpuPercent",
+            "MemoryUsedBytes",
+            "MemoryPercent",
+            "NetworkInputBytes",
+            "NetworkOutputBytes",
+            "BlockInputBytes",
+            "BlockOutputBytes",
+        ]:
+            self.assertIn(MetricName, Adapter)
+            self.assertIn(MetricName, MetricReader)
 
     def test_zabbix_registra_componentes_productivos_de_plataforma(self):
         Adapter = (ROOT / "CapacityEngine/Adapters/SyntheticZabbixAdapter.py").read_text(encoding="utf-8")
