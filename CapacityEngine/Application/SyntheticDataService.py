@@ -1,5 +1,7 @@
 from datetime import UTC, datetime, timedelta
+import os
 import random
+from urllib.parse import quote
 
 from CapacityEngine.Application.EnterpriseScoringService import EnterpriseScoringService
 from CapacityEngine.Domain.EnterpriseConstants import EvidenceState
@@ -223,6 +225,7 @@ class SyntheticDataService:
 
     def BuildEnterpriseOutputs(self, LoadId: str, Services: list[dict], Resources: list[dict], Profile: str, Random: random.Random) -> dict:
         Scoring = EnterpriseScoringService()
+        ZabbixPublicUrl = os.environ.get("ZABBIX_PUBLIC_URL", "http://localhost:8080").rstrip("/")
         EvidenceStates = [State.value for State in EvidenceState]
         Domains = [
             {"DomainId": f"{LoadId}-Domain-Infrastructure", "LoadId": LoadId, "Name": "Infrastructure", "Description": "Infraestructura", "Status": "Active", "IsTestData": True},
@@ -285,7 +288,7 @@ class SyntheticDataService:
                     "ObservedAt": datetime.now(UTC).isoformat(),
                     "FreshnessStatus": "Fresh" if EvidenceStateValue == "Available" else "Unknown",
                     "EvidenceState": EvidenceStateValue,
-                    "EvidenceReference": f"http://localhost:8080/zabbix.php?action=latest.view&filter_set=1&filter_name={Resource['Name']}",
+                    "EvidenceReference": f"{ZabbixPublicUrl}/zabbix.php?action=latest.view&filter_set=1&filter_name={quote(Resource['Name'])}",
                     "IsTestData": True,
                 }
             )

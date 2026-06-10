@@ -52,6 +52,9 @@
       "options": {
         "content": "Que muestra: salud tecnologica enterprise, scores, evidencia y riesgos. Como interpretarlo: SIN EVIDENCIA no es OK. Accion sugerida: priorizar riesgos criticos y evidencia faltante.",
         "mode": "markdown"
+      },
+      "fieldConfig": {
+        "defaults": {}
       }
     },
     {
@@ -77,18 +80,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -114,18 +106,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -151,18 +132,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -188,18 +158,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -225,18 +184,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -262,18 +210,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__value.text}&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -299,18 +236,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     }
   ],

@@ -225,6 +225,8 @@ La provision de Grafana separa las vistas en tres carpetas:
 
 Los dashboards cubren estado OK/Warning/Critical, forecast 30/60/90 dias, utilizacion promedio,
 pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias y recomendaciones.
+En los dashboards de `Risk & Compliance`, los links externos se limitan a evidencia concreta y usan
+la variable editable `ZabbixBaseUrl` para abrir Zabbix desde la IP o DNS correcto del servidor.
 
 Uso recomendado:
 

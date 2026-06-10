@@ -14,11 +14,15 @@ class EnterpriseLicenseBacklevelDashboardContractTest(unittest.TestCase):
         self.assertIn("ComplianceStatus", Text)
         self.assertIn("EnterpriseTechnologyComponent", Text)
         self.assertIn("EvidenceReference", Text)
-        self.assertIn("Ver dato de evidencia", Text)
+        self.assertIn("EvidencePath", Text)
+        self.assertIn("Abrir evidencia en Zabbix", Text)
+        self.assertIn("ZabbixBaseUrl", Text)
         self.assertIn("EnterpriseEvidenceRecord", Text)
         self.assertIn('"name": "LoadId"', Text)
         self.assertIn('"allValue": ".*"', Text)
         self.assertIn("${LoadId:regex}", Text)
+        self.assertNotIn("technical-performance", Text)
+        self.assertNotIn("localhost:8080", Text)
 
     def test_dashboard_backlevel_existe_y_filtra_por_lote(self):
         Dashboard = LoadDashboard("EnterpriseSoftwareBacklevelDashboard.json")
@@ -30,11 +34,26 @@ class EnterpriseLicenseBacklevelDashboardContractTest(unittest.TestCase):
         self.assertIn("LifecycleStatus", Text)
         self.assertIn("EnterpriseTechnologyComponent", Text)
         self.assertIn("EvidenceReference", Text)
-        self.assertIn("Ver dato de evidencia", Text)
+        self.assertIn("EvidencePath", Text)
+        self.assertIn("Abrir evidencia en Zabbix", Text)
+        self.assertIn("ZabbixBaseUrl", Text)
         self.assertIn("EnterpriseEvidenceRecord", Text)
         self.assertIn('"name": "LoadId"', Text)
         self.assertIn('"allValue": ".*"', Text)
         self.assertIn("${LoadId:regex}", Text)
+        self.assertNotIn("technical-performance", Text)
+        self.assertNotIn("localhost:8080", Text)
+
+    def test_dashboards_de_riesgo_no_tienen_links_genericos_a_technical(self):
+        for DashboardName in [
+            "EnterpriseExecutiveDashboard.json",
+            "EnterpriseGovernanceDashboard.json",
+            "EnterpriseLicenseComplianceDashboard.json",
+            "EnterpriseSoftwareBacklevelDashboard.json",
+        ]:
+            Text = json.dumps(LoadDashboard(DashboardName))
+
+            self.assertNotIn("technical-performance", Text, DashboardName)
 
 
 if __name__ == "__main__":

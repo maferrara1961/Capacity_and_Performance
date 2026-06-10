@@ -21,6 +21,17 @@
         "includeAll": true,
         "multi": true,
         "refresh": 1
+      },
+      {
+        "name": "ZabbixBaseUrl",
+        "type": "textbox",
+        "label": "URL Zabbix",
+        "query": "http://163.176.224.55:8080",
+        "current": {
+          "text": "http://163.176.224.55:8080",
+          "value": "http://163.176.224.55:8080"
+        },
+        "hide": 0
       }
     ]
   },
@@ -39,6 +50,9 @@
       "options": {
         "content": "Que muestra: hosts y componentes con software backlevel, fin de soporte o fin de vida. Como interpretarlo: Backlevel, EndOfSupport y EndOfLife elevan riesgo aun cuando la capacidad este OK. Accion sugerida: priorizar upgrades por severidad, servicio afectado y fecha de soporte.",
         "mode": "markdown"
+      },
+      "fieldConfig": {
+        "defaults": {}
       }
     },
     {
@@ -64,18 +78,7 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=.*&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+        "defaults": {}
       }
     },
     {
@@ -97,26 +100,30 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select c.ComponentName as HostName, c.TechnologyType, c.Version, c.Vendor, c.DomainName, c.BusinessServiceId, c.BacklevelStatus, c.LifecycleStatus, c.SupportStatus, c.EndOfSupportDate, c.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference from EnterpriseTechnologyComponent c left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where c.LoadId ~ '^(${LoadId:regex})' order by case c.BacklevelStatus when 'Backlevel' then 1 when 'Current' then 2 else 3 end, c.EndOfSupportDate nulls last, c.ComponentName"
+          "rawSql": "select c.ComponentName as HostName, c.TechnologyType, c.Version, c.Vendor, c.DomainName, c.BusinessServiceId, c.BacklevelStatus, c.LifecycleStatus, c.SupportStatus, c.EndOfSupportDate, c.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference, case when e.EvidenceReference is null then '#' else regexp_replace(e.EvidenceReference, '^https?://[^/]+', '') end as EvidencePath from EnterpriseTechnologyComponent c left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where c.LoadId ~ '^(${LoadId:regex})' order by case c.BacklevelStatus when 'Backlevel' then 1 when 'Current' then 2 else 3 end, c.EndOfSupportDate nulls last, c.ComponentName"
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver dato de evidencia",
-              "url": "${__data.fields.EvidenceReference}"
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "EvidencePath"
             },
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__value.text}&var-HostName=.*"
-            }
-          ]
-        }
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Abrir evidencia en Zabbix",
+                    "url": "${ZabbixBaseUrl}${__value.text}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     },
     {
@@ -138,26 +145,30 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.Severity, c.ComponentName as HostName, c.BacklevelStatus, c.LifecycleStatus, c.EndOfSupportDate, r.Impact, r.RecommendedAction, r.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Lifecycle' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.EndOfSupportDate nulls last"
+          "rawSql": "select r.Severity, c.ComponentName as HostName, c.BacklevelStatus, c.LifecycleStatus, c.EndOfSupportDate, r.Impact, r.RecommendedAction, r.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference, case when e.EvidenceReference is null then '#' else regexp_replace(e.EvidenceReference, '^https?://[^/]+', '') end as EvidencePath from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Lifecycle' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.EndOfSupportDate nulls last"
         }
       ],
       "fieldConfig": {
-        "defaults": {
-          "links": [
-            {
-              "title": "Ver dato de evidencia",
-              "url": "${__data.fields.EvidenceReference}"
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "EvidencePath"
             },
-            {
-              "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
-            },
-            {
-              "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=.*&var-HostName=.*"
-            }
-          ]
-        }
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Abrir evidencia en Zabbix",
+                    "url": "${ZabbixBaseUrl}${__value.text}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     }
   ],
