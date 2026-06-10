@@ -61,6 +61,7 @@ class StackInterconnectionContractTest(unittest.TestCase):
         Start = (ROOT / "Scripts/StartStack.sh").read_text(encoding="utf-8")
         Stop = (ROOT / "Scripts/StopStack.sh").read_text(encoding="utf-8")
         StatusScript = (ROOT / "Scripts/UpdatePlatformZabbixStatus.sh").read_text(encoding="utf-8")
+        CronScript = (ROOT / "Scripts/InstallPlatformMetricsCron.sh").read_text(encoding="utf-8")
         Reader = (ROOT / "Config/ZabbixAgent/ReadPlatformStatus.sh").read_text(encoding="utf-8")
         MetricReader = (ROOT / "Config/ZabbixAgent/ReadPlatformMetric.sh").read_text(encoding="utf-8")
 
@@ -75,6 +76,9 @@ class StackInterconnectionContractTest(unittest.TestCase):
         self.assertIn("PlatformStatus.tsv", StatusScript)
         self.assertIn("PlatformMetrics.tsv", StatusScript)
         self.assertIn("stats --no-stream", StatusScript)
+        self.assertIn("UpdatePlatformZabbixStatus.sh", CronScript)
+        self.assertIn("CAPACITY_PLATFORM_METRICS_START", CronScript)
+        self.assertIn("* * * * *", CronScript)
         self.assertIn("IsBatchService", StatusScript)
         self.assertIn("PlatformStatus.tsv", Reader)
         self.assertIn("PlatformMetrics.tsv", MetricReader)

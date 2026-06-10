@@ -25,6 +25,7 @@ Scripts/CleanupGrafanaDashboards.sh
 Scripts/BackfillPlanningMetrics.sh
 Scripts/RegisterPlatformHosts.sh
 Scripts/UpdatePlatformZabbixStatus.sh
+Scripts/InstallPlatformMetricsCron.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh

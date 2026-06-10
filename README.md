@@ -323,10 +323,10 @@ por `Scripts/UpdatePlatformZabbixStatus.sh` durante `StartStack` y `StopStack`.
 Las metricas operativas por contenedor se exponen en Zabbix con
 `capacity.platform.metric[HostName,MetricName]`. Incluyen `CpuPercent`, `MemoryUsedBytes`,
 `MemoryPercent`, `NetworkInputBytes`, `NetworkOutputBytes`, `BlockInputBytes` y
-`BlockOutputBytes`. Para historico continuo, programar:
+`BlockOutputBytes`. Para historico continuo, instalar el cron administrado:
 
 ```bash
-* * * * * cd /home/opc/Capacity_and_Performance && Scripts/UpdatePlatformZabbixStatus.sh >/dev/null 2>&1
+Scripts/InstallPlatformMetricsCron.sh install
 ```
 
 En Zabbix, esos datos se ven por host en `Monitoring > Latest data` como items de agente:
