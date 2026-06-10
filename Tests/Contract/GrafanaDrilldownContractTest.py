@@ -20,6 +20,10 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
                 Links = Panel.get("fieldConfig", {}).get("defaults", {}).get("links", [])
                 self.assertTrue(Links, f"{DashboardPath.name}: {Panel.get('title')}")
                 LinkText = json.dumps(Links)
+                if DashboardPath.name == "PlatformContainerMetricsDashboard.json":
+                    self.assertIn("/d/platform-container-metrics/platform-containers-metrics", LinkText)
+                    self.assertIn("var-HostName=${__field.labels.host_name}", LinkText)
+                    continue
                 self.assertIn("/d/technical-performance/technical-performance-dashboard", LinkText)
                 self.assertIn("var-HostName", LinkText)
 

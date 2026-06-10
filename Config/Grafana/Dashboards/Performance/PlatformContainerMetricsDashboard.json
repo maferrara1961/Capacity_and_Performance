@@ -1,0 +1,370 @@
+{
+  "uid": "platform-container-metrics",
+  "title": "Platform Containers Metrics",
+  "tags": [
+    "platform",
+    "containers",
+    "performance"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "Environment",
+        "label": "Ambiente",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "VictoriaMetrics"
+        },
+        "query": "label_values(platform_container_up, environment)",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "HostName",
+        "label": "Contenedor",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "VictoriaMetrics"
+        },
+        "query": "label_values(platform_container_up{environment=~\"${Environment:regex}\"}, host_name)",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Como leer este dashboard",
+      "description": "Guia de uso para metricas de los contenedores Podman de la plataforma.",
+      "type": "text",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### Que muestra\nMetricas reales de los contenedores Podman que componen la plataforma: estado, CPU, RAM, red y block I/O.\n\n### Como interpretarlo\n`Platform container up` indica subidas y bajadas. CPU y RAM muestran consumo operativo. Red y block I/O ayudan a detectar actividad o saturacion por componente.\n\n### Accion sugerida\nFiltrar por contenedor cuando haya picos, confirmar si coincide con reinicios o cargas, y revisar Zabbix Latest data del mismo host si falta evidencia.\n\n### Fuente\n`Scripts/UpdatePlatformZabbixStatus.sh` toma `podman stats`, alimenta ZabbixAgent y publica las mismas series en VictoriaMetrics."
+      }
+    },
+    {
+      "id": 2,
+      "title": "Platform container up",
+      "description": "Estado historico por contenedor. 1 significa disponible; 0 significa detenido o sin evidencia.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "platform_container_up{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "{{host_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "short",
+          "min": 0,
+          "max": 1
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "CPU percent",
+      "description": "CPU por contenedor desde podman stats.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "{{host_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "percent",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "RAM percent",
+      "description": "Porcentaje de RAM usada por contenedor.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "platform_container_memory_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "{{host_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "percent",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "RAM used bytes",
+      "description": "Memoria usada por contenedor en bytes.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "{{host_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "bytes",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Network I/O bytes",
+      "description": "Bytes de red recibidos y enviados por contenedor.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "platform_container_network_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Input {{host_name}}"
+        },
+        {
+          "refId": "B",
+          "expr": "platform_container_network_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Output {{host_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "bytes",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Block I/O bytes",
+      "description": "Bytes de block I/O leidos y escritos por contenedor.",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "platform_container_block_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Input {{host_name}}"
+        },
+        {
+          "refId": "B",
+          "expr": "platform_container_block_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "legendFormat": "Output {{host_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "bytes",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Top CPU containers",
+      "description": "Top de contenedores por CPU actual.",
+      "type": "bargauge",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(7, platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"})",
+          "legendFormat": "{{host_name}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "percent",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Top RAM containers",
+      "description": "Top de contenedores por RAM usada.",
+      "type": "bargauge",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(7, platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"})",
+          "legendFormat": "{{host_name}}",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "links": [
+            {
+              "title": "Filtrar este contenedor",
+              "url": "/d/platform-container-metrics/platform-containers-metrics?var-Environment=${__field.labels.environment}&var-HostName=${__field.labels.host_name}"
+            }
+          ],
+          "unit": "bytes",
+          "min": 0
+        }
+      }
+    }
+  ]
+}

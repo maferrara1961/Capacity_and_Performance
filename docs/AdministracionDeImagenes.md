@@ -43,6 +43,9 @@ Cada componente tambien expone metricas por contenedor desde `podman stats`:
 `.capacity-test-data/ZabbixAgent/PlatformMetrics.tsv`; para historico continuo debe ejecutarse cada
 minuto con `Scripts/InstallPlatformMetricsCron.sh install`.
 
+El mismo script publica esas metricas en VictoriaMetrics con prefijo `platform_container_*`. En
+Grafana se consultan desde el dashboard `Performance / Platform Containers Metrics`.
+
 Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Los providers
 de dashboard y los JSON de dashboard se montan en rutas separadas para evitar que Grafana lea el
 provider como dashboard. Despues de un `git pull`, ejecutar `Scripts/StopStack.sh` y

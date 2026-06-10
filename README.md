@@ -323,7 +323,15 @@ por `Scripts/UpdatePlatformZabbixStatus.sh` durante `StartStack` y `StopStack`.
 Las metricas operativas por contenedor se exponen en Zabbix con
 `capacity.platform.metric[HostName,MetricName]`. Incluyen `CpuPercent`, `MemoryUsedBytes`,
 `MemoryPercent`, `NetworkInputBytes`, `NetworkOutputBytes`, `BlockInputBytes` y
-`BlockOutputBytes`. Para historico continuo, instalar el cron administrado:
+`BlockOutputBytes`. El mismo script publica las series en VictoriaMetrics para Grafana:
+`platform_container_cpu_percent`, `platform_container_memory_used_bytes`,
+`platform_container_memory_percent`, `platform_container_network_input_bytes`,
+`platform_container_network_output_bytes`, `platform_container_block_input_bytes`,
+`platform_container_block_output_bytes` y `platform_container_up`.
+
+En Grafana se ven en `Performance / Platform Containers Metrics`.
+
+Para historico continuo, instalar el cron administrado:
 
 ```bash
 Scripts/InstallPlatformMetricsCron.sh install

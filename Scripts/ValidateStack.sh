@@ -40,6 +40,7 @@ Config/Grafana/Dashboards/Capacity/CapacityPlanningDashboard.json
 Config/Grafana/Dashboards/Capacity/EnterpriseOperationalDashboard.json
 Config/Grafana/Dashboards/Performance/TechnicalPerformanceDashboard.json
 Config/Grafana/Dashboards/Performance/ApplicationDashboard.json
+Config/Grafana/Dashboards/Performance/PlatformContainerMetricsDashboard.json
 Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseExecutiveDashboard.json
 Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseGovernanceDashboard.json
 Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseLicenseComplianceDashboard.json
@@ -188,9 +189,21 @@ if ! grep -q "stats --no-stream" Scripts/UpdatePlatformZabbixStatus.sh; then
   exit 1
 fi
 
+if ! grep -q "api/v1/import/prometheus" Scripts/UpdatePlatformZabbixStatus.sh; then
+  echo "No se publican metricas de plataforma en VictoriaMetrics" >&2
+  exit 1
+fi
+
 for ExpectedMetric in CpuPercent MemoryUsedBytes MemoryPercent NetworkInputBytes NetworkOutputBytes BlockInputBytes BlockOutputBytes; do
   if ! grep -q "$ExpectedMetric" CapacityEngine/Adapters/SyntheticZabbixAdapter.py Config/ZabbixAgent/ReadPlatformMetric.sh; then
     echo "Falta metrica de plataforma para Zabbix: $ExpectedMetric" >&2
+    exit 1
+  fi
+done
+
+for ExpectedSeries in platform_container_cpu_percent platform_container_memory_used_bytes platform_container_memory_percent platform_container_network_input_bytes platform_container_network_output_bytes platform_container_block_input_bytes platform_container_block_output_bytes platform_container_up; do
+  if ! grep -q "$ExpectedSeries" Scripts/UpdatePlatformZabbixStatus.sh Config/Grafana/Dashboards/Performance/PlatformContainerMetricsDashboard.json; then
+    echo "Falta serie de plataforma en VictoriaMetrics/Grafana: $ExpectedSeries" >&2
     exit 1
   fi
 done
