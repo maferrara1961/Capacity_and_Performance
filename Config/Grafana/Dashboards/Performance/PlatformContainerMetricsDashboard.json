@@ -312,7 +312,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(7, platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"})",
+          "expr": "topk(7, last_over_time(platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
           "legendFormat": "{{host_name}}",
           "instant": true
         }
@@ -348,7 +348,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(7, platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"})",
+          "expr": "topk(7, last_over_time(platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
           "legendFormat": "{{host_name}}",
           "instant": true
         }
