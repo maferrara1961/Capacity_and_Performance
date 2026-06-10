@@ -15,6 +15,19 @@ Validar archivos requeridos:
 Scripts/ValidateStack.sh
 ```
 
+Preparar un servidor remoto con Podman rootless:
+
+```bash
+Scripts/PreparePodmanHost.sh
+```
+
+En servidores accedidos por SSH, Podman rootless requiere `linger` habilitado para que los
+contenedores sigan vivos al cerrar la sesion. Si la validacion informa que falta, ejecutar:
+
+```bash
+sudo loginctl enable-linger "$USER"
+```
+
 Ejecutar tests:
 
 ```bash
@@ -56,6 +69,9 @@ Scripts/StopStack.sh
 Scripts/StartStack.sh
 Scripts/RegisterPlatformHosts.sh
 ```
+
+Si despues de iniciar por SSH los contenedores aparecen detenidos con exit `143`, ejecutar
+`Scripts/PreparePodmanHost.sh`, habilitar `linger` si lo solicita y reiniciar el stack.
 
 Consultar estado:
 
