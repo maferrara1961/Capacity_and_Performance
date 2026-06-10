@@ -33,7 +33,7 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
                     else:
                         TargetText = json.dumps(Panel.get("targets", []))
                         if "HostName" in TargetText or "host_name" in TargetText:
-                            self.assertIn('var-HostName=${__data.fields[\\"HostName\\"]}', LinkText)
+                            self.assertIn("var-HostName=${__value.text}", LinkText)
                         else:
                             self.assertIn("var-HostName=.*", LinkText)
 

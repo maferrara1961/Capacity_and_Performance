@@ -270,7 +270,7 @@
             },
             {
               "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields[\"ServiceId\"]}${__data.fields[\"BusinessServiceId\"]}&var-HostName=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__value.text}&var-HostName=.*"
             }
           ]
         }

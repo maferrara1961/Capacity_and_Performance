@@ -75,7 +75,7 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields[\"HostName\"]}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
@@ -112,7 +112,7 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields[\"HostName\"]}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
@@ -149,7 +149,7 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields[\"HostName\"]}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
@@ -186,7 +186,7 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields[\"HostName\"]}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
@@ -223,7 +223,7 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields[\"HostName\"]}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__value.text}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",

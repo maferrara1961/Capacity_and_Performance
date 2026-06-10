@@ -40,17 +40,23 @@ class GrafanaTechnicalDrilldownContractTest(unittest.TestCase):
 
         self.assertEqual([], BrokenLinks)
 
-    def test_table_links_use_grafana_field_index_syntax(self):
+    def test_table_links_use_clicked_cell_value_for_drilldown_context(self):
         BrokenLinks = []
 
         for DashboardPath in self.DashboardRoot.rglob("*.json"):
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
-            for Link in self.FindLinks(Dashboard):
-                Url = Link.get("url", "")
-                if "/d/technical-performance/technical-performance-dashboard" not in Url:
+            for Panel in Dashboard.get("panels", []):
+                if Panel.get("type") == "timeseries":
                     continue
-                if "${__data.fields." in Url:
-                    BrokenLinks.append(f"{DashboardPath.name}: {Url}")
+                for Link in self.FindLinks(Panel):
+                    Url = Link.get("url", "")
+                    Title = Link.get("title", "")
+                    if "/d/technical-performance/technical-performance-dashboard" not in Url:
+                        continue
+                    if Title == "Ver graficos del equipo" and "var-HostName=${__data.fields" in Url:
+                        BrokenLinks.append(f"{DashboardPath.name}: {Panel.get('title')}: {Url}")
+                    if Title == "Ver graficos del subsistema" and "var-ServiceId=${__data.fields" in Url:
+                        BrokenLinks.append(f"{DashboardPath.name}: {Panel.get('title')}: {Url}")
 
         self.assertEqual([], BrokenLinks)
 
