@@ -92,6 +92,7 @@
         {
           "refId": "A",
           "expr": "last_over_time(platform_container_up{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -128,6 +129,7 @@
         {
           "refId": "A",
           "expr": "last_over_time(platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -163,6 +165,7 @@
         {
           "refId": "A",
           "expr": "last_over_time(platform_container_memory_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -198,6 +201,7 @@
         {
           "refId": "A",
           "expr": "last_over_time(platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -233,11 +237,13 @@
         {
           "refId": "A",
           "expr": "last_over_time(platform_container_network_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "Input {{host_name}}"
         },
         {
           "refId": "B",
           "expr": "last_over_time(platform_container_network_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "Output {{host_name}}"
         }
       ],
@@ -273,11 +279,13 @@
         {
           "refId": "A",
           "expr": "last_over_time(platform_container_block_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "Input {{host_name}}"
         },
         {
           "refId": "B",
           "expr": "last_over_time(platform_container_block_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "interval": "1m",
           "legendFormat": "Output {{host_name}}"
         }
       ],
@@ -313,6 +321,7 @@
         {
           "refId": "A",
           "expr": "topk(7, last_over_time(platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
+          "interval": "1m",
           "legendFormat": "{{host_name}}",
           "instant": true
         }
@@ -349,6 +358,7 @@
         {
           "refId": "A",
           "expr": "topk(7, last_over_time(platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
+          "interval": "1m",
           "legendFormat": "{{host_name}}",
           "instant": true
         }
