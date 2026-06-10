@@ -29,6 +29,9 @@ def BuildParser() -> argparse.ArgumentParser:
     Subparsers.add_parser("sync-zabbix-inventory")
     Subparsers.add_parser("sync-enterprise-inventory")
 
+    BackfillPlanning = Subparsers.add_parser("backfill-planning-metrics")
+    BackfillPlanning.add_argument("--load-id")
+
     Assessment = Subparsers.add_parser("run-enterprise-assessment")
     Assessment.add_argument("--load-id")
     Assessment.add_argument("--scope", default="enterprise")
@@ -67,6 +70,8 @@ def Main(Argv: list[str] | None = None) -> int:
             return SyncZabbixInventory(PostgreSql, Zabbix)
         if Args.Action == "sync-enterprise-inventory":
             return SyncEnterpriseInventory(PostgreSql, Zabbix)
+        if Args.Action == "backfill-planning-metrics":
+            return BackfillPlanningMetrics(Args, PostgreSql)
         if Args.Action == "run-enterprise-assessment":
             return RunEnterpriseAssessment(Args, PostgreSql)
         if Args.Action == "validate-enterprise-governance":
@@ -147,6 +152,15 @@ def SyncEnterpriseInventory(PostgreSql: SyntheticPostgreSqlAdapter, Zabbix: Synt
     print("  destino: PostgreSQL enterprise")
     print(f"  componentes sincronizados: {SyncedCount}")
     print(f"  componentes dados de baja: {DeletedCount}")
+    return 0
+
+
+def BackfillPlanningMetrics(Args: argparse.Namespace, PostgreSql: SyntheticPostgreSqlAdapter) -> int:
+    LoadId = ValidateLoadId(Args.load_id) if Args.load_id else None
+    PostgreSql.BackfillPlanningMetrics(LoadId)
+    print("INFO: backfill de metricas planning completado")
+    print(f"  lote: {LoadId or 'todos'}")
+    print("  metricas: CPU RAM Storage StorageIO NetworkIO")
     return 0
 
 

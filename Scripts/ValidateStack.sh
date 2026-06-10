@@ -22,6 +22,7 @@ Scripts/CleanupStack.sh
 Scripts/ValidateLocalAccess.sh
 Scripts/ValidateDatabaseConsistency.sh
 Scripts/CleanupGrafanaDashboards.sh
+Scripts/BackfillPlanningMetrics.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh

@@ -47,6 +47,12 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("PostgreSQL", Result.stdout)
         self.assertIn("Zabbix hosts/items sinteticos", Result.stdout)
 
+    def test_backfill_planning_metrics_imprime_resumen(self):
+        Result = RunManage("backfill-planning-metrics", "--load-id", "BackfillDemo001")
+        self.assertEqual(Result.returncode, 0, Result.stderr)
+        self.assertIn("backfill de metricas planning completado", Result.stdout)
+        self.assertIn("CPU RAM Storage StorageIO NetworkIO", Result.stdout)
+
     def test_sync_zabbix_inventory_imprime_resumen(self):
         RunManage("load", "--profile", "mixed", "--volume", "small", "--load-id", "SyncInventory001")
         Result = RunManage("sync-zabbix-inventory")
@@ -195,6 +201,18 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         Script = ROOT / "Scripts" / "SyncZabbixInventory.sh"
         self.assertTrue(Script.exists())
         self.assertIn("sync-zabbix-inventory", Script.read_text())
+
+    def test_script_de_backfill_planning_metrics_existe(self):
+        Script = ROOT / "Scripts" / "BackfillPlanningMetrics.sh"
+        self.assertTrue(Script.exists())
+        self.assertIn("backfill-planning-metrics", Script.read_text())
+
+    def test_sql_de_backfill_planning_metrics_completa_metricas(self):
+        Sql = SyntheticPostgreSqlAdapter().BuildPlanningMetricsBackfillSql("BackfillSql001")
+        self.assertIn("values ('CPU'), ('RAM'), ('Storage'), ('StorageIO'), ('NetworkIO')", Sql)
+        self.assertIn("insert into CapacityKpi", Sql)
+        self.assertIn("insert into ForecastResult", Sql)
+        self.assertIn("BackfillSql001", Sql)
 
     def test_script_de_lotes_historicos_genera_30_60_y_90_dias(self):
         Script = ROOT / "Scripts" / "GenerateHistoricalVerificationBatches.sh"

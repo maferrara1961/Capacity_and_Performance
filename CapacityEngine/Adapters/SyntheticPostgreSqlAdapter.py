@@ -90,6 +90,81 @@ class SyntheticPostgreSqlAdapter:
             self.ExecuteSql(self.BuildZabbixInventorySyncSql(Hosts))
         return len(Hosts), 0
 
+    def BackfillPlanningMetrics(self, LoadId: str | None = None) -> None:
+        if os.environ.get("STACK_DRY_RUN", "0") != "1":
+            self.ExecuteSql(self.BuildPlanningMetricsBackfillSql(LoadId))
+
+    def BuildPlanningMetricsBackfillSql(self, LoadId: str | None = None) -> str:
+        Filter = ""
+        if LoadId:
+            Filter = f"and Source.LoadIdCalculado = {self.Q(LoadId)}"
+        return f"""
+{(Path("Sql/Schema/002_CapacityOutputs.sql")).read_text(encoding="utf-8")}
+with TargetMetrics(MetricName) as (
+  values ('CPU'), ('RAM'), ('Storage'), ('StorageIO'), ('NetworkIO')
+),
+Source as (
+  select coalesce(LoadId, substring(CapacityKpiId from '^(.+)-Kpi-')) as LoadIdCalculado,
+         ResourceId, CalculatedAt, WindowStart, WindowEnd,
+         AverageUtilization, PeakUtilization, P95Utilization, MonthlyGrowthRate, HeadroomAvailable, BaselineDelta
+  from CapacityKpi
+  where MetricName = 'CPU'
+),
+Missing as (
+  select Source.*, TargetMetrics.MetricName
+  from Source
+  cross join TargetMetrics
+  where Source.LoadIdCalculado is not null
+    {Filter}
+)
+insert into CapacityKpi (CapacityKpiId, LoadId, ResourceId, MetricName, CalculatedAt, WindowStart, WindowEnd,
+  AverageUtilization, PeakUtilization, P95Utilization, MonthlyGrowthRate, HeadroomAvailable, BaselineDelta)
+select Missing.LoadIdCalculado || '-Kpi-' || Missing.ResourceId || '-' || Missing.MetricName,
+       Missing.LoadIdCalculado, Missing.ResourceId, Missing.MetricName, Missing.CalculatedAt, Missing.WindowStart, Missing.WindowEnd,
+       Missing.AverageUtilization, Missing.PeakUtilization, Missing.P95Utilization, Missing.MonthlyGrowthRate,
+       Missing.HeadroomAvailable, Missing.BaselineDelta
+from Missing
+where not exists (
+  select 1
+  from CapacityKpi Existing
+  where Existing.ResourceId = Missing.ResourceId
+    and Existing.MetricName = Missing.MetricName
+    and coalesce(Existing.LoadId, substring(Existing.CapacityKpiId from '^(.+)-Kpi-')) = Missing.LoadIdCalculado
+);
+
+with TargetMetrics(MetricName) as (
+  values ('CPU'), ('RAM'), ('Storage'), ('StorageIO'), ('NetworkIO')
+),
+Source as (
+  select coalesce(LoadId, substring(ForecastResultId from '^(.+)-Forecast-')) as LoadIdCalculado,
+         ResourceId, CalculatedAt, Forecast30Days, Forecast60Days, Forecast90Days,
+         Forecast180Days, Forecast365Days, DaysToSaturation, Confidence
+  from ForecastResult
+  where MetricName = 'CPU'
+),
+Missing as (
+  select Source.*, TargetMetrics.MetricName
+  from Source
+  cross join TargetMetrics
+  where Source.LoadIdCalculado is not null
+    {Filter}
+)
+insert into ForecastResult (ForecastResultId, LoadId, ResourceId, MetricName, CalculatedAt, Forecast30Days,
+  Forecast60Days, Forecast90Days, Forecast180Days, Forecast365Days, DaysToSaturation, Confidence)
+select Missing.LoadIdCalculado || '-Forecast-' || Missing.ResourceId || '-' || Missing.MetricName,
+       Missing.LoadIdCalculado, Missing.ResourceId, Missing.MetricName, Missing.CalculatedAt, Missing.Forecast30Days,
+       Missing.Forecast60Days, Missing.Forecast90Days, Missing.Forecast180Days, Missing.Forecast365Days,
+       Missing.DaysToSaturation, Missing.Confidence
+from Missing
+where not exists (
+  select 1
+  from ForecastResult Existing
+  where Existing.ResourceId = Missing.ResourceId
+    and Existing.MetricName = Missing.MetricName
+    and coalesce(Existing.LoadId, substring(Existing.ForecastResultId from '^(.+)-Forecast-')) = Missing.LoadIdCalculado
+);
+"""
+
     def BuildZabbixInventorySyncSql(self, Hosts: list[dict]) -> str:
         Lines = [
             (Path("Sql/Schema/001_Catalog.sql")).read_text(encoding="utf-8"),

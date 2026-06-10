@@ -236,6 +236,19 @@ Uso recomendado:
 - **Enterprise Software Backlevel Dashboard**: software backlevel, end-of-support, end-of-life,
   fecha de soporte y acciones de upgrade.
 
+Si los lotes fueron generados antes de la version que agrego `RAM`, `Storage`, `StorageIO` y
+`NetworkIO` a planning, ejecutar una vez:
+
+```bash
+Scripts/BackfillPlanningMetrics.sh
+```
+
+Para completar un lote puntual:
+
+```bash
+Scripts/BackfillPlanningMetrics.sh --load-id NombreDelLote
+```
+
 Si aparece mas de un `Technical Performance Dashboard` en Grafana, el duplicado quedo persistido en
 la base operacional de Grafana. El repositorio provisiona un solo dashboard tecnico con UID
 `technical-performance`. Para limpiar duplicados historicos:
