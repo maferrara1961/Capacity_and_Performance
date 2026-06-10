@@ -208,6 +208,8 @@ class SyntheticDataCliContractTest(unittest.TestCase):
             Resource = Adapter.PlatformResource(Service)
             self.assertEqual("Produccion", Resource["Inventory"]["Environment"])
             self.assertEqual("Produccion", Resource["Inventory"]["Location"])
+        Source = (ROOT / "CapacityEngine" / "Adapters" / "SyntheticZabbixAdapter.py").read_text(encoding="utf-8")
+        self.assertIn('"delay": "1m" if ItemType != 2 else "0"', Source)
 
     def test_zabbix_history_push_usa_itemid_y_todas_las_muestras(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxHistory001", "critical", "small", 30, 1)

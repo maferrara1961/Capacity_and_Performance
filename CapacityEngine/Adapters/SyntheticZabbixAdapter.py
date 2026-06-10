@@ -461,7 +461,7 @@ class SyntheticZabbixAdapter:
             "key_": Key,
             "type": ItemType,
             "value_type": ValueType,
-            "delay": "1m",
+            "delay": "1m" if ItemType != 2 else "0",
             "history": "90d",
             "trends": "365d",
             "description": f"Monitoreo del componente de plataforma {ServiceName} en ambiente Produccion.",
