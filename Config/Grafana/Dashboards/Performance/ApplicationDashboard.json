@@ -95,11 +95,11 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
             }
           ]
         }
@@ -132,11 +132,11 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
             }
           ]
         }
@@ -169,11 +169,11 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
             }
           ]
         }
@@ -253,11 +253,11 @@
           "links": [
             {
               "title": "Ver graficos del equipo",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
             },
             {
               "title": "Ver graficos del subsistema",
-              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
+              "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${var-LoadId}&var-ServiceId=${__data.fields.ServiceId}${__data.fields.BusinessServiceId}&var-HostName=.*"
             }
           ]
         }

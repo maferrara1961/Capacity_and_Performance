@@ -27,7 +27,7 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
                     self.assertIn("var-ServiceId=${__field.labels.business_service_id}", LinkText)
                     self.assertNotIn("${__data.fields.HostName}${__field.labels.host_name}", LinkText)
                 else:
-                    self.assertIn("var-LoadId=${LoadId}", LinkText)
+                    self.assertIn("var-LoadId=${var-LoadId}", LinkText)
                     if Panel.get("type") == "stat":
                         self.assertIn("var-HostName=.*", LinkText)
                     else:
