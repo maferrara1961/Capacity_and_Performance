@@ -21,17 +21,6 @@
         "includeAll": true,
         "multi": true,
         "refresh": 1
-      },
-      {
-        "name": "ZabbixBaseUrl",
-        "type": "textbox",
-        "label": "URL Zabbix",
-        "query": "http://163.176.224.55:8080",
-        "current": {
-          "text": "http://163.176.224.55:8080",
-          "value": "http://163.176.224.55:8080"
-        },
-        "hide": 0
       }
     ]
   },
@@ -52,7 +41,8 @@
         "mode": "markdown"
       },
       "fieldConfig": {
-        "defaults": {}
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -78,7 +68,8 @@
         }
       ],
       "fieldConfig": {
-        "defaults": {}
+        "defaults": {},
+        "overrides": []
       }
     },
     {
@@ -100,7 +91,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select c.ComponentName as HostName, c.TechnologyType, c.DomainName, c.BusinessServiceId, c.Owner, c.LicenseStatus, c.ComplianceStatus, c.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference, case when e.EvidenceReference is null then '#' else regexp_replace(e.EvidenceReference, '^https?://[^/]+', '') end as EvidencePath from EnterpriseTechnologyComponent c left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where c.LoadId ~ '^(${LoadId:regex})' order by case c.LicenseStatus when 'NonCompliant' then 1 when 'Unverified' then 2 when 'Unknown' then 3 else 4 end, c.ComponentName"
+          "rawSql": "select c.ComponentName as HostName, c.TechnologyType, c.DomainName, c.BusinessServiceId, c.Owner, c.LicenseStatus, c.ComplianceStatus, c.EvidenceState, case when e.EvidenceReference is null then 'Sin evidencia disponible' else regexp_replace(e.EvidenceReference, '^https?://[^/]+', 'http://163.176.224.55:8080') end as EvidenceReference from EnterpriseTechnologyComponent c left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where c.LoadId ~ '^(${LoadId:regex})' order by case c.LicenseStatus when 'NonCompliant' then 1 when 'Unverified' then 2 when 'Unknown' then 3 else 4 end, c.ComponentName"
         }
       ],
       "fieldConfig": {
@@ -109,7 +100,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "EvidencePath"
+              "options": "EvidenceReference"
             },
             "properties": [
               {
@@ -117,7 +108,7 @@
                 "value": [
                   {
                     "title": "Abrir evidencia en Zabbix",
-                    "url": "${ZabbixBaseUrl}${__value.text}"
+                    "url": "${__value.text}"
                   }
                 ]
               }
@@ -145,7 +136,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.Severity, c.ComponentName as HostName, c.LicenseStatus, c.ComplianceStatus, r.Impact, r.RecommendedAction, r.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference, case when e.EvidenceReference is null then '#' else regexp_replace(e.EvidenceReference, '^https?://[^/]+', '') end as EvidencePath from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Compliance' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.ComponentName"
+          "rawSql": "select r.Severity, c.ComponentName as HostName, c.LicenseStatus, c.ComplianceStatus, r.Impact, r.RecommendedAction, r.EvidenceState, case when e.EvidenceReference is null then 'Sin evidencia disponible' else regexp_replace(e.EvidenceReference, '^https?://[^/]+', 'http://163.176.224.55:8080') end as EvidenceReference from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Compliance' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.ComponentName"
         }
       ],
       "fieldConfig": {
@@ -154,7 +145,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "EvidencePath"
+              "options": "EvidenceReference"
             },
             "properties": [
               {
@@ -162,7 +153,7 @@
                 "value": [
                   {
                     "title": "Abrir evidencia en Zabbix",
-                    "url": "${ZabbixBaseUrl}${__value.text}"
+                    "url": "${__value.text}"
                   }
                 ]
               }
