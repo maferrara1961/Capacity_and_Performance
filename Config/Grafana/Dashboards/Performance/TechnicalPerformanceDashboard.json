@@ -21,6 +21,19 @@
         },
         "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
         "refresh": 1,
+        "includeAll": false,
+        "multi": false
+      },
+      {
+        "name": "Environment",
+        "label": "Ambiente",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
+        "query": "select distinct Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' union select distinct Environment from Application where ApplicationId ~ '^(${LoadId:regex})' order by Environment",
+        "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
         "multi": false,
@@ -38,26 +51,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select distinct Name as HostName from MonitoredResource union select distinct ComponentName as HostName from EnterpriseTechnologyComponent order by HostName",
-        "refresh": 1,
-        "includeAll": true,
-        "allValue": ".*",
-        "multi": false,
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": "$__all"
-        }
-      },
-      {
-        "name": "Environment",
-        "label": "Ambiente",
-        "type": "query",
-        "datasource": {
-          "type": "postgres",
-          "uid": "CapacityPostgreSQL"
-        },
-        "query": "select distinct Environment from EnterpriseTechnologyComponent union select distinct Environment from Application order by Environment",
+        "query": "select distinct HostName from (select mr.Name as HostName, coalesce(c.Environment, 'Unknown') as Environment from MonitoredResource mr join CapacityKpi k on k.ResourceId = mr.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) where coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) ~ '^(${LoadId:regex})' union select ComponentName as HostName, Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})') Hosts where Environment ~ '^(${Environment:regex})' order by HostName",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
@@ -76,7 +70,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select distinct ServiceId from ServiceResourceMap union select distinct BusinessServiceId as ServiceId from EnterpriseTechnologyComponent where BusinessServiceId is not null order by ServiceId",
+        "query": "select distinct ServiceId from (select m.ServiceId, coalesce(c.Environment, 'Unknown') as Environment from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(m.MapId from '^(.+)-Map-') where m.MapId ~ '^(${LoadId:regex})' union select BusinessServiceId as ServiceId, Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and BusinessServiceId is not null) Services where Environment ~ '^(${Environment:regex})' order by ServiceId",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",

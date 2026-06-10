@@ -37,10 +37,15 @@ Iniciar el stack:
 
 ```bash
 Scripts/StartStack.sh
+Scripts/RegisterPlatformHosts.sh
 ```
 
 `StartStack.sh` valida primero que existan todas las imagenes locales. Si falta alguna, ejecutar
 `Scripts/BuildImages.sh` antes de iniciar.
+
+`RegisterPlatformHosts.sh` registra en Zabbix los componentes propios de la plataforma en el grupo
+`Capacity Platform`, todos con inventario `Environment = Produccion`: PostgreSQL, VictoriaMetrics,
+Zabbix Server, Zabbix Web, Zabbix Agent, Grafana y CapacityEngine.
 
 Grafana monta `Config/Grafana/Datasources`, `Config/Grafana/DashboardProviders` y
 `Config/Grafana/Dashboards` desde el repositorio. Despues de un `git pull`, reiniciar el stack
@@ -49,6 +54,7 @@ alcanza para reprovisionar dashboards y datasources sin reconstruir la imagen:
 ```bash
 Scripts/StopStack.sh
 Scripts/StartStack.sh
+Scripts/RegisterPlatformHosts.sh
 ```
 
 Consultar estado:
@@ -279,6 +285,18 @@ La carga enterprise reutiliza el generador sintetico existente y agrega tablas e
 PostgreSQL, datos de testing de licencias/backlevel/compliance/lifecycle, labels
 `technology_domain`, `business_service` y `business_service_id` en VictoriaMetrics, y hosts
 `SRV-#####` congruentes con el inventario de Zabbix.
+
+Los componentes de la plataforma se registran aparte como hosts productivos en Zabbix:
+
+```bash
+Scripts/RegisterPlatformHosts.sh
+```
+
+Esto crea o actualiza el grupo `Capacity Platform` con los hosts
+`capacity-performance-postgresql`, `capacity-performance-victoriametrics`,
+`capacity-performance-zabbix-server`, `capacity-performance-zabbix-web`,
+`capacity-performance-zabbix-agent`, `capacity-performance-grafana` y
+`capacity-performance-capacity-engine`, todos con ambiente `Produccion`.
 
 En Zabbix, esos datos se ven por host en `Monitoring > Latest data` como items de agente:
 

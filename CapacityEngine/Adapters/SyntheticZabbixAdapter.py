@@ -15,6 +15,47 @@ class SyntheticZabbixAdapter:
         self.User = os.environ.get("ZABBIX_USER", "Admin")
         self.Password = os.environ.get("ZABBIX_PASSWORD", "zabbix")
         self.AgentDns = os.environ.get("ZABBIX_AGENT_DNS", "capacity-performance-zabbix-agent")
+        self.PlatformEnvironment = "Produccion"
+
+    def PlatformServiceDefinitions(self) -> list[dict]:
+        return [
+            {"Name": "capacity-performance-postgresql", "Type": "Database", "Port": 5432},
+            {"Name": "capacity-performance-victoriametrics", "Type": "MonitoringPlatform", "Port": 8428},
+            {"Name": "capacity-performance-zabbix-server", "Type": "MonitoringPlatform", "Port": 10051},
+            {"Name": "capacity-performance-zabbix-web", "Type": "MonitoringPlatform", "Port": 8080},
+            {"Name": "capacity-performance-zabbix-agent", "Type": "MonitoringAgent", "Port": 10050},
+            {"Name": "capacity-performance-grafana", "Type": "Visualization", "Port": 3000},
+            {"Name": "capacity-performance-capacity-engine", "Type": "BatchEngine", "Port": None},
+        ]
+
+    def RegisterPlatformHosts(self) -> int:
+        if os.environ.get("STACK_DRY_RUN", "0") == "1":
+            return len(self.PlatformServiceDefinitions())
+        Token = self.Login()
+        GroupId = self.EnsureHostGroup(Token, "Capacity Platform")
+        for Service in self.PlatformServiceDefinitions():
+            Resource = self.PlatformResource(Service)
+            HostId = self.EnsureHost(Token, GroupId, Resource)
+            InterfaceId = self.EnsureAgentInterface(Token, HostId)
+            self.EnsurePlatformItem(Token, HostId, InterfaceId, Service)
+        return len(self.PlatformServiceDefinitions())
+
+    def PlatformResource(self, Service: dict) -> dict:
+        ServiceName = Service["Name"]
+        return {
+            "ResourceId": ServiceName,
+            "ResourceType": Service["Type"],
+            "Name": ServiceName,
+            "Inventory": {
+                "AssetTag": f"Platform-{ServiceName}",
+                "Alias": ServiceName,
+                "Type": Service["Type"],
+                "Os": "Linux",
+                "Environment": self.PlatformEnvironment,
+                "Location": self.PlatformEnvironment,
+                "Notes": f"Componente productivo de la plataforma Capacity_and_Performance: {ServiceName}",
+            },
+        }
 
     def SaveDataset(self, LoadId: str, Dataset: dict) -> None:
         Store = self.LoadStore()
@@ -380,6 +421,7 @@ class SyntheticZabbixAdapter:
         Key = self.ItemKey(Sample["MetricName"])
         Existing = self.ApiCall(Token, "item.get", {"output": ["itemid"], "hostids": HostId, "filter": {"key_": [Key]}})
         if Existing:
+            self.EnsurePlatformTrigger(Token, ServiceName, Key)
             return Existing[0]["itemid"]
         Created = self.ApiCall(
             Token,
@@ -396,6 +438,55 @@ class SyntheticZabbixAdapter:
             },
         )
         return Created["itemids"][0]
+
+    def EnsurePlatformItem(self, Token: str, HostId: str, InterfaceId: str, Service: dict) -> str:
+        ServiceName = Service["Name"]
+        Port = Service.get("Port")
+        if Port:
+            Key = f"net.tcp.service[tcp,{ServiceName},{Port}]"
+            ItemName = f"Platform TCP {ServiceName}:{Port}"
+            ItemType = 3
+            ValueType = 3
+        else:
+            Key = f"capacity.platform.status[{ServiceName}]"
+            ItemName = f"Platform status {ServiceName}"
+            ItemType = 2
+            ValueType = 3
+        Existing = self.ApiCall(Token, "item.get", {"output": ["itemid"], "hostids": HostId, "filter": {"key_": [Key]}})
+        if Existing:
+            return Existing[0]["itemid"]
+        Payload = {
+            "hostid": HostId,
+            "name": ItemName,
+            "key_": Key,
+            "type": ItemType,
+            "value_type": ValueType,
+            "delay": "1m",
+            "history": "90d",
+            "trends": "365d",
+            "description": f"Monitoreo del componente de plataforma {ServiceName} en ambiente Produccion.",
+        }
+        if ItemType == 3:
+            Payload["interfaceid"] = InterfaceId
+        Created = self.ApiCall(Token, "item.create", Payload)
+        self.EnsurePlatformTrigger(Token, ServiceName, Key)
+        return Created["itemids"][0]
+
+    def EnsurePlatformTrigger(self, Token: str, HostName: str, Key: str) -> None:
+        Description = f"Capacity Platform unavailable - {HostName}"
+        Existing = self.ApiCall(Token, "trigger.get", {"output": ["triggerid"], "filter": {"description": [Description]}})
+        if Existing:
+            return
+        self.ApiCall(
+            Token,
+            "trigger.create",
+            {
+                "description": Description,
+                "expression": f"last(/{HostName}/{Key})=0",
+                "priority": 4,
+                "comments": "Alerta productiva para componentes propios de Capacity_and_Performance.",
+            },
+        )
 
     def EnsureGraph(self, Token: str, HostId: str, ResourceName: str, ItemIds: list[str]) -> str | None:
         if not ItemIds:

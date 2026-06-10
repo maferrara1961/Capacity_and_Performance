@@ -157,15 +157,18 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
             self.assertIn("Como interpretarlo", Content)
             self.assertIn("Accion sugerida", Content)
 
-    def test_dashboards_tienen_filtro_de_lote_con_all(self):
+    def test_dashboards_tienen_filtro_de_lote(self):
         for DashboardPath in DashboardPaths():
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
             Variables = Dashboard.get("templating", {}).get("list", [])
             LoadVariables = [Variable for Variable in Variables if Variable.get("name") == "LoadId"]
             self.assertTrue(LoadVariables, DashboardPath.name)
             Variable = LoadVariables[0]
-            self.assertTrue(Variable.get("includeAll"), DashboardPath.name)
-            self.assertEqual(Variable.get("allValue"), ".*", DashboardPath.name)
+            if DashboardPath.name == "TechnicalPerformanceDashboard.json":
+                self.assertFalse(Variable.get("includeAll"), DashboardPath.name)
+            else:
+                self.assertTrue(Variable.get("includeAll"), DashboardPath.name)
+                self.assertEqual(Variable.get("allValue"), ".*", DashboardPath.name)
             self.assertIn("TestLoad", Variable.get("query", ""), DashboardPath.name)
 
     def test_paneles_filtran_por_lote(self):

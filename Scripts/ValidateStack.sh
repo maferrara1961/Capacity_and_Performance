@@ -23,6 +23,7 @@ Scripts/ValidateLocalAccess.sh
 Scripts/ValidateDatabaseConsistency.sh
 Scripts/CleanupGrafanaDashboards.sh
 Scripts/BackfillPlanningMetrics.sh
+Scripts/RegisterPlatformHosts.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh
@@ -160,6 +161,21 @@ fi
 
 if ! grep -q "capacity.enterprise.fact" Config/ZabbixAgent/UserParameters.conf; then
   echo "ZabbixAgent no declara UserParameter enterprise" >&2
+  exit 1
+fi
+
+if ! grep -q "register-platform-hosts" CapacityEngine/Scheduler/SyntheticDataCommand.py Scripts/RegisterPlatformHosts.sh; then
+  echo "Falta comando para registrar hosts productivos de la plataforma en Zabbix" >&2
+  exit 1
+fi
+
+if ! grep -q "Capacity Platform" CapacityEngine/Adapters/SyntheticZabbixAdapter.py; then
+  echo "Zabbix no declara grupo Capacity Platform" >&2
+  exit 1
+fi
+
+if ! grep -q "Produccion" CapacityEngine/Adapters/SyntheticZabbixAdapter.py; then
+  echo "Hosts de plataforma no declaran ambiente Produccion" >&2
   exit 1
 fi
 

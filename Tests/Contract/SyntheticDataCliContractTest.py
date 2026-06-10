@@ -61,6 +61,14 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("fuente: Zabbix", Result.stdout)
         self.assertIn("destino: PostgreSQL", Result.stdout)
 
+    def test_register_platform_hosts_imprime_resumen_productivo(self):
+        Result = RunManage("register-platform-hosts")
+        self.assertEqual(Result.returncode, 0, Result.stderr)
+        self.assertIn("hosts de plataforma registrados en Zabbix", Result.stdout)
+        self.assertIn("grupo: Capacity Platform", Result.stdout)
+        self.assertIn("ambiente: Produccion", Result.stdout)
+        self.assertIn("hosts registrados: 7", Result.stdout)
+
     def test_postgresql_sql_incluye_tablas_de_dashboard(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("SqlDemo001", "mixed", "small", 30, 1)
         Sql = SyntheticPostgreSqlAdapter().BuildLoadSql(Dataset)
@@ -187,6 +195,19 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         CpuThresholds = Adapter.TriggerThresholds("CPU")
         self.assertIn(("Warning", 2, 75), CpuThresholds)
         self.assertIn(("Critical", 4, 90), CpuThresholds)
+
+    def test_zabbix_adapter_registra_hosts_de_plataforma_en_produccion(self):
+        Adapter = SyntheticZabbixAdapter()
+        Services = Adapter.PlatformServiceDefinitions()
+        Names = {Service["Name"] for Service in Services}
+        self.assertEqual(7, len(Services))
+        self.assertIn("capacity-performance-postgresql", Names)
+        self.assertIn("capacity-performance-grafana", Names)
+        self.assertIn("capacity-performance-capacity-engine", Names)
+        for Service in Services:
+            Resource = Adapter.PlatformResource(Service)
+            self.assertEqual("Produccion", Resource["Inventory"]["Environment"])
+            self.assertEqual("Produccion", Resource["Inventory"]["Location"])
 
     def test_zabbix_history_push_usa_itemid_y_todas_las_muestras(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxHistory001", "critical", "small", 30, 1)

@@ -51,6 +51,26 @@ class StackInterconnectionContractTest(unittest.TestCase):
         self.assertIn("BacklevelStatus", Adapter)
         self.assertIn('"type": 0', Adapter)
 
+    def test_zabbix_registra_componentes_productivos_de_plataforma(self):
+        Adapter = (ROOT / "CapacityEngine/Adapters/SyntheticZabbixAdapter.py").read_text(encoding="utf-8")
+        Script = (ROOT / "Scripts/RegisterPlatformHosts.sh").read_text(encoding="utf-8")
+        Validator = (ROOT / "Scripts/ValidateStack.sh").read_text(encoding="utf-8")
+
+        self.assertIn("Capacity Platform", Adapter)
+        self.assertIn("Produccion", Adapter)
+        for HostName in [
+            "capacity-performance-postgresql",
+            "capacity-performance-victoriametrics",
+            "capacity-performance-zabbix-server",
+            "capacity-performance-zabbix-web",
+            "capacity-performance-zabbix-agent",
+            "capacity-performance-grafana",
+            "capacity-performance-capacity-engine",
+        ]:
+            self.assertIn(HostName, Adapter)
+        self.assertIn("register-platform-hosts", Script)
+        self.assertIn("RegisterPlatformHosts.sh", Validator)
+
     def test_grafana_monta_provisioning_desde_el_repositorio(self):
         Common = (ROOT / "Scripts/StackCommon.sh").read_text(encoding="utf-8")
         self.assertIn("${REPO_ROOT}/Config/Grafana/Datasources:/etc/grafana/provisioning/datasources:ro,Z", Common)

@@ -21,12 +21,17 @@ Scripts/BuildImages.sh Grafana v1.0.0
 
 ```bash
 Scripts/StartStack.sh
+Scripts/RegisterPlatformHosts.sh
 ```
 
 El arranque requiere que las imagenes locales ya existan. Si falta alguna imagen, el script se
 detiene antes de crear contenedores y solicita ejecutar `Scripts/BuildImages.sh`. Luego usa la red
 comun del stack e inicia servicios en orden compatible con dependencias: PostgreSQL,
 VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
+
+`Scripts/RegisterPlatformHosts.sh` registra los servidores de la plataforma en Zabbix dentro del
+grupo `Capacity Platform`, todos con ambiente `Produccion`: PostgreSQL, VictoriaMetrics,
+ZabbixServer, ZabbixWeb, ZabbixAgent, Grafana y CapacityEngine.
 
 Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Los providers
 de dashboard y los JSON de dashboard se montan en rutas separadas para evitar que Grafana lea el

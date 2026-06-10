@@ -28,6 +28,7 @@ def BuildParser() -> argparse.ArgumentParser:
 
     Subparsers.add_parser("sync-zabbix-inventory")
     Subparsers.add_parser("sync-enterprise-inventory")
+    Subparsers.add_parser("register-platform-hosts")
 
     BackfillPlanning = Subparsers.add_parser("backfill-planning-metrics")
     BackfillPlanning.add_argument("--load-id")
@@ -70,6 +71,8 @@ def Main(Argv: list[str] | None = None) -> int:
             return SyncZabbixInventory(PostgreSql, Zabbix)
         if Args.Action == "sync-enterprise-inventory":
             return SyncEnterpriseInventory(PostgreSql, Zabbix)
+        if Args.Action == "register-platform-hosts":
+            return RegisterPlatformHosts(Zabbix)
         if Args.Action == "backfill-planning-metrics":
             return BackfillPlanningMetrics(Args, PostgreSql)
         if Args.Action == "run-enterprise-assessment":
@@ -152,6 +155,15 @@ def SyncEnterpriseInventory(PostgreSql: SyntheticPostgreSqlAdapter, Zabbix: Synt
     print("  destino: PostgreSQL enterprise")
     print(f"  componentes sincronizados: {SyncedCount}")
     print(f"  componentes dados de baja: {DeletedCount}")
+    return 0
+
+
+def RegisterPlatformHosts(Zabbix: SyntheticZabbixAdapter) -> int:
+    RegisteredCount = Zabbix.RegisterPlatformHosts()
+    print("INFO: hosts de plataforma registrados en Zabbix")
+    print("  grupo: Capacity Platform")
+    print("  ambiente: Produccion")
+    print(f"  hosts registrados: {RegisteredCount}")
     return 0
 
 

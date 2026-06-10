@@ -47,9 +47,12 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
         self.assertEqual("technical-performance", Dashboard.get("uid"))
         self.assertIn("HostName", Variables)
         self.assertIn("ServiceId", Variables)
+        self.assertIn("Environment", Variables)
         self.assertIn('host_name=~\\"${HostName:regex}\\"', Text)
         self.assertIn('business_service_id=~\\"${ServiceId:regex}\\"', Text)
         self.assertIn("${ServiceId:regex}", Text)
+        self.assertIn("where LoadId ~ '^(${LoadId:regex})'", Text)
+        self.assertIn("Environment ~ '^(${Environment:regex})'", Text)
 
     def test_dashboard_tecnico_no_agrega_curvas_auxiliares_de_average_y_tendencia(self):
         Dashboard = json.loads(DashboardPath("TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
