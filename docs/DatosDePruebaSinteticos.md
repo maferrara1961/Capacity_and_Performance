@@ -83,6 +83,9 @@ PostgreSQL lo guarda en `MonitoredResource.Name`, VictoriaMetrics lo publica com
 `host_name` junto con `environment`, `technology_domain` y `business_service`, y Grafana lo muestra
 como `HostName` en tablas y leyendas.
 
+Los subsistemas se generan como `SRV-#####-TipoSubsistema`, usando valores realistas como
+`BaseDeDatos`, `Web`, `Middleware`, `Storage`, `Network`, `Mensajeria` y `Contenedores`.
+
 Para inventario operativo, Zabbix es la fuente. Luego de alta, baja o modificacion manual de hosts
 en Zabbix, ejecutar:
 

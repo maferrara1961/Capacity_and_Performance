@@ -51,19 +51,16 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
         self.assertIn('business_service_id=~\\"${ServiceId:regex}\\"', Text)
         self.assertIn("${ServiceId:regex}", Text)
 
-    def test_dashboard_tecnico_muestra_average_y_tendencia_del_rango(self):
+    def test_dashboard_tecnico_no_agrega_curvas_auxiliares_de_average_y_tendencia(self):
         Dashboard = json.loads(DashboardPath("TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
         Text = json.dumps(Dashboard)
         TimeSeriesPanels = [Panel for Panel in Dashboard.get("panels", []) if Panel.get("type") == "timeseries"]
 
         self.assertTrue(TimeSeriesPanels)
-        for Panel in TimeSeriesPanels:
-            PanelText = json.dumps(Panel)
-            self.assertIn("avg_over_time", PanelText, Panel.get("title"))
-            self.assertIn("predict_linear", PanelText, Panel.get("title"))
-            self.assertIn("$__range", PanelText, Panel.get("title"))
-            self.assertIn("average rango", PanelText, Panel.get("title"))
-            self.assertIn("tendencia rango", PanelText, Panel.get("title"))
+        self.assertNotIn("avg_over_time", Text)
+        self.assertNotIn("predict_linear", Text)
+        self.assertNotIn("average rango", Text)
+        self.assertNotIn("tendencia rango", Text)
 
     def test_series_temporales_muestran_host_no_lote_demo_en_leyenda(self):
         for DashboardPath in DashboardPaths():

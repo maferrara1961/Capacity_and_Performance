@@ -34,8 +34,12 @@ class EnterpriseGovernanceDashboardContractTest(unittest.TestCase):
             self.assertIn("thresholds", Panels[Title]["fieldConfig"]["defaults"])
 
         self.assertIn("InventarioPct", Text)
+        self.assertIn("InventarioDetalle", Text)
         self.assertIn("CicloVidaCompliancePct", Text)
+        self.assertIn("CicloVidaComplianceDetalle", Text)
         self.assertIn("ConfianzaMonitoreoPct", Text)
+        self.assertIn("ConfianzaMonitoreoDetalle", Text)
+        self.assertIn("OkCount || '/' || TotalCount", Text)
         self.assertIn("EnterpriseTechnologyComponent", Text)
         self.assertIn("EnterpriseEvidenceRecord", Text)
         self.assertIn("ComplianceStatus = 'Compliant'", Text)

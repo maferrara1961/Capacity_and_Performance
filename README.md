@@ -344,9 +344,11 @@ o `Desarrollo`. Zabbix lo expone en inventario como ubicacion, PostgreSQL lo gua
 `Environment`, VictoriaMetrics lo publica como label `environment` y Grafana lo usa como filtro
 `Ambiente`.
 
-Los subsistemas sinteticos se cargan con nomenclatura `SRV-#####-SubsistemaDefinido`. El mismo valor
-se usa como `ServiceId`, nombre de servicio, `business_service_id` y `business_service`, para que el
-filtro de subsistema en Grafana coincida con el host que lo origino.
+Los subsistemas sinteticos se cargan con nomenclatura `SRV-#####-TipoSubsistema`, por ejemplo
+`SRV-48291-Web`, `SRV-48291-BaseDeDatos`, `SRV-48291-Middleware`, `SRV-48291-Storage`,
+`SRV-48291-Network`, `SRV-48291-Mensajeria` o `SRV-48291-Contenedores`. El mismo valor se usa como
+`ServiceId`, nombre de servicio, `business_service_id` y `business_service`, para que el filtro de
+subsistema en Grafana coincida con el host que lo origino.
 
 La misma identidad de host queda disponible en todas las herramientas:
 

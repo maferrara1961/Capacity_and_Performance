@@ -80,9 +80,9 @@
     },
     {
       "id": 3,
-      "title": "Software Backlevel por Host",
+      "title": "Software y Evidencia por Host",
       "type": "table",
-      "description": "Detalle de hosts con version, vendor, fin de soporte y servicio afectado para planificar upgrades.",
+      "description": "Detalle de hosts con version, vendor, lifecycle, backlevel y referencia directa a la evidencia cuando esta disponible.",
       "datasource": {
         "type": "postgres",
         "uid": "CapacityPostgreSQL"
@@ -97,12 +97,16 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select ComponentName as HostName, TechnologyType, Version, Vendor, DomainName, BusinessServiceId, BacklevelStatus, LifecycleStatus, SupportStatus, EndOfSupportDate from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and (BacklevelStatus = 'Backlevel' or LifecycleStatus in ('EndOfSupport','EndOfLife')) order by EndOfSupportDate nulls last, ComponentName"
+          "rawSql": "select c.ComponentName as HostName, c.TechnologyType, c.Version, c.Vendor, c.DomainName, c.BusinessServiceId, c.BacklevelStatus, c.LifecycleStatus, c.SupportStatus, c.EndOfSupportDate, c.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference from EnterpriseTechnologyComponent c left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where c.LoadId ~ '^(${LoadId:regex})' order by case c.BacklevelStatus when 'Backlevel' then 1 when 'Current' then 2 else 3 end, c.EndOfSupportDate nulls last, c.ComponentName"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "links": [
+            {
+              "title": "Ver dato de evidencia",
+              "url": "${__data.fields.EvidenceReference}"
+            },
             {
               "title": "Ver graficos del equipo",
               "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
@@ -134,12 +138,16 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.Severity, c.ComponentName as HostName, c.BacklevelStatus, c.LifecycleStatus, c.EndOfSupportDate, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Lifecycle' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.EndOfSupportDate nulls last"
+          "rawSql": "select r.Severity, c.ComponentName as HostName, c.BacklevelStatus, c.LifecycleStatus, c.EndOfSupportDate, r.Impact, r.RecommendedAction, r.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Lifecycle' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.EndOfSupportDate nulls last"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "links": [
+            {
+              "title": "Ver dato de evidencia",
+              "url": "${__data.fields.EvidenceReference}"
+            },
             {
               "title": "Ver graficos del equipo",
               "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"

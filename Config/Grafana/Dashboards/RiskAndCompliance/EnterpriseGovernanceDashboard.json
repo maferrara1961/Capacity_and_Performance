@@ -60,7 +60,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select coalesce(round(100.0 * count(*) filter (where nullif(ComponentName,'') is not null and nullif(TechnologyType,'') is not null and nullif(DomainName,'') is not null and nullif(BusinessServiceId,'') is not null and nullif(Owner,'') is not null) / nullif(count(*), 0), 2), 0) as InventarioPct from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})'"
+          "rawSql": "with Conteo as (select count(*) filter (where nullif(ComponentName,'') is not null and nullif(TechnologyType,'') is not null and nullif(DomainName,'') is not null and nullif(BusinessServiceId,'') is not null and nullif(Owner,'') is not null) as OkCount, count(*) as TotalCount from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})') select coalesce(round(100.0 * OkCount / nullif(TotalCount, 0), 2), 0) as InventarioPct, '[' || OkCount || '/' || TotalCount || ']' as InventarioDetalle from Conteo"
         }
       ],
       "fieldConfig": {
@@ -136,7 +136,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select coalesce(round(100.0 * count(*) filter (where LifecycleStatus in ('Supported','Current') and SupportStatus not in ('EndOfSupport','EndOfLife','Backlevel','Unknown') and ComplianceStatus = 'Compliant' and LicenseStatus = 'Compliant' and BacklevelStatus = 'Current') / nullif(count(*), 0), 2), 0) as CicloVidaCompliancePct from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})'"
+          "rawSql": "with Conteo as (select count(*) filter (where LifecycleStatus in ('Supported','Current') and SupportStatus not in ('EndOfSupport','EndOfLife','Backlevel','Unknown') and ComplianceStatus = 'Compliant' and LicenseStatus = 'Compliant' and BacklevelStatus = 'Current') as OkCount, count(*) as TotalCount from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})') select coalesce(round(100.0 * OkCount / nullif(TotalCount, 0), 2), 0) as CicloVidaCompliancePct, '[' || OkCount || '/' || TotalCount || ']' as CicloVidaComplianceDetalle from Conteo"
         }
       ],
       "fieldConfig": {
@@ -212,7 +212,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select coalesce(round(100.0 * count(*) filter (where EvidenceState = 'Available' and FreshnessStatus = 'Fresh') / nullif(count(*), 0), 2), 0) as ConfianzaMonitoreoPct from EnterpriseEvidenceRecord where LoadId ~ '^(${LoadId:regex})'"
+          "rawSql": "with Conteo as (select count(*) filter (where EvidenceState = 'Available' and FreshnessStatus = 'Fresh') as OkCount, count(*) as TotalCount from EnterpriseEvidenceRecord where LoadId ~ '^(${LoadId:regex})') select coalesce(round(100.0 * OkCount / nullif(TotalCount, 0), 2), 0) as ConfianzaMonitoreoPct, '[' || OkCount || '/' || TotalCount || ']' as ConfianzaMonitoreoDetalle from Conteo"
         }
       ],
       "fieldConfig": {

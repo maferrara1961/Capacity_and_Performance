@@ -70,7 +70,7 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn("insert into Recommendation", Sql)
         self.assertIn("insert into Service", Sql)
         self.assertIn("insert into CapacityKpi (CapacityKpiId, LoadId", Sql)
-        self.assertIn("-SubsistemaDefinido", Sql)
+        self.assertTrue(any(f"-{Subsystem}" in Sql for Subsystem in SyntheticDataService.SubsystemTypes))
         self.assertIn("'SqlDemo001-Resource-1'", Sql)
         self.assertIn("'Revisar capacidad del host asociado", Sql)
         self.assertEqual(Dataset["Recommendations"][0]["ScopeId"], Dataset["Risks"][0]["ScopeId"])
@@ -115,21 +115,22 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertEqual(Dataset["Samples"][0]["Environment"], Dataset["Resources"][0]["Environment"])
         self.assertEqual(Dataset["EnterpriseComponents"][0]["Environment"], Dataset["Resources"][0]["Environment"])
 
-    def test_subsistemas_usan_hostname_mas_subsistema_definido(self):
+    def test_subsistemas_usan_hostname_mas_subsistema_realista(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("SubsystemDemo001", "mixed", "small", 30, 1)
+        ExpectedSubsystems = set(SyntheticDataService.SubsystemTypes)
 
         self.assertEqual(len(Dataset["Services"]), len(Dataset["Resources"]))
         for Resource, Service in zip(Dataset["Resources"], Dataset["Services"], strict=True):
-            ExpectedSubsystem = f"{Resource['Name']}-SubsistemaDefinido"
-            self.assertEqual(Service["ServiceId"], ExpectedSubsystem)
-            self.assertEqual(Service["Name"], ExpectedSubsystem)
+            self.assertTrue(Service["ServiceId"].startswith(f"{Resource['Name']}-"))
+            self.assertEqual(Service["Name"], Service["ServiceId"])
+            self.assertIn(Service["ServiceId"].removeprefix(f"{Resource['Name']}-"), ExpectedSubsystems)
 
         FirstSample = Dataset["Samples"][0]
-        self.assertEqual(FirstSample["BusinessServiceId"], f"{FirstSample['HostName']}-SubsistemaDefinido")
+        self.assertTrue(FirstSample["BusinessServiceId"].startswith(f"{FirstSample['HostName']}-"))
         self.assertEqual(FirstSample["BusinessService"], FirstSample["BusinessServiceId"])
 
         FirstComponent = Dataset["EnterpriseComponents"][0]
-        self.assertEqual(FirstComponent["BusinessServiceId"], f"{FirstComponent['ComponentName']}-SubsistemaDefinido")
+        self.assertTrue(FirstComponent["BusinessServiceId"].startswith(f"{FirstComponent['ComponentName']}-"))
 
     def test_victoriametrics_import_usa_formato_prometheus(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("VmDemo001", "mixed", "small", 30, 1)

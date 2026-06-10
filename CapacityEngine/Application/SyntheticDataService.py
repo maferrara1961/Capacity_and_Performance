@@ -10,6 +10,7 @@ class SyntheticDataService:
     VolumeScale = {"small": 3, "medium": 8, "large": 15}
     PlanningMetrics = ["CPU", "RAM", "Storage", "StorageIO", "NetworkIO"]
     Environments = ["Produccion", "Homologacion", "Testing", "Desarrollo"]
+    SubsystemTypes = ["BaseDeDatos", "Web", "Middleware", "Storage", "Network", "Mensajeria", "Contenedores"]
 
     def GenerateLoadId(self) -> str:
         return f"Load{datetime.now(UTC).strftime('%Y%m%d%H%M%S')}"
@@ -24,7 +25,7 @@ class SyntheticDataService:
         ResourceCount = self.VolumeScale[Volume]
         Load = TestLoad.Create(LoadId, Profile, Volume).WithStatus("Running")
         Resources = self.BuildResources(LoadId, ResourceCount, Profile, Random)
-        Services = self.BuildServices(LoadId, Resources, Profile)
+        Services = self.BuildServices(LoadId, Resources, Profile, Random)
         Samples = self.BuildSamples(LoadId, Services, Resources, Profile, Days, Random)
         Kpis = self.BuildKpis(LoadId, Resources, Profile, Random)
         Forecasts = self.BuildForecasts(LoadId, Resources, Profile, Random)
@@ -44,23 +45,26 @@ class SyntheticDataService:
             **Enterprise,
         }
 
-    def BuildServices(self, LoadId: str, Resources: list[dict], Profile: str) -> list[dict]:
+    def BuildServices(self, LoadId: str, Resources: list[dict], Profile: str, Random: random.Random) -> list[dict]:
         Criticalities = ["Low", "Medium", "High", "Critical"]
-        return [
-            {
-                "ServiceId": self.SubsystemNameFor(Resource),
-                "LoadId": LoadId,
-                "Name": self.SubsystemNameFor(Resource),
-                "Owner": "CapacityLab",
-                "Criticality": Criticalities[Index % len(Criticalities)],
-                "Status": self.StatusFor(Profile),
-                "IsTestData": True,
-            }
-            for Index, Resource in enumerate(Resources, start=1)
-        ]
+        Services = []
+        for Index, Resource in enumerate(Resources, start=1):
+            SubsystemName = self.SubsystemNameFor(Resource, Random)
+            Services.append(
+                {
+                    "ServiceId": SubsystemName,
+                    "LoadId": LoadId,
+                    "Name": SubsystemName,
+                    "Owner": "CapacityLab",
+                    "Criticality": Criticalities[Index % len(Criticalities)],
+                    "Status": self.StatusFor(Profile),
+                    "IsTestData": True,
+                }
+            )
+        return Services
 
-    def SubsystemNameFor(self, Resource: dict) -> str:
-        return f"{Resource['Name']}-SubsistemaDefinido"
+    def SubsystemNameFor(self, Resource: dict, Random: random.Random) -> str:
+        return f"{Resource['Name']}-{Random.choice(self.SubsystemTypes)}"
 
     def BuildResources(self, LoadId: str, Count: int, Profile: str, Random: random.Random) -> list[dict]:
         Types = ["Server", "Database", "Storage", "Network", "Dependency"]
@@ -281,7 +285,7 @@ class SyntheticDataService:
                     "ObservedAt": datetime.now(UTC).isoformat(),
                     "FreshnessStatus": "Fresh" if EvidenceStateValue == "Available" else "Unknown",
                     "EvidenceState": EvidenceStateValue,
-                    "EvidenceReference": f"synthetic:{LoadId}:{ComponentId}",
+                    "EvidenceReference": f"http://localhost:8080/zabbix.php?action=latest.view&filter_set=1&filter_name={Resource['Name']}",
                     "IsTestData": True,
                 }
             )

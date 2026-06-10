@@ -161,7 +161,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.ScopeType, coalesce(mr.Name, r.ScopeId) as HostName, c.Environment, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(r.RiskAssessmentId from '^(.+)-Risk-') where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc"
+          "rawSql": "select r.ScopeType, coalesce(mr.Name, r.ScopeId) as HostName, c.Environment, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(r.RiskAssessmentId from '^(.+)-Risk-') where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' order by case r.OverallRisk when 'Critical' then 3 when 'Warning' then 2 when 'OK' then 1 else 0 end desc, r.CalculatedAt desc"
         }
       ],
       "fieldConfig": {

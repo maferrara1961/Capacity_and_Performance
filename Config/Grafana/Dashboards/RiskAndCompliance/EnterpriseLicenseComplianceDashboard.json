@@ -80,9 +80,9 @@
     },
     {
       "id": 3,
-      "title": "Hosts con Riesgo de Licencia",
+      "title": "Hosts y Evidencia de Licencia",
       "type": "table",
-      "description": "Detalle operativo para decidir remediacion, compra, normalizacion o validacion de evidencia de licencia.",
+      "description": "Detalle de hosts con estado de licencia, compliance y referencia directa a la evidencia cuando esta disponible.",
       "datasource": {
         "type": "postgres",
         "uid": "CapacityPostgreSQL"
@@ -97,12 +97,16 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select ComponentName as HostName, TechnologyType, DomainName, BusinessServiceId, Owner, LicenseStatus, ComplianceStatus, EvidenceState from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and LicenseStatus in ('NonCompliant','Unverified','Unknown') order by case LicenseStatus when 'NonCompliant' then 1 when 'Unverified' then 2 else 3 end, ComponentName"
+          "rawSql": "select c.ComponentName as HostName, c.TechnologyType, c.DomainName, c.BusinessServiceId, c.Owner, c.LicenseStatus, c.ComplianceStatus, c.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference from EnterpriseTechnologyComponent c left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where c.LoadId ~ '^(${LoadId:regex})' order by case c.LicenseStatus when 'NonCompliant' then 1 when 'Unverified' then 2 when 'Unknown' then 3 else 4 end, c.ComponentName"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "links": [
+            {
+              "title": "Ver dato de evidencia",
+              "url": "${__data.fields.EvidenceReference}"
+            },
             {
               "title": "Ver graficos del equipo",
               "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
@@ -134,12 +138,16 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.Severity, c.ComponentName as HostName, c.LicenseStatus, c.ComplianceStatus, r.Impact, r.RecommendedAction, r.EvidenceState from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Compliance' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.ComponentName"
+          "rawSql": "select r.Severity, c.ComponentName as HostName, c.LicenseStatus, c.ComplianceStatus, r.Impact, r.RecommendedAction, r.EvidenceState, coalesce(e.EvidenceReference, 'Sin evidencia disponible') as EvidenceReference from EnterpriseRiskRegistryEntry r join EnterpriseTechnologyComponent c on c.ComponentId = r.AffectedTechnologyId left join EnterpriseEvidenceRecord e on e.ComponentId = c.ComponentId and e.LoadId = c.LoadId and e.EvidenceState = 'Available' where r.LoadId ~ '^(${LoadId:regex})' and r.RiskCategory = 'Compliance' order by case r.Severity when 'Critical' then 1 when 'High' then 2 when 'Medium' then 3 else 4 end, c.ComponentName"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "links": [
+            {
+              "title": "Ver dato de evidencia",
+              "url": "${__data.fields.EvidenceReference}"
+            },
             {
               "title": "Ver graficos del equipo",
               "url": "/d/technical-performance/technical-performance-dashboard?var-LoadId=${LoadId}&var-HostName=${__data.fields.HostName}&var-ServiceId=.*"
