@@ -8,7 +8,7 @@ class GrafanaTechnicalDrilldownContractTest(unittest.TestCase):
         self.RepoRoot = Path(__file__).resolve().parents[2]
         self.DashboardRoot = self.RepoRoot / "Config" / "Grafana" / "Dashboards"
 
-    def test_links_to_technical_performance_pass_dashboard_load_variable(self):
+    def test_links_to_technical_performance_do_not_pass_literal_dashboard_variable_name(self):
         BrokenLinks = []
 
         for DashboardPath in self.DashboardRoot.rglob("*.json"):
@@ -17,8 +17,26 @@ class GrafanaTechnicalDrilldownContractTest(unittest.TestCase):
                 Url = Link.get("url", "")
                 if "/d/technical-performance/technical-performance-dashboard" not in Url:
                     continue
-                if "var-LoadId=${LoadId}" in Url:
+                if "var-LoadId=${var-LoadId}" in Url:
                     BrokenLinks.append(f"{DashboardPath.name}: {Url}")
+
+        self.assertEqual([], BrokenLinks)
+
+    def test_panels_without_host_field_do_not_send_empty_host_filter(self):
+        BrokenLinks = []
+
+        for DashboardPath in self.DashboardRoot.rglob("*.json"):
+            Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
+            for Panel in Dashboard.get("panels", []):
+                TargetText = json.dumps(Panel.get("targets", []))
+                if "HostName" in TargetText or "host_name" in TargetText:
+                    continue
+                for Link in self.FindLinks(Panel):
+                    Url = Link.get("url", "")
+                    if "/d/technical-performance/technical-performance-dashboard" not in Url:
+                        continue
+                    if "var-HostName=${__data.fields.HostName}" in Url:
+                        BrokenLinks.append(f"{DashboardPath.name}: {Panel.get('title')}: {Url}")
 
         self.assertEqual([], BrokenLinks)
 

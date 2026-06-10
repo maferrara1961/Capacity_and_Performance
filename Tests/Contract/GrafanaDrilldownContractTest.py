@@ -27,11 +27,15 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
                     self.assertIn("var-ServiceId=${__field.labels.business_service_id}", LinkText)
                     self.assertNotIn("${__data.fields.HostName}${__field.labels.host_name}", LinkText)
                 else:
-                    self.assertIn("var-LoadId=${var-LoadId}", LinkText)
+                    self.assertIn("var-LoadId=${LoadId}", LinkText)
                     if Panel.get("type") == "stat":
                         self.assertIn("var-HostName=.*", LinkText)
                     else:
-                        self.assertIn("var-HostName=${__data.fields.HostName}", LinkText)
+                        TargetText = json.dumps(Panel.get("targets", []))
+                        if "HostName" in TargetText or "host_name" in TargetText:
+                            self.assertIn("var-HostName=${__data.fields.HostName}", LinkText)
+                        else:
+                            self.assertIn("var-HostName=.*", LinkText)
 
     def test_dashboards_tienen_rango_default_de_30_dias(self):
         for DashboardPath in DashboardPaths():
