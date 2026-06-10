@@ -91,7 +91,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "platform_container_up{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_up{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -127,7 +127,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -162,7 +162,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "platform_container_memory_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_memory_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -197,7 +197,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "{{host_name}}"
         }
       ],
@@ -232,12 +232,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "platform_container_network_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_network_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "Input {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "platform_container_network_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_network_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "Output {{host_name}}"
         }
       ],
@@ -272,12 +272,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "platform_container_block_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_block_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "Input {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "platform_container_block_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}",
+          "expr": "last_over_time(platform_container_block_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "legendFormat": "Output {{host_name}}"
         }
       ],
