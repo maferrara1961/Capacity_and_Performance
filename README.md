@@ -316,6 +316,10 @@ Esto crea o actualiza el grupo `Capacity Platform` con los hosts
 `capacity-performance-zabbix-agent`, `capacity-performance-grafana` y
 `capacity-performance-capacity-engine`, todos con ambiente `Produccion`.
 
+Los servicios con puerto exponen checks TCP `net.tcp.service[...]`. `CapacityEngine` es batch y no
+publica puerto; por eso se valida con el UserParameter `capacity.platform.status[...]`, alimentado
+por `Scripts/UpdatePlatformZabbixStatus.sh` durante `StartStack` y `StopStack`.
+
 En Zabbix, esos datos se ven por host en `Monitoring > Latest data` como items de agente:
 
 ```text

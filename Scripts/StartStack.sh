@@ -58,4 +58,5 @@ for Service in $STACK_START_ORDER; do
   fi
 done
 
+"$REPO_ROOT/Scripts/UpdatePlatformZabbixStatus.sh"
 Info "stack iniciado; validar salud con Scripts/StackStatus.sh"

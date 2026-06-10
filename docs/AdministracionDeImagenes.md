@@ -33,6 +33,10 @@ VictoriaMetrics, Zabbix, Grafana y CapacityEngine.
 grupo `Capacity Platform`, todos con ambiente `Produccion`: PostgreSQL, VictoriaMetrics,
 ZabbixServer, ZabbixWeb, ZabbixAgent, Grafana y CapacityEngine.
 
+Los componentes con puerto usan items TCP `net.tcp.service[...]`. `CapacityEngine`, al ser batch,
+usa `capacity.platform.status[...]` expuesto por ZabbixAgent desde
+`.capacity-test-data/ZabbixAgent/PlatformStatus.tsv`.
+
 Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Los providers
 de dashboard y los JSON de dashboard se montan en rutas separadas para evitar que Grafana lea el
 provider como dashboard. Despues de un `git pull`, ejecutar `Scripts/StopStack.sh` y

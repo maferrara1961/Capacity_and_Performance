@@ -421,7 +421,6 @@ class SyntheticZabbixAdapter:
         Key = self.ItemKey(Sample["MetricName"])
         Existing = self.ApiCall(Token, "item.get", {"output": ["itemid"], "hostids": HostId, "filter": {"key_": [Key]}})
         if Existing:
-            self.EnsurePlatformTrigger(Token, ServiceName, Key)
             return Existing[0]["itemid"]
         Created = self.ApiCall(
             Token,
@@ -450,10 +449,25 @@ class SyntheticZabbixAdapter:
         else:
             Key = f"capacity.platform.status[{ServiceName}]"
             ItemName = f"Platform status {ServiceName}"
-            ItemType = 2
+            ItemType = 0
             ValueType = 3
         Existing = self.ApiCall(Token, "item.get", {"output": ["itemid"], "hostids": HostId, "filter": {"key_": [Key]}})
         if Existing:
+            self.ApiCall(
+                Token,
+                "item.update",
+                {
+                    "itemid": Existing[0]["itemid"],
+                    "interfaceid": InterfaceId,
+                    "type": ItemType,
+                    "value_type": ValueType,
+                    "delay": "1m",
+                    "history": "90d",
+                    "trends": "365d",
+                    "description": f"Monitoreo del componente de plataforma {ServiceName} en ambiente Produccion.",
+                },
+            )
+            self.EnsurePlatformTrigger(Token, ServiceName, Key)
             return Existing[0]["itemid"]
         Payload = {
             "hostid": HostId,
@@ -461,13 +475,12 @@ class SyntheticZabbixAdapter:
             "key_": Key,
             "type": ItemType,
             "value_type": ValueType,
-            "delay": "1m" if ItemType != 2 else "0",
+            "delay": "1m",
             "history": "90d",
             "trends": "365d",
             "description": f"Monitoreo del componente de plataforma {ServiceName} en ambiente Produccion.",
+            "interfaceid": InterfaceId,
         }
-        if ItemType == 3:
-            Payload["interfaceid"] = InterfaceId
         Created = self.ApiCall(Token, "item.create", Payload)
         self.EnsurePlatformTrigger(Token, ServiceName, Key)
         return Created["itemids"][0]

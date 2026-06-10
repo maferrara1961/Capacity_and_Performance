@@ -3,3 +3,4 @@ LABEL org.opencontainers.image.title="Capacity Zabbix Agent"
 LABEL org.opencontainers.image.description="Zabbix agent2 with enterprise license and backlevel user parameters"
 COPY Config/ZabbixAgent/UserParameters.conf /etc/zabbix/zabbix_agent2.d/capacity_enterprise.conf
 COPY Config/ZabbixAgent/ReadEnterpriseFact.sh /usr/local/bin/ReadEnterpriseFact.sh
+COPY Config/ZabbixAgent/ReadPlatformStatus.sh /usr/local/bin/ReadPlatformStatus.sh

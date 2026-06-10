@@ -11,4 +11,5 @@ for Service in $STACK_STOP_ORDER; do
   RunPodman stop "$Container" || Info "$Service ya estaba detenido o no existe"
 done
 
+"$REPO_ROOT/Scripts/UpdatePlatformZabbixStatus.sh"
 Info "stop finalizado; los volumenes persistentes fueron preservados"

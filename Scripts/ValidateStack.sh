@@ -24,6 +24,7 @@ Scripts/ValidateDatabaseConsistency.sh
 Scripts/CleanupGrafanaDashboards.sh
 Scripts/BackfillPlanningMetrics.sh
 Scripts/RegisterPlatformHosts.sh
+Scripts/UpdatePlatformZabbixStatus.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh
@@ -44,6 +45,7 @@ Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseLicenseComplianceDashboard
 Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseSoftwareBacklevelDashboard.json
 Config/ZabbixAgent/UserParameters.conf
 Config/ZabbixAgent/ReadEnterpriseFact.sh
+Config/ZabbixAgent/ReadPlatformStatus.sh
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
@@ -161,6 +163,16 @@ fi
 
 if ! grep -q "capacity.enterprise.fact" Config/ZabbixAgent/UserParameters.conf; then
   echo "ZabbixAgent no declara UserParameter enterprise" >&2
+  exit 1
+fi
+
+if ! grep -q "capacity.platform.status" Config/ZabbixAgent/UserParameters.conf; then
+  echo "ZabbixAgent no declara UserParameter para estado de plataforma" >&2
+  exit 1
+fi
+
+if ! grep -q "UpdatePlatformZabbixStatus.sh" Scripts/StartStack.sh Scripts/StopStack.sh; then
+  echo "Start/Stop no actualizan estado de plataforma para Zabbix" >&2
   exit 1
 fi
 
