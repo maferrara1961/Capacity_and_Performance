@@ -40,6 +40,20 @@ class GrafanaTechnicalDrilldownContractTest(unittest.TestCase):
 
         self.assertEqual([], BrokenLinks)
 
+    def test_table_links_use_grafana_field_index_syntax(self):
+        BrokenLinks = []
+
+        for DashboardPath in self.DashboardRoot.rglob("*.json"):
+            Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
+            for Link in self.FindLinks(Dashboard):
+                Url = Link.get("url", "")
+                if "/d/technical-performance/technical-performance-dashboard" not in Url:
+                    continue
+                if "${__data.fields." in Url:
+                    BrokenLinks.append(f"{DashboardPath.name}: {Url}")
+
+        self.assertEqual([], BrokenLinks)
+
     def test_links_to_technical_performance_include_host_or_service_context(self):
         MissingContext = []
 
