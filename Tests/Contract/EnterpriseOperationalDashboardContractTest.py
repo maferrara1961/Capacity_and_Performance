@@ -16,14 +16,17 @@ class EnterpriseOperationalDashboardContractTest(unittest.TestCase):
         self.assertIn("technology_domain", Text)
         self.assertIn("business_service", Text)
         self.assertIn('"name": "MetricName"', Text)
+        self.assertIn('"name": "Environment"', Text)
         self.assertIn("CPU,RAM,Storage,StorageIO,NetworkIO", Text)
         self.assertIn("${MetricName:regex}", Text)
+        self.assertIn("${Environment:regex}", Text)
         self.assertIn("CapacityKpi", Text)
         self.assertIn("ForecastResult", Text)
         self.assertIn("LoadIdCalculado", Text)
         self.assertIn("c.LoadId = k.LoadIdCalculado", Text)
         self.assertIn("k.LoadIdCalculado ~", Text)
         self.assertIn('load_id=~\\"${LoadId:regex}\\"', Text)
+        self.assertIn('environment=~\\"${Environment:regex}\\"', Text)
 
 
 if __name__ == "__main__":

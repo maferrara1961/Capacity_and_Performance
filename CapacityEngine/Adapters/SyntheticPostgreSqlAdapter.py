@@ -250,10 +250,12 @@ where not exists (
             )
         for Index, Service in enumerate(Dataset["Services"], start=1):
             ApplicationId = f"{Load['LoadId']}-Application-{Index}"
+            Resource = Dataset["Resources"][(Index - 1) % len(Dataset["Resources"])]
+            Environment = Resource.get("Environment", Resource.get("Inventory", {}).get("Environment", "Unknown"))
             Lines.append(
                 "insert into Application (ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus) values "
                 f"({self.Q(ApplicationId)}, {self.Q(Service['ServiceId'])}, {self.Q('Aplicacion Sintetica ' + str(Index))}, "
-                f"{self.Q('Demo')}, {self.Q(Service['Status'])}, {self.Q(Service['Status'])}) on conflict (ApplicationId) do nothing;"
+                f"{self.Q(Environment)}, {self.Q(Service['Status'])}, {self.Q(Service['Status'])}) on conflict (ApplicationId) do nothing;"
             )
         for Resource in Dataset["Resources"]:
             Lines.append(

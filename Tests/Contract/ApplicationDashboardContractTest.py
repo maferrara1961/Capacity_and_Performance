@@ -21,6 +21,9 @@ class ApplicationDashboardContractTest(unittest.TestCase):
         self.assertIn("ServiceId", Text)
         self.assertIn("ApplicationId", Text)
         self.assertIn("ResourceId", Text)
+        self.assertIn('"name": "Environment"', Text)
+        self.assertIn("${Environment:regex}", Text)
+        self.assertIn('environment=~\\"${Environment:regex}\\"', Text)
         self.assertIn("ImpactWeight", Text)
         self.assertIn("OverallRisk", Text)
 

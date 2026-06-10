@@ -19,7 +19,14 @@ class SyntheticZabbixAdapter:
     def SaveDataset(self, LoadId: str, Dataset: dict) -> None:
         Store = self.LoadStore()
         Store[LoadId] = {
-            "Hosts": [Resource["Name"] for Resource in Dataset["Resources"]],
+            "Hosts": [
+                {
+                    "HostName": Resource["Name"],
+                    "Environment": Resource.get("Environment", Resource.get("Inventory", {}).get("Environment", "Unknown")),
+                    "Type": Resource.get("ResourceType", "Server"),
+                }
+                for Resource in Dataset["Resources"]
+            ],
             "Samples": len(Dataset["Samples"]),
         }
         self.SaveAgentFacts(Dataset)
@@ -30,7 +37,7 @@ class SyntheticZabbixAdapter:
     def DeleteDataset(self, LoadId: str) -> int:
         Store = self.LoadStore()
         Record = Store.pop(LoadId, None)
-        self.DeleteAgentFactsForHosts((Record or {}).get("Hosts", []))
+        self.DeleteAgentFactsForHosts(self.HostNamesFromRecord(Record or {}))
         self.SaveStore(Store)
         if os.environ.get("STACK_DRY_RUN", "0") != "1":
             self.DeleteRemoteDataset(LoadId)
@@ -103,6 +110,15 @@ class SyntheticZabbixAdapter:
             Facts = CurrentFacts[HostName]
             Lines.append("\t".join([HostName] + [Facts.get(Field, "Unknown") for Field in Header[1:]]))
         self.AgentFactPath.write_text("\n".join(Lines) + "\n", encoding="utf-8")
+
+    def HostNamesFromRecord(self, Record: dict) -> list[str]:
+        HostNames = []
+        for Host in Record.get("Hosts", []):
+            if isinstance(Host, dict):
+                HostNames.append(Host.get("HostName", ""))
+            else:
+                HostNames.append(str(Host))
+        return [HostName for HostName in HostNames if HostName]
 
     def SaveAgentFactsFile(self, FactsByHost: dict) -> None:
         self.AgentFactPath.parent.mkdir(parents=True, exist_ok=True)
@@ -206,6 +222,7 @@ class SyntheticZabbixAdapter:
                     "Type": Host["Type"],
                     "Os": Host["Os"],
                     "Location": Host["Location"],
+                    "Environment": Host["Environment"],
                     "Notes": Host["Notes"],
                     "TechnologyDomain": "Infrastructure",
                     "BusinessService": "Servicio inventariado desde Zabbix",
@@ -218,7 +235,10 @@ class SyntheticZabbixAdapter:
         Store = self.LoadStore()
         Hosts = []
         for LoadId, Record in Store.items():
-            for Index, HostName in enumerate(Record.get("Hosts", []), start=1):
+            for Index, HostRecord in enumerate(Record.get("Hosts", []), start=1):
+                HostName = HostRecord.get("HostName") if isinstance(HostRecord, dict) else HostRecord
+                Environment = HostRecord.get("Environment", "Unknown") if isinstance(HostRecord, dict) else "Unknown"
+                ResourceType = HostRecord.get("Type", "Server") if isinstance(HostRecord, dict) else "Server"
                 Hosts.append(
                     {
                         "HostId": f"dryrun-{LoadId}-{Index}",
@@ -226,9 +246,10 @@ class SyntheticZabbixAdapter:
                         "VisibleName": HostName,
                         "Status": "OK",
                         "AssetTag": f"{LoadId}-{Index}",
-                        "Type": "Server",
+                        "Type": ResourceType,
                         "Os": "Linux",
-                        "Location": "CapacityLab",
+                        "Location": Environment,
+                        "Environment": Environment,
                         "Notes": "Host sintetico en modo simulacion",
                     }
                 )
@@ -247,6 +268,7 @@ class SyntheticZabbixAdapter:
             "Type": Inventory.get("type") or "Server",
             "Os": Inventory.get("os") or "Unknown",
             "Location": Inventory.get("location") or "Unknown",
+            "Environment": Inventory.get("location") or "Unknown",
             "Notes": Inventory.get("notes") or "",
         }
 
@@ -320,7 +342,7 @@ class SyntheticZabbixAdapter:
             "asset_tag": Inventory.get("AssetTag", Resource["ResourceId"]),
             "type": Inventory.get("Type", Resource.get("ResourceType", "Server")),
             "os": Inventory.get("Os", "Linux"),
-            "location": Inventory.get("Location", "CapacityLab"),
+            "location": Inventory.get("Environment", Inventory.get("Location", "CapacityLab")),
             "notes": Inventory.get("Notes", "Host sintetico de capacity"),
         }
 

@@ -339,6 +339,11 @@ Ese valor se usa como nombre visible y como host name tecnico en Zabbix, y tambi
 catalogo PostgreSQL e inventario junto con asset tag, tipo, sistema operativo, ubicacion y notas del
 lote.
 
+Cada host sintetico queda asociado a un ambiente de prueba: `Produccion`, `Homologacion`, `Testing`
+o `Desarrollo`. Zabbix lo expone en inventario como ubicacion, PostgreSQL lo guarda como
+`Environment`, VictoriaMetrics lo publica como label `environment` y Grafana lo usa como filtro
+`Ambiente`.
+
 Los subsistemas sinteticos se cargan con nomenclatura `SRV-#####-SubsistemaDefinido`. El mismo valor
 se usa como `ServiceId`, nombre de servicio, `business_service_id` y `business_service`, para que el
 filtro de subsistema en Grafana coincida con el host que lo origino.
@@ -346,9 +351,9 @@ filtro de subsistema en Grafana coincida con el host que lo origino.
 La misma identidad de host queda disponible en todas las herramientas:
 
 - Zabbix: `host` y nombre visible `SRV-#####`.
-- PostgreSQL: `MonitoredResource.Name` como `SRV-#####`.
-- VictoriaMetrics: etiqueta `host_name="SRV-#####"`.
-- Grafana: columnas `HostName` y leyendas basadas en `{{host_name}}`.
+- PostgreSQL: `MonitoredResource.Name` como `SRV-#####` y `EnterpriseTechnologyComponent.Environment`.
+- VictoriaMetrics: etiquetas `host_name="SRV-#####"` y `environment`.
+- Grafana: columnas `HostName`, filtro `Ambiente` y leyendas basadas en `{{host_name}}`.
 
 `ResourceId` queda reservado como clave tecnica estable para relaciones, borrado y correlacion
 historica. Las vistas ejecutivas muestran `HostName` para que recomendaciones y riesgos sean

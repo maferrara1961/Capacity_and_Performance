@@ -13,8 +13,8 @@ required by platform conventions:
 Las entidades, servicios y artefactos Python definidos por el proyecto usan PascalCase. Las
 excepciones enterprise aceptadas son:
 
-- Labels de VictoriaMetrics como `load_id`, `resource_id`, `host_name` y futuros labels
-  `technology_domain`, `business_service` por convencion Prometheus.
+- Labels de VictoriaMetrics como `load_id`, `resource_id`, `host_name`, `environment`,
+  `technology_domain` y `business_service` por convencion Prometheus.
 - Campos JSON/YAML de Grafana y Podman definidos por esas plataformas.
 - Argumentos CLI con formato kebab-case como `--scope-id` y `--evidence-window-days`.
 - Comandos shell con nombres historicos del repositorio en `Scripts/`.

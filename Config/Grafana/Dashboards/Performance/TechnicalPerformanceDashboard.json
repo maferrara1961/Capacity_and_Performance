@@ -50,6 +50,25 @@
         }
       },
       {
+        "name": "Environment",
+        "label": "Ambiente",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
+        "query": "select distinct Environment from EnterpriseTechnologyComponent union select distinct Environment from Application order by Environment",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
         "name": "ServiceId",
         "label": "Servicio/Subsistema",
         "type": "query",
@@ -105,17 +124,17 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "CPU actual {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "avg_over_time(synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_cpu{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "CPU average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "predict_linear(synthetic_cpu{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_cpu{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "CPU tendencia rango {{host_name}}"
         }
       ],
@@ -152,17 +171,17 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "RAM actual {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "avg_over_time(synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_ram{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "RAM average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "predict_linear(synthetic_ram{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_ram{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "RAM tendencia rango {{host_name}}"
         }
       ],
@@ -199,17 +218,17 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "Storage actual {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "avg_over_time(synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_storage{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "Storage average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "predict_linear(synthetic_storage{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_storage{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "Storage tendencia rango {{host_name}}"
         }
       ],
@@ -246,32 +265,32 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "IOPS actual {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "avg_over_time(synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_iops{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "IOPS average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "predict_linear(synthetic_iops{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_iops{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "IOPS tendencia rango {{host_name}}"
         },
         {
           "refId": "D",
-          "expr": "synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_network{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "Network actual {{host_name}}"
         },
         {
           "refId": "E",
-          "expr": "avg_over_time(synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_network{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "Network average rango {{host_name}}"
         },
         {
           "refId": "F",
-          "expr": "predict_linear(synthetic_network{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_network{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "Network tendencia rango {{host_name}}"
         }
       ],
@@ -308,47 +327,47 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "Latency actual {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "avg_over_time(synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_latency{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "Latency average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "predict_linear(synthetic_latency{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_latency{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "Latency tendencia rango {{host_name}}"
         },
         {
           "refId": "D",
-          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "Throughput actual {{host_name}}"
         },
         {
           "refId": "E",
-          "expr": "avg_over_time(synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_throughput{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "Throughput average rango {{host_name}}"
         },
         {
           "refId": "F",
-          "expr": "predict_linear(synthetic_throughput{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_throughput{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "Throughput tendencia rango {{host_name}}"
         },
         {
           "refId": "G",
-          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "Errors actual {{host_name}}"
         },
         {
           "refId": "H",
-          "expr": "avg_over_time(synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_errors{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "Errors average rango {{host_name}}"
         },
         {
           "refId": "I",
-          "expr": "predict_linear(synthetic_errors{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_errors{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "Errors tendencia rango {{host_name}}"
         }
       ],
@@ -385,17 +404,17 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
+          "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
           "legendFormat": "Saturation actual {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "avg_over_time(synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
+          "expr": "avg_over_time(synthetic_saturation{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range])",
           "legendFormat": "Saturation average rango {{host_name}}"
         },
         {
           "refId": "C",
-          "expr": "predict_linear(synthetic_saturation{load_id=~\"${LoadId:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
+          "expr": "predict_linear(synthetic_saturation{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}[$__range], 0)",
           "legendFormat": "Saturation tendencia rango {{host_name}}"
         }
       ],
@@ -433,7 +452,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and coalesce(mr.Name, k.ResourceId) ~ '^(${HostName:regex})' order by k.P95Utilization desc, k.CalculatedAt desc limit 50"
+          "rawSql": "select coalesce(mr.Name, k.ResourceId) as HostName, c.Environment, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization from CapacityKpi k left join MonitoredResource mr on mr.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = k.LoadId where k.CapacityKpiId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and coalesce(mr.Name, k.ResourceId) ~ '^(${HostName:regex})' order by k.P95Utilization desc, k.CalculatedAt desc limit 50"
         }
       ],
       "fieldConfig": {
@@ -470,7 +489,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select m.ServiceId, coalesce(mr.Name, k.ResourceId) as HostName, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId left join MonitoredResource mr on mr.ResourceId = k.ResourceId where k.CapacityKpiId ~ '^(${LoadId:regex})' and coalesce(mr.Name, k.ResourceId) ~ '^(${HostName:regex})' and coalesce(m.ServiceId, '') ~ '^(${ServiceId:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"
+          "rawSql": "select m.ServiceId, coalesce(mr.Name, k.ResourceId) as HostName, c.Environment, k.ResourceId, k.MetricName, k.AverageUtilization, k.PeakUtilization, k.P95Utilization, k.HeadroomAvailable from CapacityKpi k left join ServiceResourceMap m on m.ResourceId = k.ResourceId left join MonitoredResource mr on mr.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = k.LoadId where k.CapacityKpiId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and coalesce(mr.Name, k.ResourceId) ~ '^(${HostName:regex})' and coalesce(m.ServiceId, '') ~ '^(${ServiceId:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"
         }
       ],
       "fieldConfig": {
@@ -507,7 +526,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(mr.Name, r.ScopeId) ~ '^(${HostName:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 50"
+          "rawSql": "select coalesce(mr.Name, r.ScopeId) as HostName, c.Environment, r.ScopeId as ResourceId, r.OverallRisk, r.Reason, r.CalculatedAt from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(r.RiskAssessmentId from '^(.+)-Risk-') where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and coalesce(mr.Name, r.ScopeId) ~ '^(${HostName:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc limit 50"
         }
       ],
       "fieldConfig": {

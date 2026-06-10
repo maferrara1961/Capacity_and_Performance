@@ -9,6 +9,7 @@ from CapacityEngine.Domain.SyntheticData import BuildToolValidationResult, TestL
 class SyntheticDataService:
     VolumeScale = {"small": 3, "medium": 8, "large": 15}
     PlanningMetrics = ["CPU", "RAM", "Storage", "StorageIO", "NetworkIO"]
+    Environments = ["Produccion", "Homologacion", "Testing", "Desarrollo"]
 
     def GenerateLoadId(self) -> str:
         return f"Load{datetime.now(UTC).strftime('%Y%m%d%H%M%S')}"
@@ -69,21 +70,26 @@ class SyntheticDataService:
             HostNumber = self.RandomHostNumber(Random, UsedHostNumbers)
             HostName = f"SRV-{HostNumber}"
             ResourceType = Types[(Index - 1) % len(Types)]
+            Environment = self.EnvironmentForIndex(Index)
             Resources.append(
                 {
                     "ResourceId": f"{LoadId}-Resource-{Index}",
                     "LoadId": LoadId,
                     "ResourceType": ResourceType,
                     "Name": HostName,
+                    "Environment": Environment,
                     "Platform": "PodmanLab",
                     "CapacityUnit": "Percent",
                     "TotalCapacity": 100.0,
                     "Status": self.StatusFor(Profile),
-                    "Inventory": self.BuildInventory(LoadId, HostName, ResourceType, Index),
+                    "Inventory": self.BuildInventory(LoadId, HostName, ResourceType, Index, Environment),
                     "IsTestData": True,
                 }
             )
         return Resources
+
+    def EnvironmentForIndex(self, Index: int) -> str:
+        return self.Environments[(Index - 1) % len(self.Environments)]
 
     def RandomHostNumber(self, Random: random.Random, UsedHostNumbers: set[int]) -> int:
         while True:
@@ -92,14 +98,15 @@ class SyntheticDataService:
                 UsedHostNumbers.add(HostNumber)
                 return HostNumber
 
-    def BuildInventory(self, LoadId: str, HostName: str, ResourceType: str, Index: int) -> dict:
+    def BuildInventory(self, LoadId: str, HostName: str, ResourceType: str, Index: int, Environment: str) -> dict:
         return {
             "AssetTag": f"{LoadId}-{Index}",
             "Alias": HostName,
             "Type": ResourceType,
             "Os": "Linux",
-            "Location": "CapacityLab",
-            "Notes": f"Host sintetico {HostName} generado para pruebas de capacity y performance",
+            "Environment": Environment,
+            "Location": Environment,
+            "Notes": f"Host sintetico {HostName} generado para pruebas de capacity y performance en {Environment}",
         }
 
     def BuildSamples(self, LoadId: str, Services: list[dict], Resources: list[dict], Profile: str, Days: int, Random: random.Random) -> list[dict]:
@@ -117,6 +124,7 @@ class SyntheticDataService:
                             "LoadId": LoadId,
                             "ResourceId": Resource["ResourceId"],
                             "HostName": Resource["Name"],
+                            "Environment": Resource["Environment"],
                             "TechnologyDomain": self.DomainForResource(Resource),
                             "BusinessService": Service["Name"],
                             "BusinessServiceId": Service["ServiceId"],
@@ -249,7 +257,7 @@ class SyntheticDataService:
                     "DomainName": Domain["Name"],
                     "Version": "1.0",
                     "Vendor": "Synthetic",
-                    "Environment": "Demo",
+                    "Environment": Resource.get("Environment", "Unknown"),
                     "BusinessServiceId": Service["ServiceId"],
                     "Owner": Service["Owner"],
                     "SupportStatus": "Unknown" if EvidenceStateValue == "Missing" else LifecycleStatus,

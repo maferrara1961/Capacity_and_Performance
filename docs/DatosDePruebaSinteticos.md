@@ -74,10 +74,14 @@ Los recursos se generan con host name `SRV-#####`, por ejemplo `SRV-48291`. Ese 
 nombre visible y como host tecnico en Zabbix, y queda registrado en PostgreSQL e inventario junto
 con asset tag, tipo, sistema operativo, ubicacion y notas del lote.
 
+Cada host se asigna a uno de los ambientes `Produccion`, `Homologacion`, `Testing` o `Desarrollo`.
+La misma dimension se mantiene como inventario en Zabbix, campo `Environment` en PostgreSQL, label
+`environment` en VictoriaMetrics y filtro `Ambiente` en Grafana.
+
 La identidad del host es congruente entre herramientas: Zabbix usa `SRV-#####` como `host`,
 PostgreSQL lo guarda en `MonitoredResource.Name`, VictoriaMetrics lo publica como etiqueta
-`host_name` junto con `technology_domain` y `business_service`, y Grafana lo muestra como
-`HostName` en tablas y leyendas.
+`host_name` junto con `environment`, `technology_domain` y `business_service`, y Grafana lo muestra
+como `HostName` en tablas y leyendas.
 
 Para inventario operativo, Zabbix es la fuente. Luego de alta, baja o modificacion manual de hosts
 en Zabbix, ejecutar:

@@ -35,6 +35,25 @@
           "text": "All",
           "value": "$__all"
         }
+      },
+      {
+        "name": "Environment",
+        "label": "Ambiente",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
+        "query": "select distinct Environment from EnterpriseTechnologyComponent union select distinct Environment from Application order by Environment",
+        "allValue": ".*",
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -74,7 +93,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "with KpiConLote as (select substring(CapacityKpiId from '^(.+)-Kpi-') as LoadIdCalculado, * from CapacityKpi) select coalesce(r.Name, k.ResourceId) as HostName, c.DomainName, coalesce(s.Name, c.BusinessServiceId) as BusinessService, k.MetricName, k.AverageUtilization, k.P95Utilization, k.PeakUtilization from KpiConLote k left join MonitoredResource r on r.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = r.Name and c.LoadId = k.LoadIdCalculado left join Service s on s.ServiceId = c.BusinessServiceId where k.LoadIdCalculado ~ '^(${LoadId:regex})' and k.MetricName ~ '^(${MetricName:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"
+          "rawSql": "with KpiConLote as (select substring(CapacityKpiId from '^(.+)-Kpi-') as LoadIdCalculado, * from CapacityKpi) select coalesce(r.Name, k.ResourceId) as HostName, c.Environment, c.DomainName, coalesce(s.Name, c.BusinessServiceId) as BusinessService, k.MetricName, k.AverageUtilization, k.P95Utilization, k.PeakUtilization from KpiConLote k left join MonitoredResource r on r.ResourceId = k.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = r.Name and c.LoadId = k.LoadIdCalculado left join Service s on s.ServiceId = c.BusinessServiceId where k.LoadIdCalculado ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and k.MetricName ~ '^(${MetricName:regex})' order by k.P95Utilization desc, k.PeakUtilization desc limit 20"
         }
       ],
       "fieldConfig": {
@@ -111,7 +130,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "with ForecastConLote as (select coalesce(LoadId, substring(ForecastResultId from '^(.+)-Forecast-')) as LoadIdCalculado, * from ForecastResult) select coalesce(r.Name, f.ResourceId) as HostName, f.MetricName, f.Forecast30Days, f.Forecast90Days, f.Forecast180Days, f.Forecast365Days, f.DaysToSaturation from ForecastConLote f left join MonitoredResource r on r.ResourceId = f.ResourceId where f.LoadIdCalculado ~ '^(${LoadId:regex})' and f.MetricName ~ '^(${MetricName:regex})' order by f.DaysToSaturation asc, f.Forecast90Days desc"
+          "rawSql": "with ForecastConLote as (select coalesce(LoadId, substring(ForecastResultId from '^(.+)-Forecast-')) as LoadIdCalculado, * from ForecastResult) select coalesce(r.Name, f.ResourceId) as HostName, c.Environment, f.MetricName, f.Forecast30Days, f.Forecast90Days, f.Forecast180Days, f.Forecast365Days, f.DaysToSaturation from ForecastConLote f left join MonitoredResource r on r.ResourceId = f.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = r.Name and c.LoadId = f.LoadIdCalculado where f.LoadIdCalculado ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and f.MetricName ~ '^(${MetricName:regex})' order by f.DaysToSaturation asc, f.Forecast90Days desc"
         }
       ],
       "fieldConfig": {
@@ -148,7 +167,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select c.ComponentName as HostName, e.SourceSystem, e.EvidenceType, e.FreshnessStatus, e.EvidenceState from EnterpriseEvidenceRecord e join EnterpriseTechnologyComponent c on c.ComponentId = e.ComponentId where e.LoadId ~ '^(${LoadId:regex})' order by e.FreshnessStatus, e.EvidenceState"
+          "rawSql": "select c.ComponentName as HostName, c.Environment, e.SourceSystem, e.EvidenceType, e.FreshnessStatus, e.EvidenceState from EnterpriseEvidenceRecord e join EnterpriseTechnologyComponent c on c.ComponentId = e.ComponentId where e.LoadId ~ '^(${LoadId:regex})' and c.Environment ~ '^(${Environment:regex})' order by e.FreshnessStatus, e.EvidenceState"
         }
       ],
       "fieldConfig": {
@@ -184,8 +203,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",technology_domain=~\".+\",business_service=~\".+\"}",
-          "legendFormat": "{{host_name}} - {{business_service}} - {{technology_domain}}"
+          "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",technology_domain=~\".+\",business_service=~\".+\"}",
+          "legendFormat": "{{host_name}} - {{environment}} - {{business_service}} - {{technology_domain}}"
         }
       ],
       "fieldConfig": {

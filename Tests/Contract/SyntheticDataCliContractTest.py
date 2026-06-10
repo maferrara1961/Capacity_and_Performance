@@ -103,11 +103,17 @@ class SyntheticDataCliContractTest(unittest.TestCase):
     def test_recursos_usan_hosts_srv_aleatorios_con_inventario(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("SrvDemo001", "mixed", "small", 30, 1)
         HostNames = [Resource["Name"] for Resource in Dataset["Resources"]]
+        ValidEnvironments = {"Produccion", "Homologacion", "Testing", "Desarrollo"}
         self.assertEqual(len(HostNames), len(set(HostNames)))
         for Resource in Dataset["Resources"]:
             self.assertRegex(Resource["Name"], r"^SRV-[0-9]{5}$")
+            self.assertIn(Resource["Environment"], ValidEnvironments)
+            self.assertEqual(Resource["Inventory"]["Environment"], Resource["Environment"])
+            self.assertEqual(Resource["Inventory"]["Location"], Resource["Environment"])
             self.assertEqual(Resource["Inventory"]["Alias"], Resource["Name"])
             self.assertEqual(Resource["Inventory"]["AssetTag"], f"SrvDemo001-{Dataset['Resources'].index(Resource) + 1}")
+        self.assertEqual(Dataset["Samples"][0]["Environment"], Dataset["Resources"][0]["Environment"])
+        self.assertEqual(Dataset["EnterpriseComponents"][0]["Environment"], Dataset["Resources"][0]["Environment"])
 
     def test_subsistemas_usan_hostname_mas_subsistema_definido(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("SubsystemDemo001", "mixed", "small", 30, 1)
@@ -136,6 +142,7 @@ class SyntheticDataCliContractTest(unittest.TestCase):
         self.assertIn('"__name__": "synthetic_cpu"', Payload)
         self.assertIn('"load_id": "VmDemo001"', Payload)
         self.assertIn('"host_name": "SRV-', Payload)
+        self.assertIn('"environment": "Produccion"', Payload)
         self.assertIn('"timestamps": [', Payload)
 
     def test_zabbix_adapter_define_items_de_capacity(self):
@@ -149,11 +156,12 @@ class SyntheticDataCliContractTest(unittest.TestCase):
                 "ResourceId": "SrvDemo001-Resource-1",
                 "ResourceType": "Server",
                 "Name": "SRV-12345",
-                "Inventory": {"AssetTag": "SrvDemo001-1", "Alias": "SRV-12345", "Type": "Server"},
+                "Inventory": {"AssetTag": "SrvDemo001-1", "Alias": "SRV-12345", "Type": "Server", "Environment": "Testing"},
             }
         )
         self.assertEqual(Inventory["name"], "SRV-12345")
         self.assertEqual(Inventory["asset_tag"], "SrvDemo001-1")
+        self.assertEqual(Inventory["location"], "Testing")
 
     def test_zabbix_host_name_visible_y_tecnico_usa_srv(self):
         Dataset = SyntheticDataService().BuildSyntheticDataset("ZbxSrv001", "mixed", "small", 30, 1)

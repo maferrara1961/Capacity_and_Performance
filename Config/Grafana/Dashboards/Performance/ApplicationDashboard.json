@@ -29,6 +29,25 @@
           "text": "All",
           "value": "$__all"
         }
+      },
+      {
+        "name": "Environment",
+        "label": "Ambiente",
+        "type": "query",
+        "datasource": {
+          "type": "postgres",
+          "uid": "CapacityPostgreSQL"
+        },
+        "query": "select distinct Environment from EnterpriseTechnologyComponent union select distinct Environment from Application order by Environment",
+        "refresh": 1,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
       }
     ]
   },
@@ -68,7 +87,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application where ApplicationId ~ '^(${LoadId:regex})' order by Name"
+          "rawSql": "select ApplicationId, ServiceId, Name, Environment, HealthStatus, EndToEndPerformanceStatus from Application where ApplicationId ~ '^(${LoadId:regex})' and Environment ~ '^(${Environment:regex})' order by Name"
         }
       ],
       "fieldConfig": {
@@ -105,7 +124,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select m.ServiceId, m.ApplicationId, coalesce(mr.Name, m.ResourceId) as HostName, m.ResourceId, m.Role, m.ImpactWeight from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId where m.MapId ~ '^(${LoadId:regex})' order by m.ServiceId, HostName"
+          "rawSql": "select m.ServiceId, m.ApplicationId, coalesce(mr.Name, m.ResourceId) as HostName, c.Environment, m.ResourceId, m.Role, m.ImpactWeight from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(m.MapId from '^(.+)-Map-') where m.MapId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' order by m.ServiceId, HostName"
         }
       ],
       "fieldConfig": {
@@ -142,7 +161,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select r.ScopeType, coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc"
+          "rawSql": "select r.ScopeType, coalesce(mr.Name, r.ScopeId) as HostName, c.Environment, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join MonitoredResource mr on mr.ResourceId = r.ScopeId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(r.RiskAssessmentId from '^(.+)-Risk-') where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' and r.OverallRisk in ('Warning','Critical') order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc, r.CalculatedAt desc"
         }
       ],
       "fieldConfig": {
@@ -178,18 +197,18 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\"}",
-          "legendFormat": "latency {{host_name}}"
+          "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\"}",
+          "legendFormat": "latency {{host_name}} {{environment}}"
         },
         {
           "refId": "B",
-          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\"}",
-          "legendFormat": "throughput {{host_name}}"
+          "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\"}",
+          "legendFormat": "throughput {{host_name}} {{environment}}"
         },
         {
           "refId": "C",
-          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\"}",
-          "legendFormat": "errors {{host_name}}"
+          "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\"}",
+          "legendFormat": "errors {{host_name}} {{environment}}"
         }
       ],
       "fieldConfig": {
@@ -226,7 +245,7 @@
         {
           "refId": "A",
           "format": "table",
-          "rawSql": "select m.ServiceId, coalesce(mr.Name, r.ScopeId) as HostName, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId and m.MapId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = r.ScopeId where r.RiskAssessmentId ~ '^(${LoadId:regex})' order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"
+          "rawSql": "select m.ServiceId, coalesce(mr.Name, r.ScopeId) as HostName, c.Environment, r.ScopeId as ResourceId, r.OverallRisk, r.Reason from RiskAssessment r left join ServiceResourceMap m on m.ResourceId = r.ScopeId and m.MapId ~ '^(${LoadId:regex})' left join MonitoredResource mr on mr.ResourceId = r.ScopeId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(r.RiskAssessmentId from '^(.+)-Risk-') where r.RiskAssessmentId ~ '^(${LoadId:regex})' and coalesce(c.Environment, 'Unknown') ~ '^(${Environment:regex})' order by case r.OverallRisk when 'Critical' then 2 when 'Warning' then 1 else 0 end desc limit 30"
         }
       ],
       "fieldConfig": {

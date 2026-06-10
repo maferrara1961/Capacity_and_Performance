@@ -41,6 +41,9 @@ class TechnicalDashboardContractTest(unittest.TestCase):
         self.assertIn("Top Consumers And Outliers", Text)
         self.assertIn("ResourceId", Text)
         self.assertIn("ServiceId", Text)
+        self.assertIn('"name": "Environment"', Text)
+        self.assertIn("${Environment:regex}", Text)
+        self.assertIn('environment=~\\"${Environment:regex}\\"', Text)
         self.assertIn("OverallRisk", Text)
 
 
