@@ -2,13 +2,15 @@ import json
 import unittest
 from pathlib import Path
 
+from Tests.Contract.GrafanaDatasourceContractTest import DashboardPath, DashboardPaths
+
 
 DashboardDirectory = Path("Config/Grafana/Dashboards")
 
 
 class GrafanaDrilldownContractTest(unittest.TestCase):
     def test_paneles_no_texto_tienen_links_de_drilldown(self):
-        for DashboardPath in DashboardDirectory.glob("*.json"):
+        for DashboardPath in DashboardPaths():
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
             for Panel in Dashboard.get("panels", []):
                 if Panel.get("type") == "text":
@@ -32,13 +34,13 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
                         self.assertIn("var-HostName=${__data.fields.HostName}", LinkText)
 
     def test_dashboards_tienen_rango_default_de_30_dias(self):
-        for DashboardPath in DashboardDirectory.glob("*.json"):
+        for DashboardPath in DashboardPaths():
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
 
             self.assertEqual({"from": "now-30d", "to": "now"}, Dashboard.get("time"), DashboardPath.name)
 
     def test_dashboard_tecnico_filtra_por_host_y_servicio(self):
-        Dashboard = json.loads((DashboardDirectory / "TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = json.loads(DashboardPath("TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
         Text = json.dumps(Dashboard)
         Variables = {Variable["name"] for Variable in Dashboard.get("templating", {}).get("list", [])}
 
@@ -50,7 +52,7 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
         self.assertIn("${ServiceId:regex}", Text)
 
     def test_dashboard_tecnico_muestra_average_y_tendencia_del_rango(self):
-        Dashboard = json.loads((DashboardDirectory / "TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = json.loads(DashboardPath("TechnicalPerformanceDashboard.json").read_text(encoding="utf-8"))
         Text = json.dumps(Dashboard)
         TimeSeriesPanels = [Panel for Panel in Dashboard.get("panels", []) if Panel.get("type") == "timeseries"]
 
@@ -64,7 +66,7 @@ class GrafanaDrilldownContractTest(unittest.TestCase):
             self.assertIn("tendencia rango", PanelText, Panel.get("title"))
 
     def test_series_temporales_muestran_host_no_lote_demo_en_leyenda(self):
-        for DashboardPath in DashboardDirectory.glob("*.json"):
+        for DashboardPath in DashboardPaths():
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
             for Panel in Dashboard.get("panels", []):
                 if Panel.get("type") != "timeseries":

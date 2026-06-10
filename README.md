@@ -193,17 +193,13 @@ Run-YYYYMMDDHHMMSS Succeeded resources=1
 
 ## Dashboards de Grafana
 
-La provision de Grafana incluye vistas en la carpeta `Capacity`:
+La provision de Grafana separa las vistas en tres carpetas:
 
-- Executive Capacity Dashboard
-- Technical Performance Dashboard
-- Capacity Planning Dashboard
-- Application Dashboard
-- Enterprise Executive Dashboard
-- Enterprise Governance Dashboard
-- Enterprise Operational Dashboard
-- Enterprise License Compliance Dashboard
-- Enterprise Software Backlevel Dashboard
+- `Capacity`: Executive Capacity Dashboard, Capacity Planning Dashboard y Enterprise Operational
+  Trends Dashboard.
+- `Performance`: Technical Performance Dashboard y Application Dashboard.
+- `Risk & Compliance`: Enterprise Executive Dashboard, Enterprise Governance Dashboard,
+  Enterprise License Compliance Dashboard y Enterprise Software Backlevel Dashboard.
 
 Los dashboards cubren estado OK/Warning/Critical, forecast 30/60/90 dias, utilizacion promedio,
 pico, percentil 95, headroom, dias a saturacion, baseline, SLA/SLO, dependencias y recomendaciones.

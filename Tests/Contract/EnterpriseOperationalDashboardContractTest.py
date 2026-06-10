@@ -1,11 +1,12 @@
 import json
 import unittest
-from pathlib import Path
+
+from Tests.Contract.GrafanaDatasourceContractTest import LoadDashboard
 
 
 class EnterpriseOperationalDashboardContractTest(unittest.TestCase):
     def test_dashboard_operativo_expone_tendencias_forecast_y_top_consumers(self):
-        Dashboard = json.loads(Path("Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = LoadDashboard("EnterpriseOperationalDashboard.json")
         Text = json.dumps(Dashboard)
 
         self.assertEqual("Enterprise Operational Trends Dashboard", Dashboard["title"])

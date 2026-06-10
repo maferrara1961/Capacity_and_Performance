@@ -31,15 +31,15 @@ Scripts/GenerateVerificationBatches.sh
 Scripts/GenerateHistoricalVerificationBatches.sh
 Config/Grafana/Datasources/Datasources.yml
 Config/Grafana/DashboardProviders/Provisioning.yml
-Config/Grafana/Dashboards/ExecutiveCapacityDashboard.json
-Config/Grafana/Dashboards/TechnicalPerformanceDashboard.json
-Config/Grafana/Dashboards/CapacityPlanningDashboard.json
-Config/Grafana/Dashboards/ApplicationDashboard.json
-Config/Grafana/Dashboards/EnterpriseExecutiveDashboard.json
-Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json
-Config/Grafana/Dashboards/EnterpriseOperationalDashboard.json
-Config/Grafana/Dashboards/EnterpriseLicenseComplianceDashboard.json
-Config/Grafana/Dashboards/EnterpriseSoftwareBacklevelDashboard.json
+Config/Grafana/Dashboards/Capacity/ExecutiveCapacityDashboard.json
+Config/Grafana/Dashboards/Capacity/CapacityPlanningDashboard.json
+Config/Grafana/Dashboards/Capacity/EnterpriseOperationalDashboard.json
+Config/Grafana/Dashboards/Performance/TechnicalPerformanceDashboard.json
+Config/Grafana/Dashboards/Performance/ApplicationDashboard.json
+Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseExecutiveDashboard.json
+Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseGovernanceDashboard.json
+Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseLicenseComplianceDashboard.json
+Config/Grafana/Dashboards/RiskAndCompliance/EnterpriseSoftwareBacklevelDashboard.json
 Config/ZabbixAgent/UserParameters.conf
 Config/ZabbixAgent/ReadEnterpriseFact.sh
 Sql/Schema/001_Catalog.sql
@@ -101,12 +101,12 @@ if grep -q "capacity-performance-grafana-data:/var/lib/grafana" Scripts/StackCom
   exit 1
 fi
 
-if ! grep -R "CapacityPostgreSQL" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+if ! grep -R "CapacityPostgreSQL" Config/Grafana/Dashboards >/dev/null 2>&1; then
   echo "Dashboards no declaran datasource PostgreSQL explicito" >&2
   exit 1
 fi
 
-if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+if ! grep -R "VictoriaMetrics" Config/Grafana/Dashboards >/dev/null 2>&1; then
   echo "Dashboards no declaran datasource VictoriaMetrics explicito" >&2
   exit 1
 fi
@@ -116,32 +116,32 @@ if ! grep -q "prune: true" Config/Grafana/DashboardProviders/Provisioning.yml; t
   exit 1
 fi
 
-if ! grep -R '"name": "LoadId"' Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+if ! grep -R '"name": "LoadId"' Config/Grafana/Dashboards >/dev/null 2>&1; then
   echo "Dashboards no declaran filtro de lote LoadId" >&2
   exit 1
 fi
 
-if ! grep -R 'load_id=~\\"${LoadId:regex}\\"' Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+if ! grep -R 'load_id=~\\"${LoadId:regex}\\"' Config/Grafana/Dashboards >/dev/null 2>&1; then
   echo "Dashboards no filtran series VictoriaMetrics por lote" >&2
   exit 1
 fi
 
 for ExpectedText in "Top 5 Capacity Risks" "Top Consumers And Outliers" "Overprovisioned Resources" "Service Capacity Risk"; do
-  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards >/dev/null 2>&1; then
     echo "Falta panel optimizado requerido: $ExpectedText" >&2
     exit 1
   fi
 done
 
 for ExpectedText in "Technology Health Score" "Inventario Tecnologico" "Confianza de Monitoreo" "Top Consumers Enterprise" "Forecast 30 90 180 365" "Enterprise License Compliance Dashboard" "Enterprise Software Backlevel Dashboard"; do
-  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  if ! grep -R "$ExpectedText" Config/Grafana/Dashboards >/dev/null 2>&1; then
     echo "Falta panel enterprise requerido: $ExpectedText" >&2
     exit 1
   fi
 done
 
 for ExpectedSignal in "Forecast30Days" "Forecast60Days" "Forecast90Days" "P95Utilization" "synthetic_saturation"; do
-  if ! grep -R "$ExpectedSignal" Config/Grafana/Dashboards/*.json >/dev/null 2>&1; then
+  if ! grep -R "$ExpectedSignal" Config/Grafana/Dashboards >/dev/null 2>&1; then
     echo "Falta senal requerida en dashboards: $ExpectedSignal" >&2
     exit 1
   fi

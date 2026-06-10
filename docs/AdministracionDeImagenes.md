@@ -97,14 +97,14 @@ En Grafana usar el filtro `Lote`; `All` muestra todos los lotes cargados. En Zab
 hosts del grupo `Capacity Synthetic`, sus graficos `Capacity Synthetic - <host>` y los triggers
 Warning/Critical generados por metrica.
 
-Para dashboards optimizados, revisar en Grafana la carpeta `Capacity`:
+Para dashboards optimizados, revisar en Grafana las carpetas `Capacity`, `Performance` y
+`Risk & Compliance`:
 
 - Cada dashboard comienza con `Como leer este dashboard`, que explica que muestra cada vista, como
   interpretar los cuadros y que accion tomar.
-- `Executive Capacity Dashboard`: decision ejecutiva y acciones priorizadas.
-- `Technical Performance Dashboard`: diagnostico operativo por recurso y metrica.
-- `Capacity Planning Dashboard`: crecimiento, headroom, baseline y sizing.
-- `Application Dashboard`: salud, infraestructura, dependencias y performance end-to-end.
+- `Capacity`: decision ejecutiva, planificacion, trends, forecast y top consumers.
+- `Performance`: diagnostico operativo, metricas tecnicas, aplicaciones y performance end-to-end.
+- `Risk & Compliance`: salud enterprise, gobierno, licencias, compliance y software backlevel.
 
 Si Grafana muestra dashboards tecnicos duplicados, conservar solo el dashboard con UID
 `technical-performance`:

@@ -1,11 +1,12 @@
 import json
 import unittest
-from pathlib import Path
+
+from Tests.Contract.GrafanaDatasourceContractTest import LoadDashboard
 
 
 class EnterpriseGovernanceDashboardContractTest(unittest.TestCase):
     def test_dashboard_de_gobierno_expone_inventario_y_riesgo(self):
-        Dashboard = json.loads(Path("Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = LoadDashboard("EnterpriseGovernanceDashboard.json")
         Text = json.dumps(Dashboard)
 
         self.assertEqual("Enterprise Governance Dashboard", Dashboard["title"])
@@ -18,7 +19,7 @@ class EnterpriseGovernanceDashboardContractTest(unittest.TestCase):
         self.assertIn('"allValue": ".*"', Text)
 
     def test_dashboard_de_gobierno_expone_semaforos_iniciales(self):
-        Dashboard = json.loads(Path("Config/Grafana/Dashboards/EnterpriseGovernanceDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = LoadDashboard("EnterpriseGovernanceDashboard.json")
         Text = json.dumps(Dashboard)
         Panels = {Panel["title"]: Panel for Panel in Dashboard["panels"]}
 

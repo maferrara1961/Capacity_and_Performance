@@ -1,11 +1,12 @@
 import json
 import unittest
-from pathlib import Path
+
+from Tests.Contract.GrafanaDatasourceContractTest import LoadDashboard
 
 
 class EnterpriseLicenseBacklevelDashboardContractTest(unittest.TestCase):
     def test_dashboard_de_licencias_existe_y_filtra_por_lote(self):
-        Dashboard = json.loads(Path("Config/Grafana/Dashboards/EnterpriseLicenseComplianceDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = LoadDashboard("EnterpriseLicenseComplianceDashboard.json")
         Text = json.dumps(Dashboard)
 
         self.assertEqual("Enterprise License Compliance Dashboard", Dashboard["title"])
@@ -17,7 +18,7 @@ class EnterpriseLicenseBacklevelDashboardContractTest(unittest.TestCase):
         self.assertIn("${LoadId:regex}", Text)
 
     def test_dashboard_backlevel_existe_y_filtra_por_lote(self):
-        Dashboard = json.loads(Path("Config/Grafana/Dashboards/EnterpriseSoftwareBacklevelDashboard.json").read_text(encoding="utf-8"))
+        Dashboard = LoadDashboard("EnterpriseSoftwareBacklevelDashboard.json")
         Text = json.dumps(Dashboard)
 
         self.assertEqual("Enterprise Software Backlevel Dashboard", Dashboard["title"])
