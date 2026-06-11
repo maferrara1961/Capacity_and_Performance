@@ -48,6 +48,14 @@ Grafana se consultan desde el dashboard `Performance / Platform Containers Metri
 publican como aliases `synthetic_*` con lote `Infraestructura` para que el dashboard tecnico muestre
 CPU, RAM, red, I/O y disponibilidad de los contenedores como equipos operativos.
 
+Generar un reporte operativo mensual con anomalias y sugerencias:
+
+```bash
+Scripts/GenerateMonthlyOperationalReport.sh --month 2026-06 --load-id Infraestructura
+```
+
+La salida por defecto se escribe en `Reports/Operational/ReporteOperativoMensual-YYYY-MM.md`.
+
 Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Los providers
 de dashboard y los JSON de dashboard se montan en rutas separadas para evitar que Grafana lea el
 provider como dashboard. Despues de un `git pull`, ejecutar `Scripts/StopStack.sh` y

@@ -26,6 +26,7 @@ Scripts/BackfillPlanningMetrics.sh
 Scripts/RegisterPlatformHosts.sh
 Scripts/UpdatePlatformZabbixStatus.sh
 Scripts/InstallPlatformMetricsCron.sh
+Scripts/GenerateMonthlyOperationalReport.sh
 Scripts/ManageTestData.sh
 Scripts/SyncZabbixInventory.sh
 Scripts/RunEnterpriseAssessment.sh
@@ -49,6 +50,7 @@ Config/ZabbixAgent/UserParameters.conf
 Config/ZabbixAgent/ReadEnterpriseFact.sh
 Config/ZabbixAgent/ReadPlatformStatus.sh
 Config/ZabbixAgent/ReadPlatformMetric.sh
+CapacityEngine/Scheduler/MonthlyOperationalReport.py
 Sql/Schema/001_Catalog.sql
 Sql/Schema/002_CapacityOutputs.sql
 Sql/Schema/003_TestDataLoads.sql
@@ -216,6 +218,13 @@ fi
 for ExpectedAlias in synthetic_cpu synthetic_ram synthetic_network synthetic_iops synthetic_saturation; do
   if ! grep -q "$ExpectedAlias" Scripts/UpdatePlatformZabbixStatus.sh; then
     echo "Falta alias tecnico para contenedores de infraestructura: $ExpectedAlias" >&2
+    exit 1
+  fi
+done
+
+for ExpectedReportSignal in "Reporte Operativo Mensual" "Anomalias Detectadas" "Sugerencias Priorizadas" "platform_container_up" "synthetic_cpu" "synthetic_ram"; do
+  if ! grep -q "$ExpectedReportSignal" CapacityEngine/Scheduler/MonthlyOperationalReport.py; then
+    echo "Falta senal requerida en reporte operativo mensual: $ExpectedReportSignal" >&2
     exit 1
   fi
 done

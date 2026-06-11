@@ -333,6 +333,16 @@ En Grafana se ven en `Performance / Platform Containers Metrics`.
 Tambien se publican aliases `synthetic_*` con `load_id="Infraestructura"` para que los contenedores
 aparezcan en el dashboard `Technical Performance Dashboard` al elegir `Lote = Infraestructura`.
 
+Generar un reporte operativo mensual con anomalias detectadas y sugerencias:
+
+```bash
+Scripts/GenerateMonthlyOperationalReport.sh --month 2026-06 --load-id Infraestructura
+```
+
+El reporte queda en `Reports/Operational/ReporteOperativoMensual-YYYY-MM.md`. Cruza evidencia de
+VictoriaMetrics y PostgreSQL, identifica CPU/RAM altas, indisponibilidad y brechas de evidencia, y
+nunca interpreta datos faltantes como estado saludable.
+
 Para historico continuo, instalar el cron administrado:
 
 ```bash
