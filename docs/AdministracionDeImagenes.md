@@ -44,7 +44,9 @@ Cada componente tambien expone metricas por contenedor desde `podman stats`:
 minuto con `Scripts/InstallPlatformMetricsCron.sh install`.
 
 El mismo script publica esas metricas en VictoriaMetrics con prefijo `platform_container_*`. En
-Grafana se consultan desde el dashboard `Performance / Platform Containers Metrics`.
+Grafana se consultan desde el dashboard `Performance / Platform Containers Metrics`. Tambien se
+publican como aliases `synthetic_*` con lote `Infraestructura` para que el dashboard tecnico muestre
+CPU, RAM, red, I/O y disponibilidad de los contenedores como equipos operativos.
 
 Grafana monta la configuracion de `Config/Grafana` directamente desde el repositorio. Los providers
 de dashboard y los JSON de dashboard se montan en rutas separadas para evitar que Grafana lea el

@@ -16,6 +16,9 @@ class PlatformContainerMetricsDashboardContractTest(unittest.TestCase):
         self.assertEqual("platform-container-metrics", Dashboard["uid"])
         self.assertEqual("Platform Containers Metrics", Dashboard["title"])
         self.assertIn('"uid": "VictoriaMetrics"', Source)
+        self.assertIn('"name": "LoadId"', Source)
+        self.assertIn("Infraestructura", Source)
+        self.assertIn('load_id=~\\"${LoadId:regex}\\"', Source)
         for SeriesName in [
             "platform_container_up",
             "platform_container_cpu_percent",
@@ -33,9 +36,13 @@ class PlatformContainerMetricsDashboardContractTest(unittest.TestCase):
 
         self.assertIn("api/v1/import/prometheus", Script)
         self.assertIn("PlatformMetrics.prom", Script)
+        self.assertIn('load_id=\\"$InfrastructureLoadId\\"', Script)
         self.assertIn("platform_container_cpu_percent", Script)
         self.assertIn("platform_container_memory_used_bytes", Script)
         self.assertIn("platform_container_up", Script)
+        self.assertIn("synthetic_cpu", Script)
+        self.assertIn("synthetic_ram", Script)
+        self.assertIn("synthetic_network", Script)
 
 
 if __name__ == "__main__":

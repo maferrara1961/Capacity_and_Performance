@@ -160,29 +160,38 @@ class GrafanaDatasourceContractTest(unittest.TestCase):
 
     def test_dashboards_tienen_filtro_de_lote(self):
         for DashboardPath in DashboardPaths():
-            if DashboardPath.name == "PlatformContainerMetricsDashboard.json":
-                continue
             Dashboard = json.loads(DashboardPath.read_text(encoding="utf-8"))
             Variables = Dashboard.get("templating", {}).get("list", [])
             LoadVariables = [Variable for Variable in Variables if Variable.get("name") == "LoadId"]
             self.assertTrue(LoadVariables, DashboardPath.name)
             Variable = LoadVariables[0]
+            if DashboardPath.name == "PlatformContainerMetricsDashboard.json":
+                self.assertEqual("custom", Variable.get("type"), DashboardPath.name)
+                self.assertIn("Infraestructura", Variable.get("query", ""), DashboardPath.name)
+                continue
             if DashboardPath.name == "TechnicalPerformanceDashboard.json":
                 self.assertFalse(Variable.get("includeAll"), DashboardPath.name)
             else:
                 self.assertTrue(Variable.get("includeAll"), DashboardPath.name)
                 self.assertEqual(Variable.get("allValue"), ".*", DashboardPath.name)
             self.assertIn("TestLoad", Variable.get("query", ""), DashboardPath.name)
+            self.assertIn("Infraestructura", Variable.get("query", ""), DashboardPath.name)
 
     def test_paneles_filtran_por_lote(self):
         for DashboardPath in DashboardPaths():
-            if DashboardPath.name == "PlatformContainerMetricsDashboard.json":
-                continue
             Text = DashboardPath.read_text(encoding="utf-8")
             self.assertIn("LoadId", Text, DashboardPath.name)
             if "TechnicalPerformance" in DashboardPath.name or "Application" in DashboardPath.name or "CapacityPlanning" in DashboardPath.name:
                 self.assertIn('load_id=~\\"${LoadId:regex}\\"', Text, DashboardPath.name)
             self.assertIn("${LoadId:regex}", Text, DashboardPath.name)
+
+    def test_dashboard_tecnico_incluye_lote_infraestructura(self):
+        Text = DashboardPath("TechnicalPerformanceDashboard.json").read_text(encoding="utf-8")
+
+        self.assertIn("Infraestructura", Text)
+        self.assertIn("capacity-performance-postgresql", Text)
+        self.assertIn("capacity-performance-grafana", Text)
+        self.assertIn("capacity-performance-capacity-engine", Text)
 
     def test_dashboard_tecnico_expone_average_y_top_consumers(self):
         Dashboard = LoadDashboard("TechnicalPerformanceDashboard.json")

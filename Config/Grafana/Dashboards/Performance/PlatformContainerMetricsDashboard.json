@@ -17,6 +17,27 @@
   "templating": {
     "list": [
       {
+        "name": "LoadId",
+        "label": "Lote",
+        "type": "custom",
+        "query": "Infraestructura",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "Infraestructura",
+          "value": "Infraestructura"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "Infraestructura",
+            "value": "Infraestructura"
+          }
+        ]
+      },
+      {
         "name": "Environment",
         "label": "Ambiente",
         "type": "query",
@@ -24,7 +45,7 @@
           "type": "prometheus",
           "uid": "VictoriaMetrics"
         },
-        "query": "label_values(platform_container_up, environment)",
+        "query": "label_values(platform_container_up{load_id=~\"${LoadId:regex}\"}, environment)",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
@@ -43,7 +64,7 @@
           "type": "prometheus",
           "uid": "VictoriaMetrics"
         },
-        "query": "label_values(platform_container_up{environment=~\"${Environment:regex}\"}, host_name)",
+        "query": "label_values(platform_container_up{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\"}, host_name)",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
@@ -91,7 +112,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time(platform_container_up{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_up{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
@@ -128,7 +149,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time(platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_cpu_percent{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
@@ -164,7 +185,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time(platform_container_memory_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_memory_percent{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
@@ -200,7 +221,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time(platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_memory_used_bytes{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "{{host_name}}"
         }
@@ -236,13 +257,13 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time(platform_container_network_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_network_input_bytes{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "Input {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "last_over_time(platform_container_network_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_network_output_bytes{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "Output {{host_name}}"
         }
@@ -278,13 +299,13 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "last_over_time(platform_container_block_input_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_block_input_bytes{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "Input {{host_name}}"
         },
         {
           "refId": "B",
-          "expr": "last_over_time(platform_container_block_output_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
+          "expr": "last_over_time(platform_container_block_output_bytes{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d])",
           "interval": "1m",
           "legendFormat": "Output {{host_name}}"
         }
@@ -320,7 +341,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(7, last_over_time(platform_container_cpu_percent{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
+          "expr": "topk(7, last_over_time(platform_container_cpu_percent{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
           "interval": "1m",
           "legendFormat": "{{host_name}}",
           "instant": true
@@ -357,7 +378,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(7, last_over_time(platform_container_memory_used_bytes{environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
+          "expr": "topk(7, last_over_time(platform_container_memory_used_bytes{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\"}[30d]))",
           "interval": "1m",
           "legendFormat": "{{host_name}}",
           "instant": true

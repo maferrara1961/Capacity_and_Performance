@@ -8,6 +8,7 @@ StatusFile="$StatusDir/PlatformStatus.tsv"
 MetricFile="$StatusDir/PlatformMetrics.tsv"
 PrometheusFile="$StatusDir/PlatformMetrics.prom"
 VictoriaMetricsUrl="${VICTORIA_METRICS_URL:-http://localhost:8428}"
+InfrastructureLoadId="Infraestructura"
 
 mkdir -p "$StatusDir"
 
@@ -93,7 +94,10 @@ PrometheusMetricLines() {
   NetworkOutputBytes="$(printf '%s\n' "$MetricLine" | awk -F '	' '{print $6}')"
   BlockInputBytes="$(printf '%s\n' "$MetricLine" | awk -F '	' '{print $7}')"
   BlockOutputBytes="$(printf '%s\n' "$MetricLine" | awk -F '	' '{print $8}')"
-  Labels="{host_name=\"$Container\",service=\"$Service\",environment=\"$Environment\"}"
+  NetworkTotalBytes="$(awk -v Input="$NetworkInputBytes" -v Output="$NetworkOutputBytes" 'BEGIN { printf "%.0f", Input + Output }')"
+  BlockTotalBytes="$(awk -v Input="$BlockInputBytes" -v Output="$BlockOutputBytes" 'BEGIN { printf "%.0f", Input + Output }')"
+  SaturationPercent="$(awk -v Cpu="$CpuPercent" -v Memory="$MemoryPercent" 'BEGIN { if (Cpu > Memory) print Cpu; else print Memory }')"
+  Labels="{load_id=\"$InfrastructureLoadId\",host_name=\"$Container\",service=\"$Service\",environment=\"$Environment\",business_service=\"Infraestructura\",business_service_id=\"Infraestructura\",technology_domain=\"Infrastructure\"}"
   printf 'platform_container_up%s %s\n' "$Labels" "$Status"
   printf 'platform_container_cpu_percent%s %s\n' "$Labels" "$CpuPercent"
   printf 'platform_container_memory_used_bytes%s %s\n' "$Labels" "$MemoryUsedBytes"
@@ -102,6 +106,15 @@ PrometheusMetricLines() {
   printf 'platform_container_network_output_bytes%s %s\n' "$Labels" "$NetworkOutputBytes"
   printf 'platform_container_block_input_bytes%s %s\n' "$Labels" "$BlockInputBytes"
   printf 'platform_container_block_output_bytes%s %s\n' "$Labels" "$BlockOutputBytes"
+  printf 'synthetic_cpu%s %s\n' "$Labels" "$CpuPercent"
+  printf 'synthetic_ram%s %s\n' "$Labels" "$MemoryPercent"
+  printf 'synthetic_storage%s %s\n' "$Labels" "0"
+  printf 'synthetic_iops%s %s\n' "$Labels" "$BlockTotalBytes"
+  printf 'synthetic_network%s %s\n' "$Labels" "$NetworkTotalBytes"
+  printf 'synthetic_latency%s %s\n' "$Labels" "0"
+  printf 'synthetic_throughput%s %s\n' "$Labels" "$NetworkTotalBytes"
+  printf 'synthetic_errors%s %s\n' "$Labels" "0"
+  printf 'synthetic_saturation%s %s\n' "$Labels" "$SaturationPercent"
 }
 
 PublishPrometheusMetrics() {

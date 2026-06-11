@@ -16,7 +16,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select distinct LoadId from TestLoad order by LoadId desc",
+        "query": "select distinct LoadId from TestLoad union select 'Infraestructura' as LoadId order by LoadId desc",
         "allValue": ".*",
         "includeAll": true,
         "multi": true,

@@ -330,6 +330,8 @@ Las metricas operativas por contenedor se exponen en Zabbix con
 `platform_container_block_output_bytes` y `platform_container_up`.
 
 En Grafana se ven en `Performance / Platform Containers Metrics`.
+Tambien se publican aliases `synthetic_*` con `load_id="Infraestructura"` para que los contenedores
+aparezcan en el dashboard `Technical Performance Dashboard` al elegir `Lote = Infraestructura`.
 
 Para historico continuo, instalar el cron administrado:
 

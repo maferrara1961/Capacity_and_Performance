@@ -208,6 +208,18 @@ for ExpectedSeries in platform_container_cpu_percent platform_container_memory_u
   fi
 done
 
+if ! grep -q "Infraestructura" Scripts/UpdatePlatformZabbixStatus.sh Config/Grafana/Dashboards/Performance/TechnicalPerformanceDashboard.json Config/Grafana/Dashboards/Performance/PlatformContainerMetricsDashboard.json; then
+  echo "Las metricas de plataforma no declaran lote Infraestructura" >&2
+  exit 1
+fi
+
+for ExpectedAlias in synthetic_cpu synthetic_ram synthetic_network synthetic_iops synthetic_saturation; do
+  if ! grep -q "$ExpectedAlias" Scripts/UpdatePlatformZabbixStatus.sh; then
+    echo "Falta alias tecnico para contenedores de infraestructura: $ExpectedAlias" >&2
+    exit 1
+  fi
+done
+
 if ! grep -q "register-platform-hosts" CapacityEngine/Scheduler/SyntheticDataCommand.py Scripts/RegisterPlatformHosts.sh; then
   echo "Falta comando para registrar hosts productivos de la plataforma en Zabbix" >&2
   exit 1

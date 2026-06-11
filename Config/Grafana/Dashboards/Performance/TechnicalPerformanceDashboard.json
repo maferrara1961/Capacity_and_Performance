@@ -19,7 +19,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select LoadId from TestLoad where Status = 'Succeeded' order by CreatedAt desc",
+        "query": "select LoadId from TestLoad where Status = 'Succeeded' union select 'Infraestructura' as LoadId order by LoadId desc",
         "refresh": 1,
         "includeAll": false,
         "multi": false
@@ -32,7 +32,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select distinct Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' union select distinct Environment from Application where ApplicationId ~ '^(${LoadId:regex})' order by Environment",
+        "query": "select Environment from (select distinct Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' union select distinct Environment from Application where ApplicationId ~ '^(${LoadId:regex})' union select 'Produccion' where 'Infraestructura' ~ '^(${LoadId:regex})') Environments order by Environment",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
@@ -51,7 +51,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select distinct HostName from (select mr.Name as HostName, coalesce(c.Environment, 'Unknown') as Environment from MonitoredResource mr join CapacityKpi k on k.ResourceId = mr.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) where coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) ~ '^(${LoadId:regex})' union select ComponentName as HostName, Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})') Hosts where Environment ~ '^(${Environment:regex})' order by HostName",
+        "query": "select HostName from (select distinct HostName from (select mr.Name as HostName, coalesce(c.Environment, 'Unknown') as Environment from MonitoredResource mr join CapacityKpi k on k.ResourceId = mr.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) where coalesce(k.LoadId, substring(k.CapacityKpiId from '^(.+)-Kpi-')) ~ '^(${LoadId:regex})' union select ComponentName as HostName, Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})') Hosts where Environment ~ '^(${Environment:regex})' union select HostName from (values ('capacity-performance-postgresql'), ('capacity-performance-victoriametrics'), ('capacity-performance-zabbix-server'), ('capacity-performance-zabbix-web'), ('capacity-performance-zabbix-agent'), ('capacity-performance-grafana'), ('capacity-performance-capacity-engine')) InfraHosts(HostName) where 'Infraestructura' ~ '^(${LoadId:regex})' and 'Produccion' ~ '^(${Environment:regex})') AllHosts order by HostName",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
@@ -70,7 +70,7 @@
           "type": "postgres",
           "uid": "CapacityPostgreSQL"
         },
-        "query": "select distinct ServiceId from (select m.ServiceId, coalesce(c.Environment, 'Unknown') as Environment from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(m.MapId from '^(.+)-Map-') where m.MapId ~ '^(${LoadId:regex})' union select BusinessServiceId as ServiceId, Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and BusinessServiceId is not null) Services where Environment ~ '^(${Environment:regex})' order by ServiceId",
+        "query": "select ServiceId from (select distinct ServiceId from (select m.ServiceId, coalesce(c.Environment, 'Unknown') as Environment from ServiceResourceMap m left join MonitoredResource mr on mr.ResourceId = m.ResourceId left join EnterpriseTechnologyComponent c on c.ComponentName = mr.Name and c.LoadId = substring(m.MapId from '^(.+)-Map-') where m.MapId ~ '^(${LoadId:regex})' union select BusinessServiceId as ServiceId, Environment from EnterpriseTechnologyComponent where LoadId ~ '^(${LoadId:regex})' and BusinessServiceId is not null) Services where Environment ~ '^(${Environment:regex})' union select 'Infraestructura' where 'Infraestructura' ~ '^(${LoadId:regex})' and 'Produccion' ~ '^(${Environment:regex})') AllServices order by ServiceId",
         "refresh": 1,
         "includeAll": true,
         "allValue": ".*",
