@@ -119,7 +119,8 @@
         {
           "refId": "A",
           "expr": "synthetic_cpu{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "CPU actual {{host_name}}"
+          "legendFormat": "CPU actual {{host_name}}",
+          "interval": "1m"
         }
       ],
       "fieldConfig": {
@@ -156,7 +157,8 @@
         {
           "refId": "A",
           "expr": "synthetic_ram{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "RAM actual {{host_name}}"
+          "legendFormat": "RAM actual {{host_name}}",
+          "interval": "1m"
         }
       ],
       "fieldConfig": {
@@ -193,7 +195,8 @@
         {
           "refId": "A",
           "expr": "synthetic_storage{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "Storage actual {{host_name}}"
+          "legendFormat": "Storage actual {{host_name}}",
+          "interval": "1m"
         }
       ],
       "fieldConfig": {
@@ -230,12 +233,14 @@
         {
           "refId": "A",
           "expr": "synthetic_iops{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "IOPS actual {{host_name}}"
+          "legendFormat": "IOPS actual {{host_name}}",
+          "interval": "1m"
         },
         {
           "refId": "D",
           "expr": "synthetic_network{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "Network actual {{host_name}}"
+          "legendFormat": "Network actual {{host_name}}",
+          "interval": "1m"
         }
       ],
       "fieldConfig": {
@@ -272,17 +277,20 @@
         {
           "refId": "A",
           "expr": "synthetic_latency{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "Latency actual {{host_name}}"
+          "legendFormat": "Latency actual {{host_name}}",
+          "interval": "1m"
         },
         {
           "refId": "D",
           "expr": "synthetic_throughput{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "Throughput actual {{host_name}}"
+          "legendFormat": "Throughput actual {{host_name}}",
+          "interval": "1m"
         },
         {
           "refId": "G",
           "expr": "synthetic_errors{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "Errors actual {{host_name}}"
+          "legendFormat": "Errors actual {{host_name}}",
+          "interval": "1m"
         }
       ],
       "fieldConfig": {
@@ -319,7 +327,8 @@
         {
           "refId": "A",
           "expr": "synthetic_saturation{load_id=~\"${LoadId:regex}\",environment=~\"${Environment:regex}\",host_name=~\"${HostName:regex}\",business_service_id=~\"${ServiceId:regex}\"}",
-          "legendFormat": "Saturation actual {{host_name}}"
+          "legendFormat": "Saturation actual {{host_name}}",
+          "interval": "1m"
         }
       ],
       "fieldConfig": {
