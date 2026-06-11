@@ -235,7 +235,7 @@ from (
   select coalesce(c.ComponentName, rec.RiskId) as HostName, rec.Priority, rec.Action, rec.Rationale as Reason, rec.Status
   from EnterpriseRecommendation rec
   left join EnterpriseRiskRegistryEntry r on r.RiskId = rec.RiskId
-  left join EnterpriseTechnologyComponent c on c.LoadId = rec.LoadId and c.ComponentId = any(string_to_array(r.AffectedTechnologyIds, ','))
+  left join EnterpriseTechnologyComponent c on c.LoadId = rec.LoadId and c.ComponentId = r.AffectedTechnologyId
   where rec.LoadId ~ '^{self.EscapeSqlLiteral(LoadId)}'
 ) Datos
 order by case Priority when 'Critical' then 4 when 'High' then 3 when 'Medium' then 2 else 1 end desc, HostName

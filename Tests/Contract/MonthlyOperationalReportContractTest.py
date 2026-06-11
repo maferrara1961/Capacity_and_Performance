@@ -20,6 +20,8 @@ class MonthlyOperationalReportContractTest(unittest.TestCase):
         self.assertIn("synthetic_cpu", Source)
         self.assertIn("synthetic_ram", Source)
         self.assertIn("platform_container_up", Source)
+        self.assertIn("AffectedTechnologyId", Source)
+        self.assertNotIn("AffectedTechnologyIds", Source)
 
     def test_month_validation_rejects_invalid_format(self) -> None:
         Report = MonthlyOperationalReport()
